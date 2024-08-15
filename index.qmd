@@ -1,11 +1,5 @@
 ---
-title: "is415-handson"
+title: "Hands ON"
 ---
 
-This is a Quarto website.
-
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
-
-```{r}
-1 + 1
-```
+Welcome to **IS415 Geospatial Analytics and Applications**. In this website, you will find my coursework prepared for this course.
