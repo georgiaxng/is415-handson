@@ -1,6 +1,12 @@
 ---
 title: "Hands-On Exercise 1"
 author: "Georgia Ng"
+date: "August 19, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  freeze: true
 ---
 
 ## **1.1 Overview**
