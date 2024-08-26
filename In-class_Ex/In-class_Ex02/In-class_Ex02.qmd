@@ -3,9 +3,18 @@ title: "In Class Exercise 1: Geospatial Data Science"
 author: "Georgia Ng"
 date: "August 19, 2024"
 date-modified: "last-modified"
+format: html
 execute: 
   eval: true
   echo: true
   warning: false
   freeze: true
 ---
+
+```{r}
+pacman::p_load(sf,tidyverse)
+```
+
+```{r}
+mpsz14_shp <- st_
+```
