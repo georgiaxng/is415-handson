@@ -1,5 +1,5 @@
 ---
-title: "Hands-On Exercise 1"
+title: "Hands-On Exercise 1: Geospatial Data Science with R"
 author: "Georgia Ng"
 date: "August 15, 2024"
 date-modified: "last-modified"

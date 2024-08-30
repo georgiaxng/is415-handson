@@ -1,5 +1,10 @@
 ---
 title: "Welcome"
+listing: 
+  contents: 
+    - "Hands-on_Ex/**/*.qmd"
+  sort: "date desc"
+
 execute: 
   eval: true
   echo: true
