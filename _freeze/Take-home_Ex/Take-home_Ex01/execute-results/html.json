@@ -1,0 +1,17 @@
+{
+  "hash": "97de28d1b97473a0096f509913877462",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Take-Home Exercise 1: Geospatial Analytics for Social Good: Application of Spatial and Spatio-temporal Point Patterns Analysis to discover the geographical distribution of Armed Conflict in Myanmar\"\nauthor: \"Georgia Ng\"\ndate: \"September 5, 2024\"\ndate-modified: \"last-modified\"\nexecute: \n  eval: true\n  echo: true\n  warning: false\n  freeze: true\n---\n\n\n## 1.0 Overview\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(sf, spNetwork, tmap, tidyverse)\n```\n:::\n\n\n## 1.1 The Data\n\n## 1.1.1 Importing the data\n\n\n::: {.cell}\n\n```{.r .cell-code}\nmsz_sf <- st_read(dsn=\"data/geospatial/mmr_polbnda2_adm1_250k_mimu_1/\", \n                   layer=\"mmr_polbnda2_adm1_250k_mimu_1\")\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\nReading layer `mmr_polbnda2_adm1_250k_mimu_1' from data source \n  `/Users/georgiaxng/georgiaxng/is415-handson/Take-home_Ex/data/geospatial/mmr_polbnda2_adm1_250k_mimu_1' \n  using driver `ESRI Shapefile'\nSimple feature collection with 18 features and 6 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 92.1721 ymin: 9.696844 xmax: 101.17 ymax: 28.54554\nGeodetic CRS:  WGS 84\n```\n\n\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\ntmap_mode(\"plot\")\ntm_shape(msz_sf) +\n  tm_polygons()\n```\n\n::: {.cell-output-display}\n![](Take-home_Ex01_files/figure-html/unnamed-chunk-3-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "Take-home_Ex01_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

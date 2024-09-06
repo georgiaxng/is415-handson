@@ -1,0 +1,70 @@
+---
+title: "In-class Exercise 3"
+author: "Georgia Ng"
+date: "September 2, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+## 3.1 Overview
+
+## 3.2 Installing the Required Packages
+
+Since maptools is retired and binary is removed from CRAN, we will be downloading it from the posit public package manager snapshots.
+
+> Note: It is important to add `eval:false` in the code chunk as shown below after installation is complete to avoid it being executed every time the quarto document is being rendered.
+
+```{#| eval: false}
+install.packages("maptools",repos = "https://packagemanager.posit.co/cran/2023-10-13")
+```
+
+```{r}
+pacman::p_load(sf,tmap,tidyverse)
+```
+
+## 3.3 The Data
+
+```{r}
+mpsz_sf <- st_read(dsn="data/MasterPlan2014SubzoneBoundaryWebSHP/", 
+                   layer="MP14_SUBZONE_WEB_PL")
+```
+
+The code chunk below, `st_union()` is used to derive the **coastal outline** sf tibble data.frame.
+
+```{r}
+sg_sf <-mpsz_sf %>%
+  st_union()
+```
+
+```{r}
+plot(sg_sf)
+```
+
+## 3.4 Viewing
+
+The below chunk of code imports the ACLED Myanmar data, converts it into a spatial format, changes the coordinate system, and formats the event dates into a standard date format.
+
+```{r}
+acled_sf <- read_csv("data/ACLED_Myanmar.csv") %>% 
+  st_as_sf(coords = c(
+    "longitude", "latitude"), crs = 4326) %>% 
+  st_transform(crs= 32647)%>%
+  mutate(event_date = dmy(event_date))
+```
+
+This code produces an interactive map displaying dots for events in 2023 or classified as "Political violence.
+
+```{r}
+#| eval: false
+tmap_mode('view')
+acled_sf %>%
+  filter(year == 2023 |
+           event_type == "Political violence") %>%
+  tm_shape()+
+  tm_dots()
+tmap_mode('plot')
+```
