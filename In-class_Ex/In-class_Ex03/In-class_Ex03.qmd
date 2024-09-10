@@ -8,6 +8,7 @@ execute:
   echo: true
   warning: false
   freeze: true
+  cache: true
 ---
 
 ## 3.1 Overview
@@ -18,7 +19,8 @@ Since maptools is retired and binary is removed from CRAN, we will be downloadin
 
 > Note: It is important to add `eval:false` in the code chunk as shown below after installation is complete to avoid it being executed every time the quarto document is being rendered.
 
-```{#| eval: false}
+```{r}
+#| eval: false
 install.packages("maptools",repos = "https://packagemanager.posit.co/cran/2023-10-13")
 ```
 

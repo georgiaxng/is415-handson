@@ -149,16 +149,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
-    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex01/In-class_Ex01.html">
- <span class="dropdown-text">In Class Exercise 1</span></a>
-  </li>  
-        <li>
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex02/In-class_Ex02.html">
  <span class="dropdown-text">In Class Exercise 2</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03.html">
  <span class="dropdown-text">In Class Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex04/In-class_Ex04.html">
+ <span class="dropdown-text">In Class Exercise 4</span></a>
   </li>  
     </ul>
   </li>
@@ -199,9 +199,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1.0 Overview</a></li>
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">1.1 The Data</a></li>
-  <li><a href="#importing-the-data" id="toc-importing-the-data" class="nav-link" data-scroll-target="#importing-the-data">1.1.1 Importing the data</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1. Overview</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">1.1 Introduction</a></li>
+  <li><a href="#goal" id="toc-goal" class="nav-link" data-scroll-target="#goal">1.2 Goal</a></li>
+  <li><a href="#importing-of-packages" id="toc-importing-of-packages" class="nav-link" data-scroll-target="#importing-of-packages">1.3 Importing of Packages</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">1.4 The Data</a></li>
+  </ul></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">2. Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#acled-data" id="toc-acled-data" class="nav-link" data-scroll-target="#acled-data">2.1 ACLED data</a>
+  <ul class="collapse">
+  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data">2.1.1 Importing Data</a></li>
+  <li><a href="#data-pruning-and-structuring" id="toc-data-pruning-and-structuring" class="nav-link" data-scroll-target="#data-pruning-and-structuring">2.1.2 Data Pruning and Structuring</a></li>
+  </ul></li>
+  <li><a href="#myanmar-boundary-and-sub-region-dataset-from-mimu" id="toc-myanmar-boundary-and-sub-region-dataset-from-mimu" class="nav-link" data-scroll-target="#myanmar-boundary-and-sub-region-dataset-from-mimu">2.2 Myanmar Boundary and Sub-Region Dataset from MIMU</a></li>
+  <li><a href="#mapping-the-geospatial-data-sets" id="toc-mapping-the-geospatial-data-sets" class="nav-link" data-scroll-target="#mapping-the-geospatial-data-sets">2.3 Mapping the Geospatial data sets</a></li>
+  <li><a href="#myanmar-sub-regions-for-reference-and-context" id="toc-myanmar-sub-regions-for-reference-and-context" class="nav-link" data-scroll-target="#myanmar-sub-regions-for-reference-and-context">2.4 Myanmar Sub-regions: For Reference and Context</a></li>
+  </ul></li>
+  <li><a href="#kernel-density-estimation" id="toc-kernel-density-estimation" class="nav-link" data-scroll-target="#kernel-density-estimation">3. Kernel Density Estimation</a>
+  <ul class="collapse">
+  <li><a href="#creating-owin-object" id="toc-creating-owin-object" class="nav-link" data-scroll-target="#creating-owin-object">3.1 Creating owin object</a></li>
+  <li><a href="#selection-of-sample-data" id="toc-selection-of-sample-data" class="nav-link" data-scroll-target="#selection-of-sample-data">3.2 Selection of Sample Data</a></li>
+  <li><a href="#determining-the-optimal-bandwidth-sigma" id="toc-determining-the-optimal-bandwidth-sigma" class="nav-link" data-scroll-target="#determining-the-optimal-bandwidth-sigma">3.3 Determining the Optimal Bandwidth &amp; Sigma</a>
+  <ul class="collapse">
+  <li><a href="#understanding-sigma-kernel-in-kernel-density-estimation-kde" id="toc-understanding-sigma-kernel-in-kernel-density-estimation-kde" class="nav-link" data-scroll-target="#understanding-sigma-kernel-in-kernel-density-estimation-kde">3.3.1 Understanding Sigma &amp; Kernel in Kernel Density Estimation (KDE)</a></li>
+  <li><a href="#computing-default-kernel-density-estimation" id="toc-computing-default-kernel-density-estimation" class="nav-link" data-scroll-target="#computing-default-kernel-density-estimation">3.3.2 Computing Default Kernel Density Estimation</a></li>
+  </ul></li>
+  <li><a href="#experimenting-with-fixed-bandwidth" id="toc-experimenting-with-fixed-bandwidth" class="nav-link" data-scroll-target="#experimenting-with-fixed-bandwidth">3.4 Experimenting With Fixed Bandwidth</a>
+  <ul class="collapse">
+  <li><a href="#automatic-bandwidth-methods" id="toc-automatic-bandwidth-methods" class="nav-link" data-scroll-target="#automatic-bandwidth-methods">3.4.1 Automatic Bandwidth Methods</a></li>
+  <li><a href="#plotting-kde-for-different-bandwidth-kernel" id="toc-plotting-kde-for-different-bandwidth-kernel" class="nav-link" data-scroll-target="#plotting-kde-for-different-bandwidth-kernel">3.4.2 Plotting KDE for Different Bandwidth &amp; Kernel</a></li>
+  <li><a href="#fine-tuning-kde-parameters" id="toc-fine-tuning-kde-parameters" class="nav-link" data-scroll-target="#fine-tuning-kde-parameters">3.4.3 Fine-Tuning KDE Parameters</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#quarterly-kde-layers-by-event" id="toc-quarterly-kde-layers-by-event" class="nav-link" data-scroll-target="#quarterly-kde-layers-by-event">4. Quarterly KDE Layers By Event</a>
+  <ul class="collapse">
+  <li><a href="#battles" id="toc-battles" class="nav-link" data-scroll-target="#battles">4.1 Battles</a></li>
+  <li><a href="#explosionsremote-violence" id="toc-explosionsremote-violence" class="nav-link" data-scroll-target="#explosionsremote-violence">4.2 Explosions/Remote violence</a></li>
+  <li><a href="#strategic-developments" id="toc-strategic-developments" class="nav-link" data-scroll-target="#strategic-developments">4.3 Strategic developments</a></li>
+  <li><a href="#violence-against-civilians" id="toc-violence-against-civilians" class="nav-link" data-scroll-target="#violence-against-civilians">4.4 Violence against civilians</a></li>
+  </ul></li>
+  <li><a href="#section-4" id="toc-section-4" class="nav-link" data-scroll-target="#section-4"></a></li>
   </ul>
 </nav>
     </div>
@@ -234,7 +273,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 7, 2024</p>
+      <p class="date-modified">September 11, 2024</p>
     </div>
   </div>
     
@@ -245,17 +284,907 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="overview" class="level2">
-<h2 class="anchored" data-anchor-id="overview">1.0 Overview</h2>
+<section id="overview" class="level1">
+<h1>1. Overview</h1>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">1.1 Introduction</h2>
+<!--# BACKGROUND OF MYANMAR CONFLICT HERE -->
+</section>
+<section id="goal" class="level2">
+<h2 class="anchored" data-anchor-id="goal">1.2 Goal</h2>
+<p>We will be focusing on 4 event types: <strong>Battles, Explosion/Remote violence, Strategic developments, and Violence against civilians.</strong></p>
+<ul>
+<li><p>Using appropriate function of <strong>sf</strong> and <strong>tidyverse</strong> packages, import and transform the downloaded armed conflict data and administrative boundary data into sf tibble data.frames.</p></li>
+<li><p>Using the geospatial data sets prepared, derive quarterly KDE layers.</p></li>
+<li><p>Using the geospatial data sets prepared, perform 2nd-Order Spatial Point Patterns Analysis.</p></li>
+<li><p>Using the geospatial data sets prepared, derive quarterly spatio-temporal KDE layers.</p></li>
+<li><p>Using the geospatial data sets prepared, perform 2nd-Order Spatio-temporal Point Patterns Analysis.</p></li>
+<li><p>Using appropriate <strong>tmap</strong> functions, display the KDE and Spatio-temporal KDE layers on openstreetmap of Myanmar.</p></li>
+<li><p>Describe the spatial patterns revealed by the KDE and Spatio-temporal KDE maps.1.1 The Data</p></li>
+</ul>
+</section>
+<section id="importing-of-packages" class="level2">
+<h2 class="anchored" data-anchor-id="importing-of-packages">1.3 Importing of Packages</h2>
+<p>Before we start off, we will have to import the necessary packages required for us to conduct our analysis.</p>
+<p>We will be using the following packages:</p>
+<!--# ADD ON HERE -->
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, spNetwork, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, raster, spNetwork, tmap, tidyverse, RColorBrewer, spatstat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="the-data" class="level2">
-<h2 class="anchored" data-anchor-id="the-data">1.1 The Data</h2>
+<h2 class="anchored" data-anchor-id="the-data">1.4 The Data</h2>
+<p>For the purpose of this study, we will be using the following datasets. Particularly, I will be focusing on the quarterly armed conflict events from January 2021 until June 2024.</p>
+<ul>
+<li><p>Armed Conflict Location &amp; Event Data of Myanmar between Jan 2021 to Jun 2024 from <a href="https://acleddata.com/">Armed Conflict Location &amp; Event Data (ACLED)</a>, an independent, impartial, international non-profit organization collecting data on violent conflict and protest in all countries and territories in the world.</p></li>
+<li><p>Myanmar State and Region Boundaries with Sub-region from <a href="http://www.themimu.info/">Myanmar Information Management Unit, MIMU</a></p></li>
+</ul>
 </section>
-<section id="importing-the-data" class="level2">
-<h2 class="anchored" data-anchor-id="importing-the-data">1.1.1 Importing the data</h2>
+</section>
+<section id="data-wrangling" class="level1">
+<h1>2. Data Wrangling</h1>
+<section id="acled-data" class="level2">
+<h2 class="anchored" data-anchor-id="acled-data">2.1 ACLED data</h2>
+<section id="importing-data" class="level3">
+<h3 class="anchored" data-anchor-id="importing-data">2.1.1 Importing Data</h3>
+<p>The below chunk of code is used to import ACLED conflict data from a CSV file and convert it into a geospatial data frame using longitude and latitude as coordinates.</p>
+<p>In order to perform geoprocessing using two geospatial data, we need to ensure that both geospatial data are projected using similar coordinate system which is why in this case we will project it to <code>WGS84</code> with the crs code of <code>32647</code> using <code>st_transform</code>.</p>
+<p>Since the column <code>event_date</code> was stored as characters, <code>dmy()</code> is also used to format the <code>event_date</code> column into a standardized date format for further analysis.</p>
+<blockquote class="blockquote">
+<p><code>st_as_sf</code> is used to convert a data frame or other tabular data (like from CSVs, data frames, or tibbles) into a simple features (sf) object.</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>acled_sf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/2021-01-01-2024-06-30-Myanmar.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"longitude"</span>, <span class="st">"latitude"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs=</span> <span class="dv">32647</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_date =</span> <span class="fu">dmy</span>(event_date))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, let us check the CRS again by using the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(acled_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: EPSG:32647 
+  wkt:
+PROJCRS["WGS 84 / UTM zone 47N",
+    BASEGEOGCRS["WGS 84",
+        ENSEMBLE["World Geodetic System 1984 ensemble",
+            MEMBER["World Geodetic System 1984 (Transit)"],
+            MEMBER["World Geodetic System 1984 (G730)"],
+            MEMBER["World Geodetic System 1984 (G873)"],
+            MEMBER["World Geodetic System 1984 (G1150)"],
+            MEMBER["World Geodetic System 1984 (G1674)"],
+            MEMBER["World Geodetic System 1984 (G1762)"],
+            MEMBER["World Geodetic System 1984 (G2139)"],
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]],
+            ENSEMBLEACCURACY[2.0]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4326]],
+    CONVERSION["UTM zone 47N",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",0,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",99,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",0.9996,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",500000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",0,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["(E)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["(N)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["Engineering survey, topographic mapping."],
+        AREA["Between 96°E and 102°E, northern hemisphere between equator and 84°N, onshore and offshore. China. Indonesia. Laos. Malaysia - West Malaysia. Mongolia. Myanmar (Burma). Russian Federation. Thailand."],
+        BBOX[0,96,84,102]],
+    ID["EPSG",32647]]</code></pre>
+</div>
+</div>
+</section>
+<section id="data-pruning-and-structuring" class="level3">
+<h3 class="anchored" data-anchor-id="data-pruning-and-structuring">2.1.2 Data Pruning and Structuring</h3>
+<section id="extracting-data-for-the-4-main-event-types" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-data-for-the-4-main-event-types">2.1.2.1 Extracting Data for the 4 Main Event Types</h4>
+<p>Since the data we have encapsulates all 6 types of events and we are only focusing on the 4 event types that I have indicated above, we will only be extracting the data related to that.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>acled_sf <span class="ot">&lt;-</span> acled_sf <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(event_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Battles"</span>, <span class="st">"Strategic developments"</span>, <span class="st">"Violence against civilians"</span>, <span class="st">"Explosions/Remote violence"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Using <code>unique()</code>, we can check that only rows that fall under the 4 event types have been kept.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(acled_sf<span class="sc">$</span>event_type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Battles"                    "Strategic developments"    
+[3] "Violence against civilians" "Explosions/Remote violence"</code></pre>
+</div>
+</div>
+</section>
+<section id="data-transformation-for-quarterly-analysis" class="level4">
+<h4 class="anchored" data-anchor-id="data-transformation-for-quarterly-analysis">2.1.2.2 Data Transformation for Quarterly Analysis</h4>
+<p>Since we will be analyzing it by quarters, let’s use <code>mutate()</code> to extract the information. Using <code>quarter()</code> from the <code>lubridate</code> package, we can derive the quarters from the event_date.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>acled_sf <span class="ot">&lt;-</span> acled_sf <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">quarter =</span> <span class="fu">quarter</span>(event_date))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Using <code>colnames()</code> we can see that the new column <code>quarter</code> is added.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(acled_sf) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "event_id_cnty"      "event_date"         "year"              
+ [4] "time_precision"     "disorder_type"      "event_type"        
+ [7] "sub_event_type"     "actor1"             "assoc_actor_1"     
+[10] "inter1"             "actor2"             "assoc_actor_2"     
+[13] "inter2"             "interaction"        "civilian_targeting"
+[16] "iso"                "region"             "country"           
+[19] "admin1"             "admin2"             "admin3"            
+[22] "location"           "geo_precision"      "source"            
+[25] "source_scale"       "notes"              "fatalities"        
+[28] "tags"               "timestamp"          "geometry"          
+[31] "quarter"           </code></pre>
+</div>
+</div>
+</section>
+<section id="removal-of-redundant-columns" class="level4">
+<h4 class="anchored" data-anchor-id="removal-of-redundant-columns">2.1.2.3 Removal of Redundant Columns</h4>
+<p>To enhance the efficiency of our dataset, we will also remove redundant columns. This practice reduces memory usage and processing time while simplifying the analysis. By focusing on only the relevant data, we minimize complexity and ensure clearer, more focused results. Examples of the columns we will be removing are: <code>time_precision</code>, <code>inter1</code> etc. With this, we are able to reduce to a total of <strong>20</strong> columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define columns to be removed</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>columns_to_remove <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"time_precision"</span>, <span class="st">"inter1"</span>, <span class="st">"inter2"</span>, <span class="st">"iso"</span>, <span class="st">"source"</span>, <span class="st">"source_scale"</span>, <span class="st">"notes"</span>, <span class="st">"tags"</span>, <span class="st">"region"</span>, <span class="st">"geo_precision"</span>, <span class="st">"source_scale"</span>,<span class="st">"country"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove columns only if they exist in the dataframe</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>acled_sf <span class="ot">&lt;-</span> acled_sf <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">all_of</span>(columns_to_remove[columns_to_remove <span class="sc">%in%</span> <span class="fu">names</span>(acled_sf)]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This is an overview of all the columns left:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(acled_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "event_id_cnty"      "event_date"         "year"              
+ [4] "disorder_type"      "event_type"         "sub_event_type"    
+ [7] "actor1"             "assoc_actor_1"      "actor2"            
+[10] "assoc_actor_2"      "interaction"        "civilian_targeting"
+[13] "admin1"             "admin2"             "admin3"            
+[16] "location"           "fatalities"         "timestamp"         
+[19] "geometry"           "quarter"           </code></pre>
+</div>
+</div>
+</section>
+<section id="grouping-of-data-by-year-quarter-event-type" class="level4">
+<h4 class="anchored" data-anchor-id="grouping-of-data-by-year-quarter-event-type">2.1.2.4 Grouping of Data By Year, Quarter, Event Type</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>grped_acled_sf <span class="ot">&lt;-</span> acled_sf <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, quarter, event_type) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">event_count =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="myanmar-boundary-and-sub-region-dataset-from-mimu" class="level2">
+<h2 class="anchored" data-anchor-id="myanmar-boundary-and-sub-region-dataset-from-mimu">2.2 Myanmar Boundary and Sub-Region Dataset from MIMU</h2>
+<p>The code chunk below uses <em><code>st_read()</code></em> function of <strong>sf</strong> package to import <code>mmr_polbnda2_adm1_250k_mimu_1</code> shapefile into R as a polygon feature data frame.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>mmrsr_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial/mmr_polbnda2_adm1_250k_mimu_1/"</span>, </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">layer=</span><span class="st">"mmr_polbnda2_adm1_250k_mimu_1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `mmr_polbnda2_adm1_250k_mimu_1' from data source 
+  `/Users/georgiaxng/georgiaxng/is415-handson/Take-home_Ex/Take-home_Ex01/data/geospatial/mmr_polbnda2_adm1_250k_mimu_1' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 18 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 92.1721 ymin: 9.696844 xmax: 101.17 ymax: 28.54554
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<p>As shown below, currently the data is in geographic coordinate system (latitude/longitude), we will need to transform it to a projected CRS before proceeding.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(mmrsr_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: WGS 84 
+  wkt:
+GEOGCRS["WGS 84",
+    DATUM["World Geodetic System 1984",
+        ELLIPSOID["WGS 84",6378137,298.257223563,
+            LENGTHUNIT["metre",1]],
+        ID["EPSG",6326]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433],
+        ID["EPSG",8901]],
+    CS[ellipsoidal,2],
+        AXIS["geodetic longitude",east,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["geodetic latitude",north,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]]]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mmrsr_sf <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(mmrsr_sf, <span class="at">crs =</span> <span class="dv">32647</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(mmrsr_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: EPSG:32647 
+  wkt:
+PROJCRS["WGS 84 / UTM zone 47N",
+    BASEGEOGCRS["WGS 84",
+        ENSEMBLE["World Geodetic System 1984 ensemble",
+            MEMBER["World Geodetic System 1984 (Transit)"],
+            MEMBER["World Geodetic System 1984 (G730)"],
+            MEMBER["World Geodetic System 1984 (G873)"],
+            MEMBER["World Geodetic System 1984 (G1150)"],
+            MEMBER["World Geodetic System 1984 (G1674)"],
+            MEMBER["World Geodetic System 1984 (G1762)"],
+            MEMBER["World Geodetic System 1984 (G2139)"],
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]],
+            ENSEMBLEACCURACY[2.0]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4326]],
+    CONVERSION["UTM zone 47N",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",0,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",99,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",0.9996,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",500000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",0,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["(E)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["(N)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["Engineering survey, topographic mapping."],
+        AREA["Between 96°E and 102°E, northern hemisphere between equator and 84°N, onshore and offshore. China. Indonesia. Laos. Malaysia - West Malaysia. Mongolia. Myanmar (Burma). Russian Federation. Thailand."],
+        BBOX[0,96,84,102]],
+    ID["EPSG",32647]]</code></pre>
+</div>
+</div>
+<p>To check that all the spatial objects are valid, <code>st_is_valid()</code> is utilized. As shown below, all of the objects are valid.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_is_valid</span>(mmrsr_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+[16] TRUE TRUE TRUE</code></pre>
+</div>
+</div>
+<p>This is a brief overview of how the map of Myanmar looks like.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mmrsr_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="mapping-the-geospatial-data-sets" class="level2">
+<h2 class="anchored" data-anchor-id="mapping-the-geospatial-data-sets">2.3 Mapping the Geospatial data sets</h2>
+<p>Now, let’s plot the spatial map to gain an initial understanding of the geographic distribution of all of the 4 conflict events by year. As observed, with such a large volume of data, identifying patterns through visual inspection alone can be challenging. This highlights the importance of conducting further analysis to uncover trends and achieve a deeper understanding of the spatial dynamics of these events.</p>
+<p>From a brief examination of the map, it’s evident that the region south of Sagaing exhibits the highest concentration of conflicts overall. This area shows a notably higher density of conflict events compared to other regions, marking it as a significant hotspot. However, to fully grasp these patterns and their implications, additional analysis is needed.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">2023</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">2024</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter data for 2021</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>acled_2021 <span class="ot">&lt;-</span> acled_sf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2021</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot map for 2021</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mmrsr_sf) <span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span> </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(acled_2021) <span class="sc">+</span> </span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>() <span class="sc">+</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"ACLED Conflict Events in 2021"</span>, <span class="at">main.title.size =</span> <span class="fl">1.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter data for 2022</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>acled_2022 <span class="ot">&lt;-</span> acled_sf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2022</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot map for 2022</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mmrsr_sf) <span class="sc">+</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span> </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(acled_2022) <span class="sc">+</span> </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>() <span class="sc">+</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"ACLED Conflict Events in 2022"</span>, <span class="at">main.title.size =</span> <span class="fl">1.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter data for 2023</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>acled_2023 <span class="ot">&lt;-</span> acled_sf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2023</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot map for 2023</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mmrsr_sf) <span class="sc">+</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(acled_2023) <span class="sc">+</span> </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>() <span class="sc">+</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"ACLED Conflict Events in 2023"</span>, <span class="at">main.title.size =</span> <span class="fl">1.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter data for 2024</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>acled_2024 <span class="ot">&lt;-</span> acled_sf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2024</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot map for 2024</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mmrsr_sf) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span> </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(acled_2024) <span class="sc">+</span> </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>() <span class="sc">+</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"ACLED Conflict Events in 2024"</span>, <span class="at">main.title.size =</span> <span class="fl">1.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="myanmar-sub-regions-for-reference-and-context" class="level2">
+<h2 class="anchored" data-anchor-id="myanmar-sub-regions-for-reference-and-context">2.4 Myanmar Sub-regions: For Reference and Context</h2>
+<p>For reference to the different sub-regions in Myanmar, we can refer to the labelled map plotted below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>num_colors <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(mmrsr_sf<span class="sc">$</span>ST))</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">brewer.pal</span>(<span class="at">n =</span> num_colors, <span class="at">name =</span> <span class="st">"Set3"</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mmrsr_sf) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"ST"</span>, <span class="at">palette =</span> colors) <span class="sc">+</span>  <span class="co"># Apply color palette to polygons</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_text</span>(<span class="st">"ST"</span>, <span class="at">size =</span> <span class="fl">0.8</span>, <span class="at">col =</span> <span class="st">"black"</span>, <span class="at">bg.color =</span> <span class="st">"white"</span>, <span class="at">just =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"center"</span>),  <span class="at">xmod =</span> <span class="dv">0</span>, <span class="at">ymod =</span> <span class="dv">0</span>) <span class="sc">+</span> <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Myanmar"</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">1.6</span>,</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.outside =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">TRUE</span>)<span class="sc">+</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"Sub-regions"</span>)  <span class="co"># Set custom legend title</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="kernel-density-estimation" class="level1">
+<h1>3. Kernel Density Estimation</h1>
+<p>To analyze and find the trends in the spatial distribution of conflict events in Myanmar, we will be using <strong>Kernel Density Estimation (KDE)</strong>. KDE is a non-parametric way to estimate the probability density function of a random variable, making it particularly useful in spatial analysis for identifying areas with high concentrations of events.</p>
+<p>To determine the optimal bandwidth and kernel parameters for KDE, we will be using a sample of the data. By focusing on a smaller subset, such as specific event types or time periods, we can efficiently explore different parameter combinations and choose the one that provides the most meaningful results before scaling the analysis to the entire dataset.</p>
+<section id="creating-owin-object" class="level2">
+<h2 class="anchored" data-anchor-id="creating-owin-object">3.1 Creating owin object</h2>
+<p>To improve the accuracy of our spatial analysis, we will exclude the smaller islands that are too minor to contribute meaningfully to the Kernel Density Estimation (KDE). We will focus on the main island by merging the geometry and selecting the relevant polygon.</p>
+<p>Here, we combine all the intersecting geometries in <code>mmrsr_sf</code> into a single polygon and then select the row with the highest number of features (aka the main island).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>merged_mmr <span class="ot">&lt;-</span> <span class="fu">st_union</span>(mmrsr_sf) <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_cast</span>(<span class="st">"POLYGON"</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>merged_mmr <span class="ot">&lt;-</span> merged_mmr[<span class="fu">c</span>(<span class="dv">9</span>)]</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>mmr_owin <span class="ot">&lt;-</span> <span class="fu">as.owin</span>(merged_mmr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here is the plot of the main island, without its outer islands.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mmr_owin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="selection-of-sample-data" class="level2">
+<h2 class="anchored" data-anchor-id="selection-of-sample-data">3.2 Selection of Sample Data</h2>
+<p>To choose a representative sample, we will first calculate the median number of data points across different groupings, such as year, quarter, and event type. This will help us understand the typical size of our data subsets. Using this median value, we will identify the subset of data with an <code>event_count</code> closest to this median.</p>
+<p>By selecting a sample that aligns with this typical value, we ensure that our sample accurately reflects the general distribution of the dataset. We will then use this representative sample to determine the optimal parameters for Kernel Density Estimation (KDE), such as bandwidth and kernel type. This approach will help us achieve more reliable and meaningful results in our spatial analysis.</p>
+<p>Here is the R code to select the representative sample. In this case, the resulting sample data we have arrived at is for <strong>“Battles” in the second quarter of 2023</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate mean and median of event counts</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>median_event_count <span class="ot">&lt;-</span> <span class="fu">median</span>(grped_acled_sf<span class="sc">$</span>event_count)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the row with event_count closest to the median</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>sample_acled_sf <span class="ot">&lt;-</span> grped_acled_sf <span class="sc">%&gt;%</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">distance_to_median =</span> <span class="fu">abs</span>(event_count <span class="sc">-</span> median_event_count)) <span class="sc">%&gt;%</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(distance_to_median) <span class="sc">%&gt;%</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>)</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the closest row(s)</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>sample_acled_sf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 1 feature and 5 fields
+Geometry type: MULTIPOINT
+Dimension:     XY
+Bounding box:  xmin: -174035.7 ymin: 1103500 xmax: 518300.4 ymax: 3006373
+Projected CRS: WGS 84 / UTM zone 47N
+# A tibble: 1 × 6
+   year quarter event_type event_count                                  geometry
+  &lt;dbl&gt;   &lt;int&gt; &lt;chr&gt;            &lt;int&gt;                          &lt;MULTIPOINT [m]&gt;
+1  2023       2 Battles            814 ((-174035.7 2284958), (-152179.1 2277258…
+# ℹ 1 more variable: distance_to_median &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>Here, we converted the representative sample data to <code>ppp</code> format and checked for duplicates. In this case, no duplicates were found, confirming the integrity of our sample for further KDE analysis.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sample_acled_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_coordinates</span>(sample_acled_sf),<span class="fu">st_bbox</span>(sample_acled_sf))</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">any</span>(<span class="fu">duplicated</span>(sample_acled_ppp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>sample_acled_ppp <span class="ot">&lt;-</span> sample_acled_ppp[mmr_owin]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>An overview of the point pattern plot for the sample data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sample_acled_ppp, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="determining-the-optimal-bandwidth-sigma" class="level2">
+<h2 class="anchored" data-anchor-id="determining-the-optimal-bandwidth-sigma">3.3 Determining the Optimal Bandwidth &amp; Sigma</h2>
+<section id="understanding-sigma-kernel-in-kernel-density-estimation-kde" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-sigma-kernel-in-kernel-density-estimation-kde">3.3.1 Understanding Sigma &amp; Kernel in Kernel Density Estimation (KDE)</h3>
+<p><strong>Kernel:</strong></p>
+<p>The <strong>kernel</strong> in Kernel Density Estimation (KDE) is a smoothing function that estimates the probability density function of a dataset. The choice of kernel function affects how the smoothing is applied to each data point. Common kernels include:</p>
+<ul>
+<li><p><strong>Gaussian Kernel</strong>: Assumes a normal distribution around each data point, providing a smooth, continuous density estimate.</p></li>
+<li><p><strong>Epanechnikov Kernel</strong>: Parabolic in shape, it minimizes mean squared error but is less smooth than Gaussian.</p></li>
+<li><p><strong>Uniform Kernel</strong>: Assumes constant density within a fixed distance around each data point, simpler but less smooth.</p></li>
+<li><p><strong>Triangular Kernel</strong>: Offers a clear density representation with sharp edges but less smoothness.</p></li>
+</ul>
+<p>The choice of kernel affects the density estimate’s smoothness and shape, with the Gaussian kernel being a versatile and commonly used option.</p>
+<p><strong>Sigma:</strong></p>
+<p>The <strong>sigma</strong> argument in the density() function represents the bandwidth of the kernel in KDE. It controls the level of smoothing applied to the density estimate:</p>
+<ul>
+<li><p><strong>What Sigma Represents</strong>: Sigma defines the standard deviation of the kernel function, determining the width of the “smoothing window” around each data point.</p></li>
+<li><p><strong>Effect on KDE</strong>:</p>
+<ul>
+<li><p><strong>Smaller Sigma</strong>: Leads to less smoothing, producing a more sensitive and detailed density plot, but can highlight noise.</p></li>
+<li><p><strong>Larger Sigma</strong>: Results in greater smoothing, providing a broader view of density but might obscure finer details.</p></li>
+</ul></li>
+<li><p><strong>Choosing Sigma</strong>: An appropriate sigma balances detail and smoothness. Methods like <code>bw.diggle</code>, <code>bw.ppl</code>, and <code>bw.scott</code> can help determine the optimal sigma value.</p></li>
+</ul>
+<p>In summary, the kernel determines the density estimate’s shape, while sigma controls the smoothing level. Both are crucial for accurately reflecting the spatial distribution of data, and selecting the right parameters is essential for meaningful KDE results.</p>
+</section>
+<section id="computing-default-kernel-density-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="computing-default-kernel-density-estimation">3.3.2 Computing Default Kernel Density Estimation</h3>
+<p>First, since the original data is in meters, we need to rescale it to kilometers to facilitate more meaningful spatial analysis and visualization. By converting the units to kilometers, we ensure that the scale of the Kernel Density Estimation (KDE) and subsequent analyses align with the geographical extent of the study area.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sample_acled_ppp.km <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(sample_acled_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To visualize the spatial distribution of conflict events, here is the Kernel Density Estimation (KDE) plot generated using the default settings, as shown in the code. While default settings can be sufficient for some analyses, the resulting KDE plot here appears oversmoothed, which may obscure finer details and potential small-scale clusters.</p>
+<p>This oversmoothing effect reduces the ability to detect subtle patterns in the conflict events, highlighting the importance of adjusting parameters like bandwidth (<code>sigma</code>) to better capture the underlying spatial structure. Thus, to improve the accuracy and granularity of the KDE, we will need to continue experimenting with different bandwidth values and kernel functions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>kde_default_destination <span class="ot">&lt;-</span> <span class="fu">density</span>(sample_acled_ppp.km)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_default_destination,<span class="at">main =</span> <span class="st">"Default Density KDE for ACLED Myanmar 2023 Q2 'Battles'"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="experimenting-with-fixed-bandwidth" class="level2">
+<h2 class="anchored" data-anchor-id="experimenting-with-fixed-bandwidth">3.4 Experimenting With Fixed Bandwidth</h2>
+<p>To effectively choose the appropriate bandwidth for Kernel Density Estimation (KDE), several automatic bandwidth selection methods can be employed. Each method has its own approach and focus, which can significantly impact the resulting density estimate. Below are brief descriptions of four common bandwidth selection methods:</p>
+<ul>
+<li><p><strong>bw.CvL</strong>: Calculates bandwidth using cross-validation to minimize the integrated mean squared error (IMSE) of the density estimate. This method aims to balance detail and smoothness by optimizing the bandwidth based on a global error metric, which might lead to a broad smoothing effect.</p></li>
+<li><p><strong>bw.scott</strong>: Applies a rule-of-thumb bandwidth based on the sample size and dimensionality of the data. This method is often effective for larger datasets, providing a more generalized estimate by assuming isotropic smoothing (uniform smoothing in all directions).</p></li>
+<li><p><strong>bw.ppl</strong>: Uses a bandwidth tailored for point pattern analysis, considering the spatial distribution of data points. This approach focuses on capturing local variations and spatial patterns, resulting in a more localized smoothing effect compared to other methods.</p></li>
+<li><p><strong>bw.diggle</strong>: Employs a method specifically designed for point patterns to minimize the variance of the density estimate. This results in a smaller bandwidth, leading to a finer and more detailed density plot that may capture small-scale variations but could also emphasize noise.</p></li>
+</ul>
+<section id="automatic-bandwidth-methods" class="level3">
+<h3 class="anchored" data-anchor-id="automatic-bandwidth-methods">3.4.1 Automatic Bandwidth Methods</h3>
+<p>Lets begin by examining the bandwidth values obtained from various automatic bandwidth selection methods using the following code snippet.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bw.ppl</span>(sample_acled_ppp.km)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sigma 
+21.20514 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bw.diggle</span>(sample_acled_ppp.km)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sigma 
+8.459462 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bw.CvL</span>(sample_acled_ppp.km)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sigma 
+90.92206 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bw.scott</span>(sample_acled_ppp.km)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sigma.x   sigma.y 
+ 51.29856 133.58599 </code></pre>
+</div>
+</div>
+<p>Based on the sigma values obtained from the automatic bandwidth calculation methods, we can draw the following inferences about the Kernel Density Estimation (KDE) for the sample data:</p>
+<ul>
+<li><p><strong>bw.ppl: sigma = 21.21</strong><br>
+A smaller sigma value suggests a more localized smoothing effect. This method is designed for point pattern analysis and aims to capture spatial patterns with greater precision, highlighting finer details within the data.</p></li>
+<li><p><strong>bw.diggle: sigma = 8.46</strong><br>
+As the smallest sigma value, it implies a very narrow smoothing window. This method focuses on minimizing variance and tends to produce a detailed density plot. However, it may also accentuate noise or small fluctuations in the data.</p></li>
+<li><p><strong>bw.CvL: sigma = 90.92</strong><br>
+This large value indicates a broad smoothing window. Consequently, each data point affects a wide surrounding area, leading to a smoother KDE that may obscure fine details and small-scale variations.</p></li>
+<li><p><strong>bw.scott: sigma.x = 51.30, sigma.y = 133.59</strong><br>
+The method provides different bandwidths for the x and y dimensions, suggesting anisotropic smoothing. The significant difference between these values indicates varying spatial variations in different directions, with a broader smoothing effect along the y-direction.</p></li>
+</ul>
+</section>
+<section id="plotting-kde-for-different-bandwidth-kernel" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-kde-for-different-bandwidth-kernel">3.4.2 Plotting KDE for Different Bandwidth &amp; Kernel</h3>
+<p>To better understand these differences, we will plot the KDE results using each bandwidth value and different kernels. This visual comparison will help us assess how each bandwidth setting and kernel type influences the density estimates, allowing us to determine which combination provides the most meaningful representation of our data.</p>
+<p>In practice, choosing the optimal KDE bandwidth is not straightforward, as there is no one-size-fits-all approach. Many studies emphasize that determining the best bandwidth often relies on visually comparing various settings and kernel types to assess their effectiveness and select the most appropriate one for the specific data at hand.</p>
+<section id="overview-of-kde-maps-with-gaussian-kernel-and-various-bandwidths" class="level4">
+<h4 class="anchored" data-anchor-id="overview-of-kde-maps-with-gaussian-kernel-and-various-bandwidths">3.4.2.1 Overview of KDE Maps with Gaussian Kernel and Various Bandwidths</h4>
+<p>Here is an overview of how in general the KDE maps generated with the respective bandwidths looks like using the Gaussian kernel.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>kde_diggle <span class="ot">&lt;-</span> <span class="fu">density</span>(sample_acled_ppp.km, <span class="fu">bw.diggle</span>(sample_acled_ppp.km))</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>kde_CvL <span class="ot">&lt;-</span> <span class="fu">density</span>(sample_acled_ppp.km, <span class="fu">bw.CvL</span>(sample_acled_ppp.km))</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>kde_scott <span class="ot">&lt;-</span> <span class="fu">density</span>(sample_acled_ppp.km, <span class="fu">bw.scott</span>(sample_acled_ppp.km))</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>kde_ppl <span class="ot">&lt;-</span> <span class="fu">density</span>(sample_acled_ppp.km, <span class="fu">bw.ppl</span>(sample_acled_ppp.km))</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="fl">1.5</span>),<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_diggle,<span class="at">main =</span> <span class="st">"kde_diggle"</span>)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_CvL,<span class="at">main =</span> <span class="st">"kde_CvL"</span>)</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_scott,<span class="at">main =</span> <span class="st">"kde_scott"</span>)</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_ppl,<span class="at">main =</span> <span class="st">"kde_ppl"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="comparing-kde-results-across-different-bandwidths-and-kernels" class="level4">
+<h4 class="anchored" data-anchor-id="comparing-kde-results-across-different-bandwidths-and-kernels">3.4.2.2 Comparing KDE Results Across Different Bandwidths and Kernels</h4>
+<p>The code chunk below plots different KDE plots for a various different pairings of kernels and bandwidths.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">bw.ppl</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">bw.diggle</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">bw.CvL</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">bw.scott</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.ppl, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main=</span><span class="st">"Gaussian"</span>)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.ppl, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"epanechnikov"</span>), <span class="at">main=</span><span class="st">"Epanechnikov"</span>)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.ppl, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"quartic"</span>), <span class="at">main=</span><span class="st">"Quartic"</span>)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.ppl, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"disc"</span>), <span class="at">main=</span><span class="st">"Disc"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.diggle, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main=</span><span class="st">"Gaussian"</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.diggle, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"epanechnikov"</span>), <span class="at">main=</span><span class="st">"Epanechnikov"</span>)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.diggle, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"quartic"</span>), <span class="at">main=</span><span class="st">"Quartic"</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.diggle, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"disc"</span>), <span class="at">main=</span><span class="st">"Disc"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.CvL, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main=</span><span class="st">"Gaussian"</span>)</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.CvL, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"epanechnikov"</span>), <span class="at">main=</span><span class="st">"Epanechnikov"</span>)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.CvL, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"quartic"</span>), <span class="at">main=</span><span class="st">"Quartic"</span>)</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.CvL, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"disc"</span>), <span class="at">main=</span><span class="st">"Disc"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.scott, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main=</span><span class="st">"Gaussian"</span>)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.scott, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"epanechnikov"</span>), <span class="at">main=</span><span class="st">"Epanechnikov"</span>)</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.scott, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"quartic"</span>), <span class="at">main=</span><span class="st">"Quartic"</span>)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>bw.scott, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"disc"</span>), <span class="at">main=</span><span class="st">"Disc"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>After evaluating the KDE plots, I opted for the Gaussian kernel with the bandwidth provided by <code>bw.ppl</code> because this method provided a more localized smoothing effect, better capturing the spatial patterns in the data. In comparison, the <code>bw.CvL</code> method yielded a much larger bandwidth, leading to excessive smoothing, while <code>bw.scott</code> showed considerable disparity between x and y dimensions, suggesting anisotropic smoothing. The <code>bw.diggle</code> method, though precise, resulted in very narrow smoothing that might overemphasize noise.</p>
+<p>Despite this, I found that the Gaussian KDE with <code>bw.ppl</code> still appeared to be undersmoothed. Consequently, further optimization is necessary to refine the bandwidth setting and achieve a more balanced density estimate that accurately represents the underlying spatial patterns in the data.</p>
+<hr>
+</section>
+</section>
+<section id="fine-tuning-kde-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="fine-tuning-kde-parameters">3.4.3 Fine-Tuning KDE Parameters</h3>
+<p>Since the Gaussian KDE using <code>bw.ppl</code> seems to be undersmoothed, we will need to adjust the sigma to achieve the desired results. To address this undersmoothing issue, we can increase the sigma value to widen the smoothing window, as demonstrated below. Through continued experimentation, we have determined these final parameters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>adjusted_bw <span class="ot">&lt;-</span> <span class="fu">bw.ppl</span>(sample_acled_ppp.km) <span class="sc">*</span> <span class="fl">1.5</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>kde_adjusted <span class="ot">&lt;-</span> <span class="fu">density</span>(sample_acled_ppp.km, <span class="at">sigma=</span>adjusted_bw, <span class="at">edge=</span><span class="cn">TRUE</span>, <span class="at">kernel=</span><span class="st">"gaussian"</span>)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_adjusted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Here is a comparison between the point pattern and the KDE plot of the sample data, this comparison allows us to evaluate how effectively the KDE captures the spatial distribution of the events and highlights areas where the KDE might need further refinement.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sample_acled_ppp, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>) </span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_adjusted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Value of the adjusted bandwidth:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>adjusted_bw</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sigma 
+31.80771 </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="quarterly-kde-layers-by-event" class="level1">
+<h1>4. Quarterly KDE Layers By Event</h1>
+<!--# TALK ABOUT WHY BY EVENT, WHAT WE MIGHT BE ABLE TO INFER FROM THIS ETC -->
+<section id="battles" class="level2">
+<h2 class="anchored" data-anchor-id="battles">4.1 Battles</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">4</span>))</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  battle_data <span class="ot">&lt;-</span> grped_acled_sf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(event_type <span class="sc">==</span> <span class="st">"Battles"</span>)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop through each combination of year and quarter</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(battle_data))) {</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    filtered_sf <span class="ot">&lt;-</span> battle_data[i, ]</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract the current year, quarter, and event type</span></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>    current_year <span class="ot">&lt;-</span> filtered_sf<span class="sc">$</span>year</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>    current_quarter <span class="ot">&lt;-</span> filtered_sf<span class="sc">$</span>quarter</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to ppp object</span></span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>    filtered_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_coordinates</span>(filtered_sf), <span class="fu">st_bbox</span>(filtered_sf))</span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">any</span>(<span class="fu">duplicated</span>(filtered_ppp))){</span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rjitter</span>(filtered_ppp, <span class="at">retry=</span><span class="cn">TRUE</span>, <span class="at">nsim=</span><span class="dv">1</span>, <span class="at">drop=</span><span class="cn">TRUE</span>)</span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a>    filtered_ppp <span class="ot">&lt;-</span> filtered_ppp[mmr_owin]</span>
+<span id="cb56-20"><a href="#cb56-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rescale to kilometres</span></span>
+<span id="cb56-21"><a href="#cb56-21" aria-hidden="true" tabindex="-1"></a>    filtered_ppp.km <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(filtered_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb56-22"><a href="#cb56-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb56-23"><a href="#cb56-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Conduct KDE with the chosen bandwidth</span></span>
+<span id="cb56-24"><a href="#cb56-24" aria-hidden="true" tabindex="-1"></a>    kde_result <span class="ot">&lt;-</span> <span class="fu">density</span>(filtered_ppp.km, <span class="at">sigma =</span> adjusted_bw, <span class="at">edge =</span> <span class="cn">TRUE</span>, <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
+<span id="cb56-25"><a href="#cb56-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb56-26"><a href="#cb56-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot the KDE</span></span>
+<span id="cb56-27"><a href="#cb56-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span>(kde_result, <span class="at">main =</span> <span class="fu">paste</span>(current_year, <span class="st">" Q"</span>, current_quarter, <span class="at">sep =</span> <span class="st">""</span>))</span>
+<span id="cb56-28"><a href="#cb56-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="explosionsremote-violence" class="level2">
+<h2 class="anchored" data-anchor-id="explosionsremote-violence">4.2 Explosions/Remote violence</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">4</span>))</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  explosions_data <span class="ot">&lt;-</span> grped_acled_sf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(event_type <span class="sc">==</span> <span class="st">"Explosions/Remote violence"</span>)</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop through each combination of year and quarter</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(explosions_data))) {</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>    filtered_sf <span class="ot">&lt;-</span> explosions_data[i, ]</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract the current year, quarter, and event type</span></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>    current_year <span class="ot">&lt;-</span> filtered_sf<span class="sc">$</span>year</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>    current_quarter <span class="ot">&lt;-</span> filtered_sf<span class="sc">$</span>quarter</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to ppp object</span></span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>    filtered_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_coordinates</span>(filtered_sf), <span class="fu">st_bbox</span>(filtered_sf))</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">any</span>(<span class="fu">duplicated</span>(filtered_ppp))){</span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rjitter</span>(filtered_ppp, <span class="at">retry=</span><span class="cn">TRUE</span>, <span class="at">nsim=</span><span class="dv">1</span>, <span class="at">drop=</span><span class="cn">TRUE</span>)</span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>    filtered_ppp <span class="ot">&lt;-</span> filtered_ppp[mmr_owin]</span>
+<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rescale to kilometres</span></span>
+<span id="cb57-21"><a href="#cb57-21" aria-hidden="true" tabindex="-1"></a>    filtered_ppp.km <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(filtered_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb57-22"><a href="#cb57-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb57-23"><a href="#cb57-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Conduct KDE with the chosen bandwidth</span></span>
+<span id="cb57-24"><a href="#cb57-24" aria-hidden="true" tabindex="-1"></a>    kde_result <span class="ot">&lt;-</span> <span class="fu">density</span>(filtered_ppp.km, <span class="at">sigma =</span> adjusted_bw, <span class="at">edge =</span> <span class="cn">TRUE</span>, <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
+<span id="cb57-25"><a href="#cb57-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb57-26"><a href="#cb57-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot the KDE</span></span>
+<span id="cb57-27"><a href="#cb57-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span>(kde_result, <span class="at">main =</span> <span class="fu">paste</span>(current_year, <span class="st">" Q"</span>, current_quarter, <span class="at">sep =</span> <span class="st">""</span>))</span>
+<span id="cb57-28"><a href="#cb57-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="strategic-developments" class="level2">
+<h2 class="anchored" data-anchor-id="strategic-developments">4.3 Strategic developments</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">4</span>))</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  strategic_data <span class="ot">&lt;-</span> grped_acled_sf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(event_type <span class="sc">==</span> <span class="st">"Strategic developments"</span>)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop through each combination of year and quarter</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(strategic_data))) {</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>    filtered_sf <span class="ot">&lt;-</span> strategic_data[i, ]</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract the current year, quarter, and event type</span></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>    current_year <span class="ot">&lt;-</span> filtered_sf<span class="sc">$</span>year</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>    current_quarter <span class="ot">&lt;-</span> filtered_sf<span class="sc">$</span>quarter</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to ppp object</span></span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>    filtered_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_coordinates</span>(filtered_sf), <span class="fu">st_bbox</span>(filtered_sf))</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">any</span>(<span class="fu">duplicated</span>(filtered_ppp))){</span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rjitter</span>(filtered_ppp, <span class="at">retry=</span><span class="cn">TRUE</span>, <span class="at">nsim=</span><span class="dv">1</span>, <span class="at">drop=</span><span class="cn">TRUE</span>)</span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>    filtered_ppp <span class="ot">&lt;-</span> filtered_ppp[mmr_owin]</span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rescale to kilometres</span></span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>    filtered_ppp.km <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(filtered_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Conduct KDE with the chosen bandwidth</span></span>
+<span id="cb58-24"><a href="#cb58-24" aria-hidden="true" tabindex="-1"></a>    kde_result <span class="ot">&lt;-</span> <span class="fu">density</span>(filtered_ppp.km, <span class="at">sigma =</span> adjusted_bw, <span class="at">edge =</span> <span class="cn">TRUE</span>, <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
+<span id="cb58-25"><a href="#cb58-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb58-26"><a href="#cb58-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot the KDE</span></span>
+<span id="cb58-27"><a href="#cb58-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span>(kde_result, <span class="at">main =</span> <span class="fu">paste</span>(current_year, <span class="st">" Q"</span>, current_quarter, <span class="at">sep =</span> <span class="st">""</span>))</span>
+<span id="cb58-28"><a href="#cb58-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="violence-against-civilians" class="level2">
+<h2 class="anchored" data-anchor-id="violence-against-civilians">4.4 Violence against civilians</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">4</span>))</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  violence_data <span class="ot">&lt;-</span> grped_acled_sf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(event_type <span class="sc">==</span> <span class="st">"Violence against civilians"</span>)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop through each combination of year and quarter</span></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(violence_data))) {</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>    filtered_sf <span class="ot">&lt;-</span> violence_data[i, ]</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract the current year, quarter, and event type</span></span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>    current_year <span class="ot">&lt;-</span> filtered_sf<span class="sc">$</span>year</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>    current_quarter <span class="ot">&lt;-</span> filtered_sf<span class="sc">$</span>quarter</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to ppp object</span></span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>    filtered_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_coordinates</span>(filtered_sf), <span class="fu">st_bbox</span>(filtered_sf))</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">any</span>(<span class="fu">duplicated</span>(filtered_ppp))){</span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rjitter</span>(filtered_ppp, <span class="at">retry=</span><span class="cn">TRUE</span>, <span class="at">nsim=</span><span class="dv">1</span>, <span class="at">drop=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a>    filtered_ppp <span class="ot">&lt;-</span> filtered_ppp[mmr_owin]</span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rescale to kilometres</span></span>
+<span id="cb59-21"><a href="#cb59-21" aria-hidden="true" tabindex="-1"></a>    filtered_ppp.km <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(filtered_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb59-22"><a href="#cb59-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-23"><a href="#cb59-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Conduct KDE with the chosen bandwidth</span></span>
+<span id="cb59-24"><a href="#cb59-24" aria-hidden="true" tabindex="-1"></a>    kde_result <span class="ot">&lt;-</span> <span class="fu">density</span>(filtered_ppp.km, <span class="at">sigma =</span> adjusted_bw, <span class="at">edge =</span> <span class="cn">TRUE</span>, <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
+<span id="cb59-25"><a href="#cb59-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb59-26"><a href="#cb59-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot the KDE</span></span>
+<span id="cb59-27"><a href="#cb59-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span>(kde_result, <span class="at">main =</span> <span class="fu">paste</span>(current_year, <span class="st">" Q"</span>, current_quarter, <span class="at">sep =</span> <span class="st">""</span>))</span>
+<span id="cb59-28"><a href="#cb59-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="section-4" class="level1">
+<h1></h1>
 
 
 </section>

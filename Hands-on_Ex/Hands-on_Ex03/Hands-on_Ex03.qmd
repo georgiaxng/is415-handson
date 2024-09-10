@@ -8,6 +8,7 @@ execute:
   echo: true
   warning: false
   freeze: true
+  cache: true
 ---
 
 ## **3.1 Overview**
