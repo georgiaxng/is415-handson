@@ -663,27 +663,360 @@ Value of the adjusted bandwidth:
 
 ### 4.2.1 Q1
 
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2022
+  current_quarter = 1
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+
+```
+
 ### 4.2.2 Q2
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2022
+  current_quarter = 2
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+
+```
 
 ### 4.2.3 Q3
 
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2022
+  current_quarter = 3
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+```
+
 ### 4.2.4 Q4
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2022
+  current_quarter = 4
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+```
 
 ## 4.3 2023
 
 ### 4.3.1 Q1
 
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2023
+  current_quarter = 1
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+```
+
 ### 4.3.2 Q2
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2023
+  current_quarter = 2
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+```
 
 ### 4.3.3 Q3
 
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2023
+  current_quarter = 3
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+```
+
 ### 4.3.4 Q4
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2023
+  current_quarter = 4
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+```
 
 ## 4.4 2024
 
 ### 4.4.1 Q1
 
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2024
+  current_quarter = 1
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+
+```
+
 ### 4.4.2 Q2
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2024
+  current_quarter = 2
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Convert to ppp object
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+    
+    if(any(duplicated(filtered_ppp))){
+      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+    }
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Rescale to kilometres
+    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  
+    # Conduct KDE with the chosen bandwidth
+    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
+    
+    # Plot the KDE
+    plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
+}
+```
 
 # 5. 2nd-Order Spatial Point Patterns Analysis
 
