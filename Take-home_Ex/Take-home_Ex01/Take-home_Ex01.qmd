@@ -19,11 +19,13 @@ format:
 
 ## 1.1 Introduction
 
-<!--# BACKGROUND OF MYANMAR CONFLICT HERE -->
+Since early 2021, Myanmar has been engulfed in a brutal civil war that erupted following the military coup on February 1, 2021, which ousted the democratically elected government led by Aung San Suu Kyi. The coup ignited widespread protests and a civil disobedience movement across the country, escalating into armed resistance as various ethnic armed groups and newly formed militias began confronting the military junta. The conflict has led to severe humanitarian crises, including widespread violence, displacement, and human rights abuses. The military's response has been marked by extreme repression, including airstrikes and targeted attacks on civilian populations, exacerbating the suffering of ordinary Myanmar citizens. Despite international condemnation and calls for a return to democratic governance, the violence continues, deepening the political instability and socio-economic challenges faced by Myanmar.
+
+In light of this ongoing crisis, I will be conducting a detailed geospatial analysis of the conflict events in Myanmar. This analysis aims to map and evaluate the spatial distribution and intensity of conflict incidents from 2021 to 2024. By utilizing geospatial techniques and spatial data, I will examine patterns of violence, identify hotspots of conflict, and assess the impact on civilian areas. This approach will provide valuable insights into the spatial dynamics of the conflict, helping to inform humanitarian responses and policy decisions.
 
 ## 1.2 Goal
 
-We will be focusing on 4 event types: **Battles, Explosion/Remote violence, Strategic developments, and Violence against civilians.**
+We will be focusing on 4 event types: **Battles, Explosion/Remote violence, [Strategic developments](https://acleddata.com/knowledge-base/strategic-developments-in-the-acled-dataset/), and Violence against civilians.**
 
 -   Using appropriate function of **sf** and **tidyverse** packages, import and transform the downloaded armed conflict data and administrative boundary data into sf tibble data.frames.
 
@@ -45,10 +47,24 @@ Before we start off, we will have to import the necessary packages required for 
 
 We will be using the following packages:
 
-<!--# ADD ON HERE -->
+-   **`sf`**: Manages spatial vector data, enabling operations like spatial joins, buffering, and transformations for points, lines, and polygons.
+
+-   **`raster`**: Handles raster data, allowing for operations such as raster calculations, resampling, and visualization of spatial grids (e.g., elevation or satellite images).
+
+-   **`spNetwork`**: Analyzes spatial networks by modeling connectivity and movement within networks like road systems or utility grids.
+
+-   **`tmap`**: Creates and customizes thematic maps for spatial data visualization, including static and interactive maps with various map elements.
+
+-   **`tidyverse`**: A suite of packages for data manipulation (`dplyr`), visualization (`ggplot2`), and tidying (`tidyr`), facilitating a streamlined workflow for data analysis.
+
+-   **`RColorBrewer`**: Provides a range of color palettes for effective and aesthetically pleasing data visualization, including options for categorical, sequential, and diverging data.
+
+-   **`spatstat`**: Conducts spatial statistics and analysis, including point pattern analysis and spatial simulations, to study spatial distributions and interactions.
+
+-   **`sparr`**: Facilitates the analysis of spatial point patterns and spatial autoregressive models. It includes functions for fitting and analyzing spatial point processes, particularly useful for examining spatial dependencies and interactions in point pattern data.
 
 ```{r}
-pacman::p_load(sf, raster, spNetwork, tmap, tidyverse, RColorBrewer, spatstat)
+pacman::p_load(sf, raster, spNetwork, tmap, tidyverse, RColorBrewer, spatstat, sparr)
 ```
 
 ## 1.4 The Data
@@ -138,6 +154,8 @@ colnames(acled_sf)
 ```
 
 #### 2.1.2.4 Grouping of Data By Year, Quarter, Event Type
+
+This chunk of code groups the ACLED Data by quarter, event and year, allowing us to better manage and access the data later on.
 
 ```{r}
 grped_acled_sf <- acled_sf %>%
@@ -252,7 +270,7 @@ colors <- brewer.pal(n = num_colors, name = "Set3")
 
 tm_shape(mmrsr_sf) +
   tm_polygons(col = "ST", palette = colors) +  # Apply color palette to polygons
-  tm_text("ST", size = 0.8, col = "black", bg.color = "white", just = c("center", "center"),  xmod = 0, ymod = 0) + tm_layout(main.title = "Myanmar",
+  tm_text("ST", size = 1, col = "black", bg.color = "white", just = c("center", "center"),  xmod = 0, ymod = 0) + tm_layout(main.title = "Myanmar",
             main.title.position = "center",
             main.title.size = 1.6,
             legend.outside = TRUE,
@@ -323,7 +341,7 @@ sample_acled_ppp <- sample_acled_ppp[mmr_owin]
 An overview of the point pattern plot for the sample data.
 
 ```{r,fig.width=10, fig.height=8}
-plot(sample_acled_ppp, pch = 16, cex = 0.5) 
+plot(sample_acled_ppp, pch = 16, cex = 0.8) 
 ```
 
 ## 3.3 Determining the Optimal Bandwidth & Sigma
@@ -485,7 +503,7 @@ plot(density(sample_acled_ppp.km, sigma=bw.scott, edge=TRUE, kernel="disc"), mai
 ```
 :::
 
-After evaluating the KDE plots, I opted for the Gaussian kernel with the bandwidth provided by `bw.ppl` because this method provided a more localized smoothing effect, better capturing the spatial patterns in the data. In comparison, the `bw.CvL` method yielded a much larger bandwidth, leading to excessive smoothing, while `bw.scott` showed considerable disparity between x and y dimensions, suggesting anisotropic smoothing. The `bw.diggle` method, though precise, resulted in very narrow smoothing that might overemphasize noise.
+After evaluating the KDE plots, I opted for the **Gaussian kernel** with the bandwidth provided by `bw.ppl` because this method provided a more localized smoothing effect, better capturing the spatial patterns in the data. In comparison, the `bw.CvL` method yielded a much larger bandwidth, leading to excessive smoothing, while `bw.scott` showed considerable disparity between x and y dimensions, suggesting anisotropic smoothing. The `bw.diggle` method, though precise, resulted in very narrow smoothing that might overemphasize noise.
 
 Despite this, I found that the Gaussian KDE with `bw.ppl` still appeared to be undersmoothed. Consequently, further optimization is necessary to refine the bandwidth setting and achieve a more balanced density estimate that accurately represents the underlying spatial patterns in the data.
 
@@ -504,6 +522,7 @@ plot(kde_adjusted)
 Here is a comparison between the point pattern and the KDE plot of the sample data, this comparison allows us to evaluate how effectively the KDE captures the spatial distribution of the events and highlights areas where the KDE might need further refinement.
 
 ```{r}
+par(mar = c(1,0,1,0))
 par(mfrow=c(1,2))
 plot(sample_acled_ppp, pch = 16, cex = 0.5) 
 plot(kde_adjusted)
@@ -512,7 +531,7 @@ plot(kde_adjusted)
 Value of the adjusted bandwidth:
 
 ```{r}
-# adjusted_bw
+adjusted_bw
 ```
 
 # 4. Quarterly KDE Layers
@@ -1020,77 +1039,487 @@ Value of the adjusted bandwidth:
 
 # 5. 2nd-Order Spatial Point Patterns Analysis
 
-# 6. Spatio-Temporal Point Patterns Analysis
+In this section, we will conduct second-order spatial point pattern analysis (PPA), which examines interactions between events at various spatial scales. By using statistical functions such as G, F, K, and L, we can quantify and explore clustering patterns, distances between events, and the spatial distribution of points relative to a given area. These functions help reveal whether the events exhibit random, clustered, or regular patterns, providing deeper insights into the underlying spatial structure of conflict events in Myanmar.
+
+Here’s a detailed description of the second-order spatial point pattern analysis functions:
+
+-   **G-function (Nearest Neighbor Distribution Function)**: The G-function describes the cumulative distribution of the distances from each event to its nearest neighboring event. It highlights how clustered events are by comparing observed distances with those expected from a random spatial pattern.
+
+-   **F-function (Empty Space Function)**: The F-function examines the distribution of distances from arbitrary (random) locations to the nearest event. It helps in evaluating how well events fill the study area. A large gap between random points and events indicates spatial heterogeneity or clustering.
+
+-   **K-function (Ripley’s K-function)**: This function estimates the number of events within a certain distance of each other, relative to what would be expected under complete spatial randomness (CSR). It accumulates the number of events within varying distances, thus detecting clustering or dispersion at multiple spatial scales. If the observed K-function is higher than expected under CSR, it indicates clustering.
+
+-   **L-function (Besag’s L-function)**: The L-function is a variance-stabilized transformation of the K-function. It linearizes the expected K-values, making it easier to interpret deviations from randomness. An L-function above the CSR line indicates clustering, while values below suggest dispersion.
+
+## 5.1 Analysis Background
+
+For this analysis, I will be primarily using the **G-function** to conduct second-order spatial point pattern analysis. I chose it for its computational efficiency, straightforward interpretation of nearest-neighbor distances, and suitability for analyzing a single type of event. The K and L-functions, while valuable, are more resource-intensive and complex to interpret, while the F-function is less applicable to our single-type event analysis.
+
+### 5.1.1 Monte Carlo Simulation
+
+I will also be conducting a Monte Carlo simulation for testing **Complete Spatial Randomness (CSR)** in the spatial distribution of conflict events. This involves generating multiple random point patterns under CSR to create a range of expected spatial statistics. By comparing the observed G-function of the conflict events against these simulated envelopes, I can determine if the observed clustering or dispersion is significantly different from what would be expected by chance.
+
+The envelope function provides upper and lower bounds for the G-function, helping to assess whether the spatial pattern of conflict events is significantly clustered or dispersed compared to random patterns. This method ensures a rigorous evaluation of spatial randomness and enhances the interpretation of observed patterns.
+
+### 5.1.2 Example of G-Function Plot
+
+This code snippet below provides an example of a G-function plot of a sample of the data, calculated using an envelope derived from 99 simulations. This approach is used to evaluate the spatial distribution of events and assess how the observed point pattern compares to what might be expected under complete spatial randomness. Note that we will be using a set seed to ensure the reproducibility of our code.
+
+```{r}
+set.seed(123456)
+test_second_sf <- grped_acled_sf %>% filter(event_type == "Battles", year == 2023, quarter ==2)
+test_second_ppp<-as.ppp(st_coordinates(test_second_sf), st_bbox(test_second_sf))
+
+if(any(duplicated(test_second_ppp))){
+  test_second_ppp <- rjitter(test_second_ppp, retry=TRUE, nsim=1, drop=TRUE)
+}
+
+test_second_ppp <- test_second_ppp[mmr_owin]
+test_second.csr <- envelope(test_second_ppp, Gest, nsim = 99)
+plot(test_second.csr, xlim=c(0,10000), main="Example of G-Function Plot")
+```
+
+::: callout-tip
+The plot typically shows several key elements related to both the observed data and the simulated patterns:
+
+-   **G\^obs (Observed G-function)**:This represents the **empirical G-function** calculated from your actual point pattern data. It shows the cumulative distribution of the nearest-neighbor distances between points in the dataset.
+
+-   **G\^theo (Theoretical G-function)**: **Theoretical G-function** that would be expected if the point pattern follows **Complete Spatial Randomness (CSR)**. Under CSR, the points are distributed independently and uniformly across the study area.
+
+-   **G\^hi (Upper Envelope)**:
+
+    -   **Upper bound** of the G-function values generated from the random simulations (based on `nsim`, the number of simulations). It defines the maximum value that the G-function could take under CSR in these simulations.
+
+    -   If the observed G-function (G\^obs) exceeds G\^hi, it suggests **clustering**—points are closer together than expected by chance.
+
+-   **G\^lo (Lower Envelope)**:
+
+    -   **Lower bound** of the G-function values from the random simulations. It defines the minimum G-function value expected under CSR.
+
+    -   If the observed G-function (G\^obs) falls below G\^lo, it suggests **dispersion** or **regularity**—points are more evenly spaced than expected by chance.
+:::
+
+## 5.2 Battles
+
+```{r,fig.width=14, fig.height=12}
+set.seed(123456)
+battle_data_sf <- grped_acled_sf %>% filter(event_type == "Battles")
+
+# Initialize an empty list to store the results
+battle_G_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(battle_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- battle_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[mmr_owin]
+  G_CK.csr <- envelope(filtered_ppp, Gest, nsim = 99)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  battle_G_CK_list[[name]] <- G_CK.csr
+}
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(battle_G_CK_list)) {
+  g_ck <- battle_G_CK_list[[i]]
+  plot(g_ck, xlim=c(0,10000), main=names(battle_G_CK_list)[i])
+}
+```
+
+```{r}
+  plot(battle_G_CK_list[[8]], xlim=c(0,10000), main=names(battle_G_CK_list)[8])
+
+```
+
+## 5.3 Explosions/Remote Violence
+
+```{r,fig.width=14, fig.height=12}
+#| code-fold: true
+set.seed(123456)
+explosions_data_sf <- grped_acled_sf %>% filter(event_type == "Explosions/Remote violence")
+
+# Initialize an empty list to store the results
+explosions_G_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(explosions_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- explosions_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[mmr_owin]
+  G_CK.csr <- envelope(filtered_ppp, Gest, nsim = 99)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  explosions_G_CK_list[[name]] <- G_CK.csr
+}
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(explosions_G_CK_list)) {
+  g_ck <- explosions_G_CK_list[[i]]
+  plot(g_ck, xlim=c(0,10000), main=names(explosions_G_CK_list)[i])
+}
+```
+
+## 5.4 Strategic Developments
+
+```{r,fig.width=14, fig.height=12}
+#| code-fold: true
+set.seed(123456)
+strategic_data_sf <- grped_acled_sf %>% filter(event_type == "Strategic developments")
+
+# Initialize an empty list to store the results
+strategic_G_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(strategic_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- strategic_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[mmr_owin]
+  G_CK.csr <- envelope(filtered_ppp, Gest, nsim = 99)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  strategic_G_CK_list[[name]] <- G_CK.csr
+}
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(strategic_G_CK_list)) {
+  g_ck <- strategic_G_CK_list[[i]]
+  plot(g_ck, xlim=c(0,10000), main=names(strategic_G_CK_list)[i])
+}
+```
+
+## 5.5 Violence Against Citizens
+
+```{r,fig.width=14, fig.height=12}
+#| code-fold: true
+set.seed(123456)
+violence_data_sf <- grped_acled_sf %>% filter(event_type == "Violence against civilians")
+
+# Initialize an empty list to store the results
+violence_G_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(violence_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- violence_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[mmr_owin]
+  G_CK.csr <- envelope(filtered_ppp, Gest, nsim = 99)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  violence_G_CK_list[[name]] <- G_CK.csr
+}
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(violence_G_CK_list)) {
+  g_ck <- violence_G_CK_list[[i]]
+  plot(g_ck, xlim=c(0,10000), main=names(violence_G_CK_list)[i])
+}
+```
+
+## 5.6 Insights
+
+-   All of the observed G-function lines are way above the envelope, suggesting that the points, in this case the conflicts, are **more clustered** than expected under CSR. This means that the distribution of the conflicts is not at random and that tends to cluster in specific regions
+
+-   The slope of the observed G-function generally shows a **smooth and constant trend**, with the exception of data from 2021 Q1. This anomaly can be attributed to the fact that conflicts were just beginning to emerge during this period, resulting in a sparse distribution of conflict events. As a result, the G-function for this early quarter might reflect less pronounced clustering or dispersion compared to later periods when the conflict events became more frequent and widespread.
+
+-   The estimated/theoretical G function are all within the envelope, this indicates that the observed spatial distribution of points is not significantly different from what would be expected under a random distribution, suggesting that the observed patterns do not show strong evidence of non-random spatial structure.
+
+# 6. Quarterly Spatio-Temporal KDE Layers
 
 <!--# TALK ABOUT WHAT WE MIGHT BE ABLE TO INFER FROM THIS ETC -->
 
+Here in this section, we will be conducting a spatio temporal point patterns analysis where
+
 ## 6.1 Battles
 
-```{r, fig.width=10, fig.height=10}
-  par(mar = c(1,0,1,0))
-  par(mfrow=c(4,4))
-  battle_data <- grped_acled_sf %>% filter(event_type == "Battles")
-  # Loop through each combination of year and quarter
-  for (i in seq_len(nrow(battle_data))) {
-    
-    filtered_sf <- battle_data[i, ]
+### 6.1.1 Overview
 
-    # Extract the current year, quarter, and event type
-    current_year <- filtered_sf$year
-    current_quarter <- filtered_sf$quarter
-    
-    # Convert to ppp object
-    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
-    
-    if(any(duplicated(filtered_ppp))){
-      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
-    }
-    filtered_ppp <- filtered_ppp[mmr_owin]
-    # Rescale to kilometres
-    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal KDE for all 14 quarters from 2021 to 2024 Q2.
+
+```{r, fig.width=14, fig.height=12}
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(4,4))
+  current_event = "Battles"
   
-    # Conduct KDE with the chosen bandwidth
-    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
-    
-    # Plot the KDE
-    plot(kde_result, main = paste(current_year, " Q", current_quarter, sep = ""))
+  # Filter the data
+  battle_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
+  
+  # Define time slices for plotting
+  tims <- c(
+  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
+  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
+  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
+  "2024 Q1", "2024 Q2"
+  )
+  
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(battle_data_sf), st_bbox(battle_data_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  # Rescale to kilometres
+  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp.km)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste("KDE for", tims[x]))
 }
+
 ```
+
+### 6.1.2 By Year
 
 ## 6.2 Explosions/Remote violence
 
-```{r, fig.width=10, fig.height=10}
-  par(mar = c(1,0,1,0))
-  par(mfrow=c(4,4))
-  explosions_data <- grped_acled_sf %>% filter(event_type == "Explosions/Remote violence")
-  # Loop through each combination of year and quarter
-  for (i in seq_len(nrow(explosions_data))) {
-    
-    filtered_sf <- explosions_data[i, ]
+### 6.2.1 Overview
 
-    # Extract the current year, quarter, and event type
-    current_year <- filtered_sf$year
-    current_quarter <- filtered_sf$quarter
-    
-    # Convert to ppp object
-    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
-    
-    if(any(duplicated(filtered_ppp))){
-      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
-    }
-    filtered_ppp <- filtered_ppp[mmr_owin]
-    # Rescale to kilometres
-    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(4,4))
+  current_event = "Explosions/Remote violence"
+
+  # Filter the data
+  explosions_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
   
-    # Conduct KDE with the chosen bandwidth
-    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
-    
-    # Plot the KDE
-    plot(kde_result, main = paste(current_year, " Q", current_quarter, sep = ""))
+  # Define time slices for plotting
+  tims <- c(
+  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
+  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
+  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
+  "2024 Q1", "2024 Q2"
+)
+  
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(explosions_data_sf), st_bbox(explosions_data_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  # Rescale to kilometres
+  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp.km)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste("KDE for", tims[x]))
 }
 ```
 
+### 6.2.2 By Year
+
 ## 6.3 Strategic developments
+
+### 6.3.1 Overview
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(4,4))
+  current_event = "Strategic developments"
+  
+  # Filter the data
+  strategic_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
+  
+  # Define time slices for plotting
+  tims <- c(
+  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
+  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
+  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
+  "2024 Q1", "2024 Q2"
+)
+  
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(strategic_data_sf), st_bbox(strategic_data_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  # Rescale to kilometres
+  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp.km)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste("KDE for", tims[x]))
+}
+```
+
+### 6.3.2 By Year
+
+## 6.4 Violence against civilians
+
+### 6.4.1 Overview
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(4,4))
+  current_event = "Violence against civilians"
+  # Filter the data
+  violence_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
+  
+  # Define time slices for plotting
+  tims <- c(
+  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
+  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
+  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
+  "2024 Q1", "2024 Q2"
+)
+  
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(violence_data_sf), st_bbox(violence_data_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  # Rescale to kilometres
+  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp.km)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste("KDE for", tims[x]))
+}
+```
+
+### 6.4.2 By Year
+
+# 7. 2nd-Order Spatio-temporal Point Patterns Analysis
+
+The specific questions we aim to address are whether the locations of conflict in Myanmar are spatially and spatio-temporally independent. Using second-order spatio-temporal point pattern analysis, we will examine if the conflicts exhibit significant clustering or dispersion across geographic areas and over time. This analysis will determine whether the observed spatial patterns and temporal distributions of conflicts deviate from what would be expected under Complete Spatial Randomness (CSR) and Complete Spatio-Temporal Randomness (CSTR). By identifying areas and periods of heightened conflict activity, we aim to understand if the patterns are random or reflect underlying spatial and temporal processes, providing insights into the dynamics of conflict distribution.
+
+## 7.1 Visualising geographic distribution of conflicts by Quarter
+
+# 8.
+
+# 9. Overall Insights
+
+# Drafts
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(1,0,1,0))
+  par(mfrow=c(2,2))
+  current_year = 2021
+  current_quarter = 2
+  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
+  # Loop through each event
+  for (i in seq_len(nrow(quarter_data))) {
+    
+    filtered_sf <- quarter_data[i, ]
+    filtered_ppp <- as.ppp(st_coordinates(filtered_sf),st_bbox(filtered_sf))
+    any(duplicated(filtered_ppp))
+
+    filtered_ppp <- filtered_ppp[mmr_owin]
+    # Extract the current year, quarter, and event type
+    current_event <- filtered_sf$event_type
+    
+    # Plot the KDE
+    plot(filtered_ppp, pch = 16, cex = 1,main = paste(current_event))
+}
+```
+
+```{r}
+  current_year = 2021
+  current_quarter = 1
+  test_data <- acled_sf %>% filter(year == current_year, quarter == current_quarter,event_type=="Violence against civilians") 
+
+```
 
 ```{r, fig.width=10, fig.height=10}
   par(mar = c(1,0,1,0))
@@ -1123,62 +1552,28 @@ Value of the adjusted bandwidth:
 }
 ```
 
-## 6.4 Violence against civilians
-
 ```{r, fig.width=10, fig.height=10}
-  par(mar = c(1,0,1,0))
-  par(mfrow=c(4,4))
-  violence_data <- grped_acled_sf %>% filter(event_type == "Violence against civilians")
-  # Loop through each combination of year and quarter
-  for (i in seq_len(nrow(violence_data))) {
-    
-    filtered_sf <- violence_data[i, ]
+  par(mar = c(2,1,2,1))
+  #par(mfrow=c(2,2))
 
-    # Extract the current year, quarter, and event type
-    current_year <- filtered_sf$year
-    current_quarter <- filtered_sf$quarter
-    
-    # Convert to ppp object
-    filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
-    
-    if(any(duplicated(filtered_ppp))){
-      rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
-    }
-    filtered_ppp <- filtered_ppp[mmr_owin]
-    # Rescale to kilometres
-    filtered_ppp.km <- rescale.ppp(filtered_ppp, 1000, "km")
+  battle_data_sf <- grped_acled_sf %>% filter(event_type == "Battles", year == 2024)
+
   
-    # Conduct KDE with the chosen bandwidth
-    kde_result <- density(filtered_ppp.km, sigma = adjusted_bw, edge = TRUE, kernel = "gaussian")
-    
-    # Plot the KDE
-    plot(kde_result, main = paste(current_year, " Q", current_quarter, sep = ""))
-}
-```
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(battle_data_sf), st_bbox(battle_data_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  # Rescale to kilometres
+  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
+  
+  st_kde <- spattemp.density(spattemp_ppp.km)
 
-# 
-
-# Drafts
-
-```{r, fig.width=14, fig.height=12}
-#| code-fold: true
-  par(mar = c(1,0,1,0))
-  par(mfrow=c(2,2))
-  current_year = 2021
-  current_quarter = 2
-  quarter_data <- grped_acled_sf %>% filter(year == current_year, quarter == current_quarter) 
-  # Loop through each event
-  for (i in seq_len(nrow(quarter_data))) {
-    
-    filtered_sf <- quarter_data[i, ]
-    filtered_ppp <- as.ppp(st_coordinates(filtered_sf),st_bbox(filtered_sf))
-    any(duplicated(filtered_ppp))
-
-    filtered_ppp <- filtered_ppp[mmr_owin]
-    # Extract the current year, quarter, and event type
-    current_event <- filtered_sf$event_type
-    
-    # Plot the KDE
-    plot(filtered_ppp, pch = 16, cex = 1,main = paste(current_event))
-}
+  plot(st_kde, 2, 
+   override.par=FALSE, 
+   fix.range=TRUE)
+  
 ```
