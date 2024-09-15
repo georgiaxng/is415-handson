@@ -278,6 +278,14 @@ tm_shape(mmrsr_sf) +
     tm_legend(title = "Sub-regions")  # Set custom legend title
 ```
 
+# 2.5 Setting Seed
+
+To ensure the reproducibility, we will be using a fixed seed for our randomisation.
+
+```{r}
+set.seed(123456)
+```
+
 # 3. Kernel Density Estimation
 
 To analyze and find the trends in the spatial distribution of conflict events in Myanmar, we will be using **Kernel Density Estimation (KDE)**. KDE is a non-parametric way to estimate the probability density function of a random variable, making it particularly useful in spatial analysis for identifying areas with high concentrations of events.
@@ -1101,6 +1109,8 @@ The plot typically shows several key elements related to both the observed data 
 
 ## 5.2 Battles
 
+This chunk of code generates a G-function plot for all quarters of a particular event, using an envelope derived from 99 simulations for significance testing. Then, it saves the results to a list to plot it later on.
+
 ```{r,fig.width=14, fig.height=12}
 set.seed(123456)
 battle_data_sf <- grped_acled_sf %>% filter(event_type == "Battles")
@@ -1133,6 +1143,8 @@ for (i in seq_len(nrow(battle_data_sf))) {
   battle_G_CK_list[[name]] <- G_CK.csr
 }
 ```
+
+This chunk of code plots the G-function plot for all quarters.
 
 ```{r,fig.width=14, fig.height=12}
 par(mar = c(2,1,2,1))
@@ -1297,9 +1309,7 @@ for(i in seq_along(violence_G_CK_list)) {
 
 # 6. Quarterly Spatio-Temporal KDE Layers
 
-<!--# TALK ABOUT WHAT WE MIGHT BE ABLE TO INFER FROM THIS ETC -->
-
-Here in this section, we will be conducting a spatio temporal point patterns analysis where
+In this section, we will be conducting spatiotemporal Kernel Density Estimation (KDE). This approach allows us to visualize and analyze the density of conflicts over both space and time, providing a comprehensive view of how conflict activity evolves. By applying KDE to the dataset spanning from 2021 to 2024, we can identify hotspots and trends in conflict intensity across different quarters and regions.
 
 ## 6.1 Battles
 
@@ -1332,21 +1342,141 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
   
   # Convert to owin
   spattemp_ppp <- spattemp_ppp[mmr_owin]
-  # Rescale to kilometres
-  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
-  
+
   # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp.km)
+  st_kde <- spattemp.density(spattemp_ppp)
   for(x in seq_along(tims)){
     plot(st_kde, x, 
      override.par=FALSE, 
      fix.range=TRUE, 
-     main=paste("KDE for", tims[x]))
+     main=paste(tims[x]))
 }
 
 ```
 
 ### 6.1.2 By Year
+
+```{r}
+  current_event = "Battles"
+  quarter_2021_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2021)
+  quarter_2022_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2022)
+  quarter_2023_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2023)
+  quarter_2024_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2024)
+```
+
+::: panel-tabset
+## 2021
+
+```{r, fig.width=14, fig.height=12}
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2021
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2021_sf), st_bbox(quarter_2021_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+
+## 2022
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2022
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2022_sf), st_bbox(quarter_2022_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+
+## 2023
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2023
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2023_sf), st_bbox(quarter_2023_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+
+## 2024
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2024
+  
+  tims <- c("Q1", "Q2")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2024_sf), st_bbox(quarter_2024_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+:::
 
 ## 6.2 Explosions/Remote violence
 
@@ -1377,20 +1507,142 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
   }
   # Convert to owin
   spattemp_ppp <- spattemp_ppp[mmr_owin]
-  # Rescale to kilometres
-  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
   
   # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp.km)
+  st_kde <- spattemp.density(spattemp_ppp)
   for(x in seq_along(tims)){
     plot(st_kde, x, 
      override.par=FALSE, 
      fix.range=TRUE, 
-     main=paste("KDE for", tims[x]))
+     main=paste(tims[x]))
 }
 ```
 
 ### 6.2.2 By Year
+
+```{r}
+  current_event = "Explosions/Remote violence"
+  quarter_2021_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2021)
+  quarter_2022_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2022)
+  quarter_2023_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2023)
+  quarter_2024_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2024)
+```
+
+::: panel-tabset
+## 2021
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2021
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2021_sf), st_bbox(quarter_2021_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+
+## 2022
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2022
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2022_sf), st_bbox(quarter_2022_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+
+## 2023
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2023
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2023_sf), st_bbox(quarter_2023_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+
+## 2024
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2024
+  
+  tims <- c("Q1", "Q2")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2024_sf), st_bbox(quarter_2024_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+:::
 
 ## 6.3 Strategic developments
 
@@ -1421,20 +1673,143 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
   }
   # Convert to owin
   spattemp_ppp <- spattemp_ppp[mmr_owin]
-  # Rescale to kilometres
-  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
   
   # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp.km)
+  st_kde <- spattemp.density(spattemp_ppp)
   for(x in seq_along(tims)){
     plot(st_kde, x, 
      override.par=FALSE, 
      fix.range=TRUE, 
-     main=paste("KDE for", tims[x]))
+     main=paste(tims[x]))
 }
 ```
 
 ### 6.3.2 By Year
+
+```{r}
+  current_event = "Strategic developments"
+  quarter_2021_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2021)
+  quarter_2022_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2022)
+  quarter_2023_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2023)
+  quarter_2024_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2024)
+```
+
+::: panel-tabset
+## 2021
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2021
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2021_sf), st_bbox(quarter_2021_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+
+## 2022
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2022
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2022_sf), st_bbox(quarter_2022_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+
+## 2023
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2023
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2023_sf), st_bbox(quarter_2023_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+
+## 2024
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2024
+  
+  tims <- c("Q1", "Q2")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2024_sf), st_bbox(quarter_2024_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+:::
 
 ## 6.4 Violence against civilians
 
@@ -1464,20 +1839,144 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
   }
   # Convert to owin
   spattemp_ppp <- spattemp_ppp[mmr_owin]
-  # Rescale to kilometres
-  spattemp_ppp.km <- rescale.ppp(spattemp_ppp, 1000, "km")
   
   # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp.km)
+  st_kde <- spattemp.density(spattemp_ppp)
   for(x in seq_along(tims)){
     plot(st_kde, x, 
      override.par=FALSE, 
      fix.range=TRUE, 
-     main=paste("KDE for", tims[x]))
+     main=paste(tims[x]))
 }
 ```
 
 ### 6.4.2 By Year
+
+```{r}
+  current_event = "Violence against civilians"
+  quarter_2021_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2021)
+  quarter_2022_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2022)
+  quarter_2023_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2023)
+  quarter_2024_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2024)
+```
+
+::: panel-tabset
+## 2021
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2021
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2021_sf), st_bbox(quarter_2021_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+
+## 2022
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2022
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2022_sf), st_bbox(quarter_2022_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+
+## 2023
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2023
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2023_sf), st_bbox(quarter_2023_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+
+## 2024
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2024
+  
+  tims <- c("Q1", "Q2")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2024_sf), st_bbox(quarter_2024_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+:::
 
 # 7. 2nd-Order Spatio-temporal Point Patterns Analysis
 
