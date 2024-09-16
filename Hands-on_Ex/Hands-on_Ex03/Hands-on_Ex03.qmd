@@ -337,7 +337,7 @@ plot(kde_childcareSG.bw)
 
 > While the output image looks identical to the earlier version, the only changes in the data values (refer to the legend).
 
-### **3.6.2 Working with different automatic badwidth methods**
+### **3.6.2 Working with different automatic bandwidth methods**
 
 Beside *bw.diggle()*, there are three other **spatstat** functions can be used to determine the bandwidth, they are: *bw.CvL()*, *bw.scott()*, and *bw.ppl()*.
 

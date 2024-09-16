@@ -144,7 +144,7 @@ columns_to_remove <- c("time_precision", "inter1", "inter2", "iso", "source", "s
 
 # Remove columns only if they exist in the dataframe
 acled_sf <- acled_sf %>%
-  select(-all_of(columns_to_remove[columns_to_remove %in% names(acled_sf)]))
+  dplyr::select(-all_of(columns_to_remove[columns_to_remove %in% names(acled_sf)]))
 ```
 
 This is an overview of all the columns left:
@@ -1107,11 +1107,14 @@ The plot typically shows several key elements related to both the observed data 
     -   If the observed G-function (G\^obs) falls below G\^lo, it suggests **dispersion** or **regularity**—points are more evenly spaced than expected by chance.
 :::
 
-## 5.2 Battles
+## 5.2 Whole of Myanmar
+
+### 5.2.1 Battles
 
 This chunk of code generates a G-function plot for all quarters of a particular event, using an envelope derived from 99 simulations for significance testing. Then, it saves the results to a list to plot it later on.
 
 ```{r,fig.width=14, fig.height=12}
+#| eval: false
 set.seed(123456)
 battle_data_sf <- grped_acled_sf %>% filter(event_type == "Battles")
 
@@ -1142,6 +1145,15 @@ for (i in seq_len(nrow(battle_data_sf))) {
   name <- paste0(current_year, "_Q", current_quarter)
   battle_G_CK_list[[name]] <- G_CK.csr
 }
+
+write_rds(battle_G_CK_list, "data/rds/battle_G_CK_list.rds")
+```
+
+<!--# Read from RDS -->
+
+```{r}
+#| echo: false # so that code chunk is not seen
+battle_G_CK_list <- read_rds( "data/rds/battle_G_CK_list.rds")
 ```
 
 This chunk of code plots the G-function plot for all quarters.
@@ -1161,10 +1173,11 @@ for(i in seq_along(battle_G_CK_list)) {
 
 ```
 
-## 5.3 Explosions/Remote Violence
+### 5.2.2 Explosions/Remote Violence
 
 ```{r,fig.width=14, fig.height=12}
 #| code-fold: true
+#| eval: false
 set.seed(123456)
 explosions_data_sf <- grped_acled_sf %>% filter(event_type == "Explosions/Remote violence")
 
@@ -1195,6 +1208,14 @@ for (i in seq_len(nrow(explosions_data_sf))) {
   name <- paste0(current_year, "_Q", current_quarter)
   explosions_G_CK_list[[name]] <- G_CK.csr
 }
+write_rds(explosions_G_CK_list, "data/rds/explosions_G_CK_list.rds")
+```
+
+<!--# Read from RDS -->
+
+```{r}
+#| echo: false # so that code chunk is not seen
+explosions_G_CK_list <- read_rds( "data/rds/explosions_G_CK_list.rds")
 ```
 
 ```{r,fig.width=14, fig.height=12}
@@ -1207,10 +1228,12 @@ for(i in seq_along(explosions_G_CK_list)) {
 }
 ```
 
-## 5.4 Strategic Developments
+### 5.2.3 Strategic Developments
 
 ```{r,fig.width=14, fig.height=12}
 #| code-fold: true
+#| eval: false
+
 set.seed(123456)
 strategic_data_sf <- grped_acled_sf %>% filter(event_type == "Strategic developments")
 
@@ -1241,6 +1264,14 @@ for (i in seq_len(nrow(strategic_data_sf))) {
   name <- paste0(current_year, "_Q", current_quarter)
   strategic_G_CK_list[[name]] <- G_CK.csr
 }
+write_rds(strategic_G_CK_list, "data/rds/strategic_G_CK_list.rds")
+```
+
+<!--# Read from RDS -->
+
+```{r}
+#| echo: false # so that code chunk is not seen
+strategic_G_CK_list <- read_rds( "data/rds/strategic_G_CK_list.rds")
 ```
 
 ```{r,fig.width=14, fig.height=12}
@@ -1253,10 +1284,11 @@ for(i in seq_along(strategic_G_CK_list)) {
 }
 ```
 
-## 5.5 Violence Against Citizens
+### 5.2.4 Violence Against Citizens
 
 ```{r,fig.width=14, fig.height=12}
 #| code-fold: true
+#| eval: false
 set.seed(123456)
 violence_data_sf <- grped_acled_sf %>% filter(event_type == "Violence against civilians")
 
@@ -1287,6 +1319,14 @@ for (i in seq_len(nrow(violence_data_sf))) {
   name <- paste0(current_year, "_Q", current_quarter)
   violence_G_CK_list[[name]] <- G_CK.csr
 }
+write_rds(violence_G_CK_list, "data/rds/violence_G_CK_list.rds")
+```
+
+<!--# Read from RDS -->
+
+```{r}
+#| echo: false # so that code chunk is not seen
+violence_G_CK_list <- read_rds( "data/rds/violence_G_CK_list.rds")
 ```
 
 ```{r,fig.width=14, fig.height=12}
@@ -1299,13 +1339,17 @@ for(i in seq_along(violence_G_CK_list)) {
 }
 ```
 
-## 5.6 Insights
+### 5.2.5 Insights
 
 -   All of the observed G-function lines are way above the envelope, suggesting that the points, in this case the conflicts, are **more clustered** than expected under CSR. This means that the distribution of the conflicts is not at random and that tends to cluster in specific regions
 
 -   The slope of the observed G-function generally shows a **smooth and constant trend**, with the exception of data from 2021 Q1. This anomaly can be attributed to the fact that conflicts were just beginning to emerge during this period, resulting in a sparse distribution of conflict events. As a result, the G-function for this early quarter might reflect less pronounced clustering or dispersion compared to later periods when the conflict events became more frequent and widespread.
 
 -   The estimated/theoretical G function are all within the envelope, this indicates that the observed spatial distribution of points is not significantly different from what would be expected under a random distribution, suggesting that the observed patterns do not show strong evidence of non-random spatial structure.
+
+## 5.3 Sagaing
+
+## 5.4 Yangon
 
 # 6. Quarterly Spatio-Temporal KDE Layers
 
@@ -1982,7 +2026,35 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
 
 The specific questions we aim to address are whether the locations of conflict in Myanmar are spatially and spatio-temporally independent. Using second-order spatio-temporal point pattern analysis, we will examine if the conflicts exhibit significant clustering or dispersion across geographic areas and over time. This analysis will determine whether the observed spatial patterns and temporal distributions of conflicts deviate from what would be expected under Complete Spatial Randomness (CSR) and Complete Spatio-Temporal Randomness (CSTR). By identifying areas and periods of heightened conflict activity, we aim to understand if the patterns are random or reflect underlying spatial and temporal processes, providing insights into the dynamics of conflict distribution.
 
-## 7.1 Visualising geographic distribution of conflicts by Quarter
+## 7.1 Battles
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  current_event = "Battles"
+
+  # Filter the data
+  battles_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
+  
+  # Define time slices for plotting
+  tims <- c(
+  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
+  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
+  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
+  "2024 Q1", "2024 Q2"
+)
+  
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(battles_data_sf), st_bbox(battles_data_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  summary(spattemp_ppp)
+
+```
 
 # 8.
 

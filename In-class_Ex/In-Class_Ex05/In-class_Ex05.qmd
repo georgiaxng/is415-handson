@@ -1,0 +1,197 @@
+---
+title: "In Class Exercise 5"
+author: "Georgia Ng"
+date: "September 16, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# 1. Overview
+
+# 2. Importing the Packages
+
+In this in class exercise, we will be using the following packages:
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse, knitr, GWmodel)
+```
+
+3 Data Wrangling
+
+### **3.1 Import shapefile into r environment**
+
+The code chunk below uses [*st_read()*](https://r-spatial.github.io/sf/reference/st_read.html) of **sf** package to import Hunan shapefile into R. The imported shapefile will be **simple features** Object of **sf**.
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+### **3.2 Import csv file into r environment**
+
+Next, we will import *Hunan_2012.csv* into R by using *read_csv()* of **readr** package. The output is R dataframe class.
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+### **3.3 Performing relational join**
+
+The code chunk below will be used to update the attribute table of *hunan*’s SpatialPolygonsDataFrame with the attribute fields of *hunan2012* dataframe. This is performed by using *left_join()* of **dplyr** package.
+
+```{r}
+#| eval: false
+hunan_sf <- left_join(hunan,hunan2012)%>%
+  select(1:3, 7, 15, 16, 31,32)
+```
+
+Saving the output into a output file so that R studio will no longer need to waste time on the previous step.
+
+```{r}
+#| eval: false
+write_rds(hunan_sf, "data/rds/hunan_sf.rds")
+```
+
+Reading the data.
+
+```{r}
+#| echo: false # so that code chunk is not seen
+hunan_sf <- read_rds( "data/rds/hunan_sf.rds")
+```
+
+## 3.4 Converting to SpatialPolygonDataFrame
+
+::: callout-note
+**GWmodel is built around the older sp and not sf formats for handling spatial data in R.**
+:::
+
+```{r}
+hunan_sp <- hunan_sf %>% as_Spatial()
+```
+
+# 4 Geographically Weighted Summary Statistics with adaptive bandwidth
+
+## 4.1 Determine Adaptive Bandwidth
+
+### 4.1.1 AIC
+
+```{r}
+bw_AIC <- bw.gwr(GDPPC ~ 1, 
+                 data = hunan_sp,
+                 approach = "AIC",
+                 adaptive = TRUE,
+                 kernel = "bisquare",
+                 longlat = T)
+```
+
+Good thing with GWmodel is that automatically determines the bandwidth for you
+
+::: callout-note
+Unit of measurement for bandwidth value shown here is in kilometres.
+:::
+
+### 4.1.2 Cross-validation
+
+```{r}
+bw_AIC <- bw.gwr(GDPPC ~ 1, 
+                 data = hunan_sp,
+                 approach = "CV",
+                 adaptive = TRUE,
+                 kernel = "bisquare",
+                 longlat = T)
+```
+
+Identical to AIC, same number of results generated.
+
+## 4.2 Determine Fixed Bandwidth
+
+### 4.2.1 AIC
+
+```{r}
+bw_AIC <- bw.gwr(GDPPC ~ 1, 
+                 data = hunan_sp,
+                 approach = "AIC",
+                 kernel = "bisquare",
+                 adaptive = FALSE,
+                 longlat = T)
+```
+
+### 4.2.2 Cross Validation
+
+```{r}
+bw_AIC <- bw.gwr(GDPPC ~ 1, 
+                 data = hunan_sp,
+                 approach = "CV",
+                 kernel = "bisquare",
+                 adaptive = FALSE,
+                 longlat = T)
+```
+
+::: callout-tip
+The bandwidth calculated here can be used to pass it over to the calculation (in next section). The number of
+:::
+
+## 4.3 Computing Geographically Weighted Summary Statistics
+
+Since we are using one variable for two chunks of code above (bw_AIC), need to make sure that the adaptive one is ran before this chunk of code is ran.
+
+```{r}
+#| echo: false # so that code chunk is not seen
+bw_AIC <- bw.gwr(GDPPC ~ 1, 
+                 data = hunan_sp,
+                 approach = "CV",
+                 adaptive = TRUE,
+                 kernel = "bisquare",
+                 longlat = T)
+```
+
+```{r}
+gstat <- gwss( data = hunan_sp,
+                vars = "GDPPC",
+                bw = bw_AIC,
+                kernel = "bisquare",
+                adaptive = TRUE,
+                longlat = T)
+```
+
+How to interpret the table of the data: GDPPC_LM –\> Average of all the neighbours
+
+### 4.3.2 Preparing the output data
+
+Code chunk below is used to extract SDF data table from gwss object output from `gwss()`. It will be converted into data.frame. It will be converted into data.frame by using as.data.frame().
+
+::: callout-note
+Sort or order etc altering functions cannot be applied to the code below, it will mess with the sequence fo the
+:::
+
+```{r}
+gstat_df <- as.data.frame(gstat$SDF)
+
+```
+
+Next, `cbind()` is used to append the newly derived data.frame onto hunan_sf sf data.frame.
+
+```{r}
+hunan_gstat <- cbind(hunan_sf, gstat_df)
+```
+
+## 4.4 Visualising Geographically Weighted Summary Statistics
+
+```{r, fig.width=10, fig.height=10}
+tm_shape(hunan_gstat)+
+  tm_fill("GDPPC_LM",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Distribution of geographically weighted mean",
+            main.title.position = "center",
+            main.title.size = 2.0,
+            legend.text.size = 1.2,
+            legend.height = 1.5,
+            legend.width = 1.5,
+            frame = TRUE)
+```
