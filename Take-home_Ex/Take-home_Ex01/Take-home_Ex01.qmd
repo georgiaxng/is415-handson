@@ -278,7 +278,22 @@ tm_shape(mmrsr_sf) +
     tm_legend(title = "Sub-regions")  # Set custom legend title
 ```
 
-# 2.5 Setting Seed
+## 2.5 Myanmar District Data.
+
+This chunk
+
+```{r}
+mmrsr_district_sf <- st_read(dsn="data/geospatial/mmr_district_mimu/", 
+                   layer="mmr_polbnda_adm2_250k_mimu")
+mmrsr_district_sf <- st_transform(mmrsr_district_sf, crs = 32647)
+st_is_valid(mmrsr_district_sf)
+```
+
+```{r}
+plot(mmrsr_district_sf)
+```
+
+## 2.6 Setting Seed
 
 To ensure the reproducibility, we will be using a fixed seed for our randomisation.
 
@@ -1168,11 +1183,6 @@ for(i in seq_along(battle_G_CK_list)) {
 }
 ```
 
-```{r}
-  plot(battle_G_CK_list[[8]], xlim=c(0,10000), main=names(battle_G_CK_list)[8])
-
-```
-
 ### 5.2.2 Explosions/Remote Violence
 
 ```{r,fig.width=14, fig.height=12}
@@ -1284,7 +1294,7 @@ for(i in seq_along(strategic_G_CK_list)) {
 }
 ```
 
-### 5.2.4 Violence Against Citizens
+### 5.2.4 Violence Against Civilians
 
 ```{r,fig.width=14, fig.height=12}
 #| code-fold: true
@@ -1347,9 +1357,294 @@ for(i in seq_along(violence_G_CK_list)) {
 
 -   The estimated/theoretical G function are all within the envelope, this indicates that the observed spatial distribution of points is not significantly different from what would be expected under a random distribution, suggesting that the observed patterns do not show strong evidence of non-random spatial structure.
 
-## 5.3 Sagaing
+## 5.3 Hotspot of Conflict
 
-## 5.4 Yangon
+### 5.3.1 Identifying the Hotspot of Conflict
+
+While the KDE map shows a high concentration of conflict in the region where Sagaing, Magway, and Mandalay intersect, it's challenging to visually pinpoint the exact region with the highest density of conflict events. To overcome this, we employ a quantitative approach using the following code chunk to calculate the number of conflict events within each region.
+
+By counting the number of data points within each region, we observe that the majority of conflict events occur in the Sagaing region. This result aligns with the spatial trends observed in the KDE map, confirming Sagaing as the area with the highest concentration of conflict.
+
+```{r}
+#| eval: false
+# Create an empty dataframe to store results
+conflict_counts <- data.frame(Region = character(), Conflict_Count = integer(), stringsAsFactors = FALSE)
+
+# Get a list of unique regions
+regions <- unique(mmrsr_sf$ST)
+
+# Loop through each region
+for (region in regions) {
+  # Filter the region geometry
+  region_sf <- mmrsr_sf %>% filter(ST == region)
+  
+  # Perform spatial intersection with conflict points
+  no_of_conflict_within <- st_intersection(acled_sf, region_sf)
+  
+  # Count the number of conflicts in this region
+  conflict_count <- nrow(no_of_conflict_within)
+  
+  # Store the results in the dataframe
+  conflict_counts <- rbind(conflict_counts, data.frame(Region = region, Conflict_Count = conflict_count))
+}
+
+# Arrange the results in descending order of conflict count
+conflict_counts_ordered <- conflict_counts %>%
+  arrange(desc(Conflict_Count))
+
+write_rds(conflict_counts_ordered, "data/rds/conflict_counts_ordered.rds")
+```
+
+```{r}
+conflict_counts_ordered <- read_rds( "data/rds/conflict_counts_ordered.rds")
+print(conflict_counts_ordered)
+```
+
+### 5.3.2 Sagaing Region
+
+Given that conflict events in Sagaing account for around 25% of the total, we aim to conduct a more detailed analysis to understand the spatial patterns within this significant region. The first step involves isolating the conflict events specific to Sagaing by filtering the data to focus exclusively on this area.
+
+#### 5.3.2.1 Overview of Sagaing Region
+
+Since we are focusing solely on Sagaing, here is a more granular map from MIMU which divides Sagaing into districts.
+
+```{r, fig.width=10, fig.height=8}
+sagaing_map_sf <- mmrsr_district_sf %>% filter(ST == "Sagaing")
+tm_shape(sagaing_map_sf) +
+  tm_polygons(col = "DT", palette = colors) +  # Apply color palette to polygons
+  tm_text("DT", size = 1, col = "black", bg.color = "white", just = c("center", "center"),  xmod = 0, ymod = 0) + tm_layout(main.title = "Sagaing",
+            main.title.position = "center",
+            main.title.size = 1.6,
+            legend.outside = TRUE,
+            frame = TRUE)+
+    tm_legend(title = "Districts")  # Set custom legend title
+```
+
+This chunk of code creates a Sagaing owin object, converts acled_sf into a ppp object and plots the a map displaying only conflict events in Sagaing Region.
+
+```{r}
+sagaing_owin <- as.owin(sagaing_map_sf)
+acled_ppp <- as.ppp(acled_sf)
+sagaing_ppp <- acled_ppp[sagaing_owin]
+plot(sagaing_ppp, pch = 16, cex = 0.5)
+```
+
+#### 5.3.2.2 Battles
+
+```{r,fig.width=14, fig.height=12}
+#| code-fold: true
+#| eval: false
+set.seed(123456)
+battle_data_sf <- grped_acled_sf %>% filter(event_type == "Battles")
+
+# Initialize an empty list to store the results
+sagaing_battle_G_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(battle_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- battle_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  G_CK.csr <- envelope(filtered_ppp, Gest, nsim = 99)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_battle_G_CK_list[[name]] <- G_CK.csr
+}
+
+write_rds(sagaing_battle_G_CK_list, "data/rds/sagaing_battle_G_CK_list.rds")
+
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_battle_G_CK_list <- read_rds( "data/rds/sagaing_battle_G_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_battle_G_CK_list)) {
+  g_ck <- sagaing_battle_G_CK_list[[i]]
+  plot(g_ck, xlim=c(0,10000), main=names(sagaing_battle_G_CK_list)[i])
+}
+```
+
+#### 5.3.2.3 Explosions/ Remote Violence
+
+```{r,fig.width=14, fig.height=12}
+#| code-fold: true
+#| eval: false
+set.seed(123456)
+explosions_data_sf <- grped_acled_sf %>% filter(event_type == "Explosions/Remote violence")
+
+# Initialize an empty list to store the results
+sagaing_explosions_G_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(explosions_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- explosions_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  G_CK.csr <- envelope(filtered_ppp, Gest, nsim = 99)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_explosions_G_CK_list[[name]] <- G_CK.csr
+}
+write_rds(sagaing_explosions_G_CK_list, "data/rds/sagaing_explosions_G_CK_list.rds")
+
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_explosions_G_CK_list <- read_rds( "data/rds/sagaing_explosions_G_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_explosions_G_CK_list)) {
+  g_ck <- sagaing_explosions_G_CK_list[[i]]
+  plot(g_ck, xlim=c(0,10000), main=names(sagaing_explosions_G_CK_list)[i])
+}
+```
+
+#### 5.3.2.4 Strategic Developments
+
+```{r,fig.width=14, fig.height=12}
+#| code-fold: true
+#| eval: false
+set.seed(123456)
+strategic_data_sf <- grped_acled_sf %>% filter(event_type == "Strategic developments")
+
+# Initialize an empty list to store the results
+sagaing_strategic_G_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(strategic_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- strategic_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  G_CK.csr <- envelope(filtered_ppp, Gest, nsim = 99)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_strategic_G_CK_list[[name]] <- G_CK.csr
+}
+write_rds(sagaing_strategic_G_CK_list, "data/rds/sagaing_strategic_G_CK_list.rds")
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_strategic_G_CK_list <- read_rds( "data/rds/sagaing_strategic_G_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_strategic_G_CK_list)) {
+  g_ck <- sagaing_strategic_G_CK_list[[i]]
+  plot(g_ck, xlim=c(0,10000), main=names(sagaing_strategic_G_CK_list)[i])
+}
+```
+
+#### 5.3.2.5 Violence against Civilians
+
+```{r,fig.width=14, fig.height=12}
+#| code-fold: true
+#| eval: false
+set.seed(123456)
+violence_data_sf <- grped_acled_sf %>% filter(event_type == "Violence against civilians")
+
+# Initialize an empty list to store the results
+sagaing_violence_G_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(violence_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- violence_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  G_CK.csr <- envelope(filtered_ppp, Gest, nsim = 99)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_violence_G_CK_list[[name]] <- G_CK.csr
+}
+write_rds(sagaing_violence_G_CK_list, "data/rds/sagaing_violence_G_CK_list.rds")
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_violence_G_CK_list <- read_rds( "data/rds/sagaing_violence_G_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_violence_G_CK_list)) {
+  g_ck <- sagaing_violence_G_CK_list[[i]]
+  plot(g_ck, xlim=c(0,10000), main=names(sagaing_violence_G_CK_list)[i])
+}
+```
+
+#### 5.3.2.6 Insights
 
 # 6. Quarterly Spatio-Temporal KDE Layers
 
@@ -2147,4 +2442,59 @@ The specific questions we aim to address are whether the locations of conflict i
    override.par=FALSE, 
    fix.range=TRUE)
   
+```
+
+## L Function
+
+```{r,fig.width=14, fig.height=12}
+#| eval: false
+set.seed(123456)
+battle_data_sf <- grped_acled_sf %>% filter(event_type == "Battles")
+
+# Initialize an empty list to store the results
+sagaing_battle_L_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(battle_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- battle_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  L_ck.csr <- envelope(filtered_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_battle_L_CK_list[[name]] <- L_ck.csr
+}
+
+write_rds(sagaing_battle_L_CK_list, "data/rds/sagaing_battle_L_CK_list.rds")
+
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_battle_L_CK_list <- read_rds( "data/rds/sagaing_battle_L_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_battle_L_CK_list)) {
+  g_ck <- sagaing_battle_L_CK_list[[i]]
+  plot(g_ck, . - r ~ r, xlab="d", ylab="L(d)-r", main=names(sagaing_battle_L_CK_list)[i])
+}
+
 ```
