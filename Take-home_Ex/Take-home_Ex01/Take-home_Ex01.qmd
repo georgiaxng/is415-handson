@@ -63,8 +63,10 @@ We will be using the following packages:
 
 -   **`sparr`**: Facilitates the analysis of spatial point patterns and spatial autoregressive models. It includes functions for fitting and analyzing spatial point processes, particularly useful for examining spatial dependencies and interactions in point pattern data.
 
+-   `stpp` : Provides tools for spatio-temporal point pattern analysis, including methods for modeling and analyzing the interactions and distributions of points over both space and time.
+
 ```{r}
-pacman::p_load(sf, raster, spNetwork, tmap, tidyverse, RColorBrewer, spatstat, sparr)
+pacman::p_load(sf, raster, spNetwork, tmap, tidyverse, RColorBrewer, spatstat, sparr, stpp,lgcp)
 ```
 
 ## 1.4 The Data
@@ -74,6 +76,10 @@ For the purpose of this study, we will be using the following datasets. Particul
 -   Armed Conflict Location & Event Data of Myanmar between Jan 2021 to Jun 2024 from [Armed Conflict Location & Event Data (ACLED)](https://acleddata.com/), an independent, impartial, international non-profit organization collecting data on violent conflict and protest in all countries and territories in the world.
 
 -   Myanmar State and Region Boundaries with Sub-region from [Myanmar Information Management Unit, MIMU](http://www.themimu.info/)
+
+-   [OpenStreetMap datase](https://www.geofabrik.de/geofabrik/openstreetmap.html)t, which is an open-sourced geospatial dataset including shapefiles of important layers including road networks, forests, building footprints and many other points of interest.
+
+-   Myanmar District Boundaries from [Myanmar Information Management Unit, MIMU](http://www.themimu.info/)
 
 # 2. Data Wrangling
 
@@ -278,15 +284,14 @@ tm_shape(mmrsr_sf) +
     tm_legend(title = "Sub-regions")  # Set custom legend title
 ```
 
-## 2.5 Myanmar District Data.
+## 2.5 Myanmar District Data
 
-This chunk
+This chunk of code imports the geospatial data for the districts of Myanmar from MIMU.
 
 ```{r}
 mmrsr_district_sf <- st_read(dsn="data/geospatial/mmr_district_mimu/", 
                    layer="mmr_polbnda_adm2_250k_mimu")
 mmrsr_district_sf <- st_transform(mmrsr_district_sf, crs = 32647)
-st_is_valid(mmrsr_district_sf)
 ```
 
 ```{r}
@@ -563,6 +568,8 @@ adjusted_bw
 
 ### 4.1.1 Q1
 
+This chunk of code generates the KDE layers using the adjusted bandwidth we have previously counted and the gaussian kernel, plotting the resulting KDE layers by each quarter.
+
 ```{r, fig.width=14, fig.height=12}
   par(mar = c(1,0,1,0))
   par(mfrow=c(2,2))
@@ -594,6 +601,14 @@ adjusted_bw
     plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
 }
 ```
+
+::: callout-note
+-   **Battles**: Distinct hotspot in Shan (North), which indicates this is likely the main battlefield during this quarter.
+
+-   **Explosions/Remote Violence**: Appears to have a wider spatial distribution, with more intense activity seen along the southern, western and central-eastern parts of the country. This suggests that attacks carried out here were more widespread and not confined to one region. This could imply different actors using remote violence across various territories or a strategic shift towards this type of warfare in multiple conflict zones.
+
+-   **Strategic Developments, Violence Against Civilians**: We can observe that both events display a similar KDE map, indicating that both events could have been carried out concurrently, hence leading to the similarity. The **co-occurrence of strategic developments and civilian violence** is concerning and could imply that the areas experiencing strategic military activity are also sites where civilians are more vulnerable to harm. These could be areas under military occupation, zones of forced displacement, or regions where there is a breakdown of law and order.
+:::
 
 ### 4.1.2 Q2
 
@@ -630,6 +645,14 @@ adjusted_bw
 }
 ```
 
+::: callout-note
+\* **Battles**: Presents a more spatially distributed distribution, with new hotspots at the Chin/Sagaing/Magway intersection.
+
+\* **Explosions/Remote Violence**: The intensity of explosions and remote violence has **shifted southward**, with the most significant hotspot now in Yangon, the capital of the country. The shift to **Yangon** could also be a sign of more strategic attacks aimed at disrupting economic or political centers of power, following the military coup in early 2021.
+
+\* **Strategic Developments, Violence Against Civilians:** Both events still present similar spatial distribution, reinforcing the idea that **military strategic moves** are closely linked to **targeted violence against civilians.**
+:::
+
 ### 4.1.3 Q3
 
 ```{r, fig.width=14, fig.height=12}
@@ -664,6 +687,10 @@ adjusted_bw
     plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
 }
 ```
+
+::: callout-note
+All 4 events shows a distinct hotspot at southern Sagaing, which appears to be the main battlefield and where most of the conflicts happen for 2021 Q4. Similarly, Yangon appears to have a significant amount of conflicts happening as well.
+:::
 
 ### 4.1.4 Q4
 
@@ -700,6 +727,10 @@ adjusted_bw
 }
 
 ```
+
+### 4.1.5 Overall Insights for 2021
+
+**Fluid Conflict Zones**: The **hotspots of conflict** in Myanmar were more fluid and dynamic, with notable shifts in violence across various regions throughout the year. This shifting pattern likely reflects the **early stages of the Myanmar civil conflict**, which began in full force following the **February 2021 military coup**. There is a strong focus placed on Yangon and Southern Sagaing in particular.
 
 ## 4.2 2022
 
@@ -845,6 +876,12 @@ adjusted_bw
 }
 ```
 
+### 4.2.5 Overall Insights for 2022
+
+**Stabilization of Conflict Zones**: The KDE plot for all quarters for the year of 2022 appears to stay identical, with majority of the conflicts being in the vicinity of southern Sagaing. This consistency indicates a **stabilization** of the conflict, with fewer fluctuations in the geography of violence. This suggests that the main **battleground** has become more fixed, with both government forces and resistance groups focusing their efforts in this region.
+
+**Implications**: The entrenchment of conflict in **southern Sagaing** also likely reflects a combination of military control over key areas and entrenched resistance by local groups. This stabilization might also indicate a **stalemate** or protracted conflict, where neither side is able to decisively push the front lines or gain control of new territories.
+
 ## 4.3 2023
 
 ### 4.3.1 Q1
@@ -987,6 +1024,16 @@ adjusted_bw
 }
 ```
 
+### 4.3.5 Overall Insights for 2023
+
+**Consistent hotspots**: There's a persistent area of high activity in the region around Southern Sagaing across all event types and quarters, similar to the previous year.
+
+**Event type variations**: Different event types show slightly different patterns. For example, "Strategic developments" tend to be more concentrated, while "Battles" and "Explosions/Remote violence" show more widespread activity.
+
+**Geographical spread:** Activity is not uniform across the country. The southern peninsular region generally shows less activity, while the central and northern regions show more.
+
+**Q4 escalation**: There appears to be an increase in activity across all event types in Q4, particularly in the northern regions.
+
 ## 4.4 2024
 
 ### 4.4.1 Q1
@@ -1025,6 +1072,12 @@ adjusted_bw
 
 ```
 
+::: callout-note
+**Less conflicts**: Conflict events appears to have lessen significantly, as evidenced from the decrease in the intensity level of the hotspots across Myanmar. This decline is particularly apparent for **"Explosions/Remote Violence,"** where the once prominent hotspots have become **less concentrated** and more dispersed compared to previous quarters.
+
+Possible Reasons
+:::
+
 ### 4.4.2 Q2
 
 ```{r, fig.width=14, fig.height=12}
@@ -1059,6 +1112,12 @@ adjusted_bw
     plot(kde_result, main = paste(current_event," ",current_year, " Q", current_quarter, sep = ""))
 }
 ```
+
+::: callout-note
+**Battles**: Hotspot in southern Sagaing has decreased in intensity
+
+**Violence Against Civilian**s: Hotspot in Sagaing remains, new hotspots are also appearing on the southern part of Myanmar.
+:::
 
 # 5. 2nd-Order Spatial Point Patterns Analysis
 
@@ -1123,6 +1182,13 @@ The plot typically shows several key elements related to both the observed data 
 :::
 
 ## 5.2 Whole of Myanmar
+
+To confirm the observed spatial patterns above, a hypothesis test (i.e. Monte Carlo simulation test) will be conducted. For this, the hypothesis and test are as follows:
+
+-   **Ho** = The distribution of conflict events in Myanmar are randomly distributed.
+-   **H1**= The distribution of conflict events in Myanmar are not randomly distributed.
+-   The null hypothesis will be rejected if **p-value is smaller** than **alpha value of 0.001**.
+-   The null hypothesis will
 
 ### 5.2.1 Battles
 
@@ -1355,7 +1421,7 @@ for(i in seq_along(violence_G_CK_list)) {
 
 -   The slope of the observed G-function generally shows a **smooth and constant trend**, with the exception of data from 2021 Q1. This anomaly can be attributed to the fact that conflicts were just beginning to emerge during this period, resulting in a sparse distribution of conflict events. As a result, the G-function for this early quarter might reflect less pronounced clustering or dispersion compared to later periods when the conflict events became more frequent and widespread.
 
--   The estimated/theoretical G function are all within the envelope, this indicates that the observed spatial distribution of points is not significantly different from what would be expected under a random distribution, suggesting that the observed patterns do not show strong evidence of non-random spatial structure.
+Conclusion:
 
 ## 5.3 Hotspot of Conflict
 
@@ -1645,6 +1711,223 @@ for(i in seq_along(sagaing_violence_G_CK_list)) {
 ```
 
 #### 5.3.2.6 Insights
+
+### K-Function
+
+#### Battles
+
+```{r}
+#| eval: false
+set.seed(123456)
+battle_data_sf <- grped_acled_sf %>% filter(event_type == "Battles")
+
+# Initialize an empty list to store the results
+sagaing_battle_K_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(battle_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- battle_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  K_ck.csr <- envelope(filtered_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_battle_K_CK_list[[name]] <- K_ck.csr
+}
+
+write_rds(sagaing_battle_K_CK_list, "data/rds/sagaing_battle_K_CK_list.rds")
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_battle_K_CK_list <- read_rds( "data/rds/sagaing_battle_K_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_battle_K_CK_list)) {
+  k_ck <- sagaing_battle_K_CK_list[[i]]
+  plot(k_ck, . - r ~ r, xlab="d", ylab="k(d)-r", main=names(sagaing_battle_K_CK_list)[i])
+}
+
+```
+
+#### Explosions/ Remote Violence
+
+```{r}
+#| eval: false
+set.seed(123456)
+explosions_data_sf <- grped_acled_sf %>% filter(event_type == "Explosions/Remote violence")
+
+# Initialize an empty list to store the results
+sagaing_explosions_K_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(explosions_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- explosions_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  K_ck.csr <- envelope(filtered_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_explosions_K_CK_list[[name]] <- K_ck.csr
+}
+
+write_rds(sagaing_explosions_K_CK_list, "data/rds/sagaing_explosions_K_CK_list.rds")
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_explosions_K_CK_list <- read_rds( "data/rds/sagaing_explosions_K_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_explosions_K_CK_list)) {
+  k_ck <- sagaing_explosions_K_CK_list[[i]]
+  plot(k_ck, . - r ~ r, xlab="d", ylab="k(d)-r", main=names(sagaing_explosions_K_CK_list)[i])
+}
+```
+
+#### Strategic Developments
+
+```{r}
+#| eval: false
+set.seed(123456)
+strategic_data_sf <- grped_acled_sf %>% filter(event_type == "Strategic developments")
+
+# Initialize an empty list to store the results
+sagaing_strategic_K_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(strategic_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- strategic_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  K_ck.csr <- envelope(filtered_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_strategic_K_CK_list[[name]] <- K_ck.csr
+}
+
+write_rds(sagaing_strategic_K_CK_list, "data/rds/sagaing_strategic_K_CK_list.rds")
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_strategic_K_CK_list <- read_rds( "data/rds/sagaing_strategic_K_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_strategic_K_CK_list)) {
+  k_ck <- sagaing_strategic_K_CK_list[[i]]
+  plot(k_ck, . - r ~ r, xlab="d", ylab="k(d)-r", main=names(sagaing_strategic_K_CK_list)[i])
+}
+
+```
+
+#### Violence Against Civilians
+
+```{r}
+#| eval: false
+set.seed(123456)
+violence_data_sf <- grped_acled_sf %>% filter(event_type == "Violence against civilians")
+
+# Initialize an empty list to store the results
+sagaing_violence_K_CK_list <- list()
+
+# Loop through each combination of year and quarter
+for (i in seq_len(nrow(violence_data_sf))) {
+  
+  # Filter the data for the current iteration
+  filtered_sf <- violence_data_sf[i, ]
+  
+  # Extract the current year, quarter, and event type
+  current_year <- filtered_sf$year
+  current_quarter <- filtered_sf$quarter
+  
+  # Convert to ppp object
+  filtered_ppp <- as.ppp(st_coordinates(filtered_sf), st_bbox(filtered_sf))
+  
+  if(any(duplicated(filtered_ppp))){
+    filtered_ppp <- rjitter(filtered_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  filtered_ppp <- filtered_ppp[sagaing_owin]
+  K_ck.csr <- envelope(filtered_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+  
+  # Save the result in the list with a unique name
+  name <- paste0(current_year, "_Q", current_quarter)
+  sagaing_violence_K_CK_list[[name]] <- K_ck.csr
+}
+
+write_rds(sagaing_violence_K_CK_list, "data/rds/sagaing_violence_K_CK_list.rds")
+
+```
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_violence_K_CK_list <- read_rds( "data/rds/sagaing_violence_K_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_violence_K_CK_list)) {
+  k_ck <- sagaing_violence_K_CK_list[[i]]
+  plot(k_ck, . - r ~ r, xlab="d", ylab="k(d)-r", main=names(sagaing_violence_K_CK_list)[i])
+}
+```
 
 # 6. Quarterly Spatio-Temporal KDE Layers
 
@@ -2319,41 +2602,173 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
 
 # 7. 2nd-Order Spatio-temporal Point Patterns Analysis
 
-The specific questions we aim to address are whether the locations of conflict in Myanmar are spatially and spatio-temporally independent. Using second-order spatio-temporal point pattern analysis, we will examine if the conflicts exhibit significant clustering or dispersion across geographic areas and over time. This analysis will determine whether the observed spatial patterns and temporal distributions of conflicts deviate from what would be expected under Complete Spatial Randomness (CSR) and Complete Spatio-Temporal Randomness (CSTR). By identifying areas and periods of heightened conflict activity, we aim to understand if the patterns are random or reflect underlying spatial and temporal processes, providing insights into the dynamics of conflict distribution.
+The specific questions we aim to address are whether the locations of conflict in Myanmar are spatio-temporally independent. Using second-order spatio-temporal point pattern analysis, we will examine if the conflicts exhibit significant clustering or dispersion across geographic areas and over time. This analysis will determine whether the observed spatial patterns and temporal distributions of conflicts deviate from what would be expected under Complete Spatial Randomness (CSR) and Complete Spatio-Temporal Randomness (CSTR). By identifying areas and periods of heightened conflict activity, we aim to understand if the patterns are random or reflect underlying spatial and temporal processes, providing insights into the dynamics of conflict distribution.
 
 ## 7.1 Battles
 
-```{r, fig.width=14, fig.height=12}
-#| code-fold: true
-  current_event = "Battles"
+## Mark
 
-  # Filter the data
-  battles_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
+```{r}
+current_event <- "Battles"
+
+quarter_to_continuous <- function(year, quarter) {
+  # Calculate the number of quarters since a reference point (e.g., 2000 Q1)
+  reference_year <- 2021
+  quarters_since_reference <- (year - reference_year) * 4 + quarter
+  return(quarters_since_reference)
+}
+
+grped_acled_quartered_sf <- acled_sf %>%   mutate(
+                                                          year = as.numeric(year),
+                                                          quarter = as.numeric(quarter),
+                                                          t = quarter_to_continuous(year, quarter)
+                                                        )
+grped_acled_quartered_sf <- grped_acled_quartered_sf %>% filter(event_type == current_event)
+
+# Step 2: Convert the data to a spatio-temporal point pattern
+# Define the spatial window (using your bounding box)
+
+# Create a spatio-temporal point pattern (ppp is the spatial part, time is added separately)
+ppp_data <- as.ppp(st_coordinates(grped_acled_quartered_sf), W = mmr_owin)
+marks(ppp_data) <- data.frame(time = acled_sf$t)
+
+Kst_result <- Kest(ppp_data, tmax = 1, rmax = 10000)
+
+# Step 4: Visualize and interpret the results
+plot(Kst_result)
+```
+
+## STPP
+
+### Battles
+
+```{r}
+  current_event <- "Battles"
   
-  # Define time slices for plotting
-  tims <- c(
-  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
-  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
-  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
-  "2024 Q1", "2024 Q2"
-)
-  
-  # Convert to ppp object
-  spattemp_ppp <- as.ppp(st_coordinates(battles_data_sf), st_bbox(battles_data_sf))
-  # Remove Duplicates
-  if(any(duplicated(spattemp_ppp))){
-    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  quarter_to_continuous <- function(year, quarter) {
+    # Calculate the number of quarters since a reference point (e.g., 2000 Q1)
+    reference_year <- 2021
+    quarters_since_reference <- (year - reference_year) * 4 + quarter
+    return(quarters_since_reference)
   }
-  # Convert to owin
-  spattemp_ppp <- spattemp_ppp[mmr_owin]
   
-  summary(spattemp_ppp)
+  grped_acled_quartered_sf <- acled_sf %>%   mutate(
+                                                            year = as.numeric(year),
+                                                            quarter = as.numeric(quarter),
+                                                            t = quarter_to_continuous(year, quarter)
+                                                          )
+  grped_acled_quartered_sf <- grped_acled_quartered_sf %>% filter(event_type == current_event)
+  
+  # Step 2: Convert the data to a spatio-temporal point pattern
+  # Define the spatial window (using your bounding box)
+  
+  # Create a spatio-temporal point pattern (ppp is the spatial part, time is added separately)
+  coords_matrix <- st_coordinates(grped_acled_quartered_sf)
+  x_coords <- coords_matrix[, "X"]
+  y_coords <- coords_matrix[, "Y"]
+  
+  stpp_data <- as.3dpoints(x_coords,y_coords, grped_acled_quartered_sf$t)
+  
+  Kst_result <- stpp::STIKhat(xyt=stpp_data)
+  
+  # Step 4: Visualize and interpret the results
+  plotK(Kst_result)
+```
+
+### Explosions/ Remote Violence
+
+```{r}
+  current_event <- "Explosions/Remote violence"
+  
+  quarter_to_continuous <- function(year, quarter) {
+    # Calculate the number of quarters since a reference point (e.g., 2000 Q1)
+    reference_year <- 2021
+    quarters_since_reference <- (year - reference_year) * 4 + quarter
+    return(quarters_since_reference)
+  }
+  
+  grped_acled_quartered_sf <- acled_sf %>%   mutate(
+                                                            year = as.numeric(year),
+                                                            quarter = as.numeric(quarter),
+                                                            t = quarter_to_continuous(year, quarter)
+                                                          )
+  grped_acled_quartered_sf <- grped_acled_quartered_sf %>% filter(event_type == current_event)
+  
+  # Step 2: Convert the data to a spatio-temporal point pattern
+  # Define the spatial window (using your bounding box)
+  
+  # Create a spatio-temporal point pattern (ppp is the spatial part, time is added separately)
+  coords_matrix <- st_coordinates(grped_acled_quartered_sf)
+   x_coords <- coords_matrix[, "X"] /1000
+  y_coords <- coords_matrix[, "Y"] /1000
+  
+  stpp_data <- as.3dpoints(x_coords,y_coords, grped_acled_quartered_sf$t)
+  
+  Kst_result <- stpp::STIKhat(xyt=stpp_data)
+  
+  # Step 4: Visualize and interpret the results
+  plotK(Kst_result)
 
 ```
 
-# 8.
+### LGCP
+
+```{r}
+  current_event <- "Battles"
+  
+  quarter_to_continuous <- function(year, quarter) {
+    # Calculate the number of quarters since a reference point (e.g., 2000 Q1)
+    reference_year <- 2021
+    quarters_since_reference <- (year - reference_year) * 4 + quarter
+    return(quarters_since_reference)
+  }
+  
+  grped_acled_quartered_sf <- acled_sf %>%   mutate(
+                                                            year = as.numeric(year),
+                                                            quarter = as.numeric(quarter),
+                                                            t = quarter_to_continuous(year, quarter)
+                                                          )
+  grped_acled_quartered_sf <- grped_acled_quartered_sf %>% filter(event_type == current_event)
+  
+  # Step 2: Convert the data to a spatio-temporal point pattern
+  # Define the spatial window (using your bounding box)
+  
+  # Create a spatio-temporal point pattern (ppp is the spatial part, time is added separately)
+  coords_matrix <- st_coordinates(grped_acled_quartered_sf)
+  x_coords <- coords_matrix[, "X"]
+  y_coords <- coords_matrix[, "Y"]
+  time_interval_range <- c(min(grped_acled_quartered_sf$t), max(grped_acled_quartered_sf$t))
+  
+  stpp_data <- as.3dpoints(x_coords,y_coords, grped_acled_quartered_sf$t)
+  
+  Kst_result <- stpp::STIKhat(xyt=stpp_data)
+  
+  # Step 4: Visualize and interpret the results
+  # plot(x=Kst_result)
+  # animation(xyt=Kst_result)
+  # rlgcp(coords_matrix,time_interval_range)
+
+```
+
+# 8. OpenStreetmap
 
 # 9. Overall Insights
+
+# 10. Reflections
+
+The biggest challenge I faced in this assignment was definitely in the interpretation of the plots and the analysis. It was difficult to find online resources on how to interpret it, and while there were numerous technical guides on how to calculate spatial statistics, very few focused on providing clear explanations for what the results actually mean in a real-world context.
+
+Understanding how to interpret functions like the G-function and the significance of clustering versus dispersion required a deep dive into spatial theory, which was not always straightforward.
+
+Another layer of complexity was in distinguishing between statistical significance and practical relevance. While my results showed clear clustering, translating that into meaningful insights—such as understanding why certain areas experience more conflicts—was not immediately obvious. This challenge highlighted the importance of combining spatial analysis with domain knowledge, in this case, political or socio-economic factors driving conflict.
+
+Furthermore, I also had to carefully consider the assumptions behind the models I used, particularly the assumption of Complete Spatial Randomness (CSR). In reality, conflicts are rarely random, and this led to questions about how appropriate these models are for analyzing such phenomena. It pushed me to think critically about the limitations of the tools and methods and reminded me that spatial analysis is as much about the context and the data as it is about the statistical techniques.
+
+In the end, this assignment taught me the importance of not just relying on statistical results but also developing the ability to interpret and contextualize those results in light of the real-world phenomena they are meant to represent. It also reinforced the need for interdisciplinary approaches, combining quantitative analysis with qualitative insights.
+
+# 11. References
+
+Baddeley, A., Rubak, E., & Turner, R. (2016). *Spatial point patterns: Methodology and applications with R*. CHAPMAN & HALL CRC.
 
 # Drafts
 
@@ -2497,4 +2912,26 @@ for(i in seq_along(sagaing_battle_L_CK_list)) {
   plot(g_ck, . - r ~ r, xlab="d", ylab="L(d)-r", main=names(sagaing_battle_L_CK_list)[i])
 }
 
+```
+
+# K-Function
+
+```{r}
+#| echo: false # so that code chunk is not seen
+sagaing_battle_K_CK_list <- read_rds( "data/rds/sagaing_battle_K_CK_list.rds")
+```
+
+```{r,fig.width=14, fig.height=12}
+par(mar = c(2,1,2,1))
+par(mfrow=c(4,4))
+# Plotting
+for(i in seq_along(sagaing_battle_K_CK_list)) {
+  k_ck <- sagaing_battle_K_CK_list[[i]]
+  plot(k_ck, . - r ~ r, xlab="d", ylab="k(d)-r", main=names(sagaing_battle_K_CK_list)[i])
+}
+```
+
+```{r}
+  k_ck <- sagaing_battle_K_CK_list[[3]]
+  plot(k_ck, . - r ~ r, xlab="d", ylab="k(d)-r", main=names(sagaing_battle_K_CK_list)[3])
 ```
