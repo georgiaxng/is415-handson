@@ -1,0 +1,37 @@
+---
+title: "Hands-On Exercise 6: Global & Local Measures of Spatial Autocorrelation"
+author: "Georgia Ng"
+date: "September 21, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# 6.1 Overview
+
+In this hands-on exercise, we will learn how to compute Global Measures of Spatial Autocorrelation (GMSA) by using **spdep** package. By the end to this hands-on exercise, we will be able to:
+
+-   import geospatial data using appropriate function(s) of **sf** package,
+
+-   import csv file using appropriate function of **readr** package,
+
+-   perform relational join using appropriate join function of **dplyr** package,
+
+-   compute Global Spatial Autocorrelation (GSA) statistics by using appropriate functions of **spdep** package,
+
+    -   plot Moran scatterplot,
+
+    -   compute and plot spatial correlogram using appropriate function of **spdep** package.
+
+-   provide statistically correct interpretation of GSA statistics.
+
+Also, we will learn how to compute Local Measures of Spatial Autocorrelation (LMSA). By the end to this hands-on exercise, we will be able to:
+
+-   compute Local Indicator of Spatial Association (LISA) statistics for detecting clusters and outliers by using appropriate functions **spdep** package;
+
+-   compute Getis-Ord’s Gi-statistics for detecting hot spot or/and cold spot area by using appropriate functions of **spdep** package; and
+
+-   to visualise the analysis output by using **tmap** package.

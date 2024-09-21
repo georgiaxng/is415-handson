@@ -13,6 +13,7 @@ format:
   html:
     code-fold: false
     code-summary: "Click to view the code"
+    embed-resources: true
 ---
 
 # 1. Overview
@@ -2494,16 +2495,23 @@ This chunk of code converts acled data to continuous quarter for time slices and
                                                     ) %>% distinct(event_type, geometry, t, .keep_all = TRUE)
 ```
 
-### 7.2.1 Battles
+::: callout-important
+There appears to be an issue where the plots appear in the viewer of Rstudio but yet I am unable to have it render and appear on the Quarto Document. Hence I have made the choice to instead download and display it instead.
+:::
 
 This chunk of code utilises `STIKhat()` from the `stpp` package to compute an estimate of the Space-Time Inhomogeneous K-function and `plotK()` to plot the graph.
 
+The code below plots the different graphical representation of the estimate of the Space-Time Inhomogeneous K-function: Projection, Perspective, Image.
+
+::: panel-tabset
+## Battles
+
 ```{r}
 #| eval: false
+#| code-fold: true
   current_event <- "Battles"
 
   battle_quartered_sf <- grped_acled_quartered_sf %>% filter(event_type == current_event)
-  
   coords_matrix <- st_coordinates(battle_quartered_sf)
   x_coords <- coords_matrix[, "X"]
   y_coords <- coords_matrix[, "Y"]
@@ -2521,30 +2529,27 @@ This chunk of code utilises `STIKhat()` from the `stpp` package to compute an es
 battle_stik_result <- read_rds( "data/rds/battle_stik_result.rds")
 ```
 
-The code below plots the different graphical representation of the estimate of the Space-Time Inhomogeneous K-function.
-
-::: panel-tabset
-## persp
-
 ```{r}
-plotK(battle_stik_result, type ="persp")
-```
-
-## projection
-
-```{r}
+#| eval: false
 plotK(battle_stik_result)
-```
-
-## image
-
-```{r}
+plotK(battle_stik_result, type ="persp")
 plotK(battle_stik_result, type ="image")
-
 ```
+
+::: {style="display: flex; flex-wrap: wrap;"}
+::: {style="flex: 1; margin: 5px;"}
+![Battle Projection](figure/battle_proj.png)
+
+![Battle Perspective](figure/battle_persp.png)
 :::
 
-### 7.2.2 Explosions/ Remote Violence
+::: {style="flex: 1; margin: 5px;"}
+![Battle Image](figure/battle_image.png)
+:::
+:::
+
+
+## Explosions/ Remote Violence
 
 ```{r}
 #| code-fold: true
@@ -2562,7 +2567,6 @@ plotK(battle_stik_result, type ="image")
   Kst_result <- stpp::STIKhat(xyt=stpp_data)
 
   write_rds(Kst_result, "data/rds/explosions_stik_result.rds")
-
 ```
 
 ```{r}
@@ -2570,28 +2574,25 @@ plotK(battle_stik_result, type ="image")
 explosions_stik_result <- read_rds( "data/rds/explosions_stik_result.rds")
 ```
 
-::: panel-tabset
-## persp
-
-```{r}
-plotK(explosions_stik_result, type ="persp")
-```
-
-## projection
-
 ```{r}
 plotK(explosions_stik_result)
-```
-
-## image
-
-```{r}
+plotK(explosions_stik_result, type ="persp")
 plotK(explosions_stik_result, type ="image")
-
 ```
+
+::: {style="display: flex; flex-wrap: wrap;"}
+::: {style="flex: 1; margin: 5px;"}
+![Explosions Projection](figure/explosions_proj.png)
+
+![Explosions Perspective](figure/explosions_persp.png)
 :::
 
-### 7.2.3 Strategic developments
+::: {style="flex: 1; margin: 5px;"}
+![Explosions Image](figure/explosions_image.png)
+:::
+:::
+
+## Strategic Developments
 
 ```{r}
 #| code-fold: true
@@ -2616,27 +2617,25 @@ plotK(explosions_stik_result, type ="image")
 strategic_stik_result <- read_rds( "data/rds/strategic_stik_result.rds")
 ```
 
-::: panel-tabset
-## persp
-
-```{r}
-plotK(strategic_stik_result, type ="persp")
-```
-
-## projection
-
 ```{r}
 plotK(strategic_stik_result)
-```
-
-## image
-
-```{r}
+plotK(strategic_stik_result, type ="persp")
 plotK(strategic_stik_result, type ="image")
-
 ```
+
+::: {style="display: flex; flex-wrap: wrap;"}
+::: {style="flex: 1; margin: 5px;"}
+![Strategic Projection](figure/strategic_proj.png)
+
+![Strategic Perspective](figure/strategic_persp.png)
 :::
-### 7.2.4 Violence Against Civilians
+
+::: {style="flex: 1; margin: 5px;"}
+![Strategic Image](figure/strategic_image.png)
+:::
+:::
+
+## Violence Against Civilians
 
 ```{r}
 #| code-fold: true
@@ -2660,27 +2659,24 @@ plotK(strategic_stik_result, type ="image")
 violence_stik_result <- read_rds( "data/rds/violence_stik_result.rds")
 ```
 
-::: panel-tabset
-## persp
-
-```{r}
-plotK(violence_stik_result, type ="persp")
-```
-
-## projection
-
 ```{r}
 plotK(violence_stik_result)
-```
-
-## image
-
-```{r}
+plotK(violence_stik_result, type ="persp")
 plotK(violence_stik_result, type ="image")
-
 ```
+::: {style="display: flex; flex-wrap: wrap;"}
+::: {style="flex: 1; margin: 5px;"}
+![Violence Projection](figure/violence_proj.png)
+
+![Violence Perspective](figure/violence_persp.png)
 :::
 
+::: {style="flex: 1; margin: 5px;"}
+![Violence Image](figure/violence_image.png)
+:::
+:::
+
+:::
 
 # 8. OpenStreetmap
 
