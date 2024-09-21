@@ -731,7 +731,7 @@ All 4 events shows a distinct hotspot at southern Sagaing, which appears to be t
 
 ### 4.1.5 Overall Insights for 2021
 
-**Fluid Conflict Zones**: The **hotspots of conflict** in Myanmar were more fluid and dynamic, with notable shifts in violence across various regions throughout the year. This shifting pattern likely reflects the **early stages of the Myanmar civil conflict**, which began in full force following the **February 2021 military coup**. There is a strong focus placed on Yangon and Southern Sagaing in particular.
+**Fluid Conflict Zones**: The hotspots of conflict in Myanmar were more fluid and dynamic, with notable shifts in violence across various regions throughout the year. This shifting pattern likely reflects the early stages of the Myanmar civil conflict, which began in full force following the February 2021 military coup. There is a strong focus placed on Yangon and Southern Sagaing in particular.
 
 ## 4.2 2022
 
@@ -879,9 +879,9 @@ All 4 events shows a distinct hotspot at southern Sagaing, which appears to be t
 
 ### 4.2.5 Overall Insights for 2022
 
-**Stabilization of Conflict Zones**: The KDE plot for all quarters for the year of 2022 appears to stay identical, with majority of the conflicts being in the vicinity of southern Sagaing. This consistency indicates a **stabilization** of the conflict, with fewer fluctuations in the geography of violence. This suggests that the main **battleground** has become more fixed, with both government forces and resistance groups focusing their efforts in this region.
+**Stabilization of Conflict Zones**: The KDE plot for all quarters for the year of 2022 appears to stay identical, with majority of the conflicts being in the vicinity of southern Sagaing. This consistency indicates a stabilization of the conflict, with fewer fluctuations in the geography of violence. This suggests that the main battleground has become more fixed, with both government forces and resistance groups focusing their efforts in this region.
 
-**Implications**: The entrenchment of conflict in **southern Sagaing** also likely reflects a combination of military control over key areas and entrenched resistance by local groups. This stabilization might also indicate a **stalemate** or protracted conflict, where neither side is able to decisively push the front lines or gain control of new territories.
+**Implications**: The entrenchment of conflict in southern Sagaing also likely reflects a combination of military control over key areas and entrenched resistance by local groups. This stabilization might also indicate a stalemate or protracted conflict, where neither side is able to decisively push the front lines or gain control of new territories.
 
 ## 4.3 2023
 
@@ -1750,13 +1750,15 @@ for(i in seq_along(sagaing_violence_K_CK_list)) {
 
 In this section, we will be conducting spatiotemporal Kernel Density Estimation (KDE). This approach allows us to visualize and analyze the density of conflicts over both space and time, providing a comprehensive view of how conflict activity evolves. By applying KDE to the dataset spanning from 2021 to 2024, we can identify hotspots and trends in conflict intensity across different quarters and regions.
 
-## 6.1 Battles
-
-### 6.1.1 Overview
+## 6.1 Overview
 
 This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal KDE for all 14 quarters from 2021 to 2024 Q2.
 
+::: panel-tabset
+## Battles
+
 ```{r, fig.width=14, fig.height=12}
+#| code-fold: true
   par(mar = c(2,0,2,0))
   par(mfrow=c(4,4))
   current_event = "Battles"
@@ -1790,136 +1792,9 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
      fix.range=TRUE, 
      main=paste(tims[x]))
 }
-
 ```
 
-### 6.1.2 By Year
-
-```{r}
-  current_event = "Battles"
-  quarter_2021_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2021)
-  quarter_2022_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2022)
-  quarter_2023_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2023)
-  quarter_2024_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2024)
-```
-
-::: panel-tabset
-## 2021
-
-```{r, fig.width=14, fig.height=12}
-  par(mar = c(2,0,2,0))
-  par(mfrow=c(2,2))
-  year = 2021
-  
-  tims <- c("Q1", "Q2", "Q3", "Q4")
-  # Convert to ppp object
-  spattemp_ppp <- as.ppp(st_coordinates(quarter_2021_sf), st_bbox(quarter_2021_sf))
-  # Remove Duplicates
-  if(any(duplicated(spattemp_ppp))){
-    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
-  }
-  
-  # Convert to owin
-  spattemp_ppp <- spattemp_ppp[mmr_owin]
-  
-  # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp)
-  for(x in seq_along(tims)){
-    plot(st_kde, x, 
-     override.par=FALSE, 
-     fix.range=TRUE, 
-     main=paste(year,tims[x]))}
-```
-
-## 2022
-
-```{r, fig.width=14, fig.height=12}
-#| code-fold: true
-  par(mar = c(2,0,2,0))
-  par(mfrow=c(2,2))
-  year = 2022
-  
-  tims <- c("Q1", "Q2", "Q3", "Q4")
-  # Convert to ppp object
-  spattemp_ppp <- as.ppp(st_coordinates(quarter_2022_sf), st_bbox(quarter_2022_sf))
-  # Remove Duplicates
-  if(any(duplicated(spattemp_ppp))){
-    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
-  }
-  
-  # Convert to owin
-  spattemp_ppp <- spattemp_ppp[mmr_owin]
-  
-  # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp)
-  for(x in seq_along(tims)){
-    plot(st_kde, x, 
-     override.par=FALSE, 
-     fix.range=TRUE, 
-     main=paste(year,tims[x]))}
-
-```
-
-## 2023
-
-```{r, fig.width=14, fig.height=12}
-#| code-fold: true
-  par(mar = c(2,0,2,0))
-  par(mfrow=c(2,2))
-  year = 2023
-  
-  tims <- c("Q1", "Q2", "Q3", "Q4")
-  # Convert to ppp object
-  spattemp_ppp <- as.ppp(st_coordinates(quarter_2023_sf), st_bbox(quarter_2023_sf))
-  # Remove Duplicates
-  if(any(duplicated(spattemp_ppp))){
-    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
-  }
-  
-  # Convert to owin
-  spattemp_ppp <- spattemp_ppp[mmr_owin]
-  
-  # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp)
-  for(x in seq_along(tims)){
-    plot(st_kde, x, 
-     override.par=FALSE, 
-     fix.range=TRUE, 
-     main=paste(year,tims[x]))}
-```
-
-## 2024
-
-```{r, fig.width=14, fig.height=12}
-#| code-fold: true
-  par(mar = c(2,0,2,0))
-  par(mfrow=c(2,2))
-  year = 2024
-  
-  tims <- c("Q1", "Q2")
-  # Convert to ppp object
-  spattemp_ppp <- as.ppp(st_coordinates(quarter_2024_sf), st_bbox(quarter_2024_sf))
-  # Remove Duplicates
-  if(any(duplicated(spattemp_ppp))){
-    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
-  }
-  
-  # Convert to owin
-  spattemp_ppp <- spattemp_ppp[mmr_owin]
-  
-  # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp)
-  for(x in seq_along(tims)){
-    plot(st_kde, x, 
-     override.par=FALSE, 
-     fix.range=TRUE, 
-     main=paste(year,tims[x]))}
-```
-:::
-
-## 6.2 Explosions/Remote violence
-
-### 6.2.1 Overview
+## Explosions/ Remote Violence
 
 ```{r, fig.width=14, fig.height=12}
 #| code-fold: true
@@ -1957,7 +1832,222 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
 }
 ```
 
-### 6.2.2 By Year
+## Strategic Developments
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(4,4))
+  current_event = "Strategic developments"
+  
+  # Filter the data
+  strategic_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
+  
+  # Define time slices for plotting
+  tims <- c(
+  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
+  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
+  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
+  "2024 Q1", "2024 Q2"
+)
+  
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(strategic_data_sf), st_bbox(strategic_data_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(tims[x]))
+}
+```
+
+## Violence Against Civilians
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(4,4))
+  current_event = "Violence against civilians"
+  # Filter the data
+  violence_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
+  
+  # Define time slices for plotting
+  tims <- c(
+  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
+  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
+  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
+  "2024 Q1", "2024 Q2"
+)
+  
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(violence_data_sf), st_bbox(violence_data_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(tims[x]))
+}
+```
+:::
+
+## 6.2 Spatio-Temporal KDE By Year
+
+### 6.2.1 Battles
+
+```{r}
+  current_event = "Battles"
+  quarter_2021_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2021)
+  quarter_2022_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2022)
+  quarter_2023_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2023)
+  quarter_2024_sf <- grped_acled_sf %>% filter(event_type == current_event, year == 2024)
+```
+
+This chunk of code plots the Spatio-Temporal KDE Layers by year.
+
+::: panel-tabset
+## 2021
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2021
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2021_sf), st_bbox(quarter_2021_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+
+## 2022
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2022
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2022_sf), st_bbox(quarter_2022_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+
+```
+
+## 2023
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2023
+  
+  tims <- c("Q1", "Q2", "Q3", "Q4")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2023_sf), st_bbox(quarter_2023_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+
+## 2024
+
+```{r, fig.width=14, fig.height=12}
+#| code-fold: true
+  par(mar = c(2,0,2,0))
+  par(mfrow=c(2,2))
+  year = 2024
+  
+  tims <- c("Q1", "Q2")
+  # Convert to ppp object
+  spattemp_ppp <- as.ppp(st_coordinates(quarter_2024_sf), st_bbox(quarter_2024_sf))
+  # Remove Duplicates
+  if(any(duplicated(spattemp_ppp))){
+    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
+  }
+  
+  # Convert to owin
+  spattemp_ppp <- spattemp_ppp[mmr_owin]
+  
+  # Compute the spatiotemporal Kernel Density Estimate (KDE)
+  st_kde <- spattemp.density(spattemp_ppp)
+  for(x in seq_along(tims)){
+    plot(st_kde, x, 
+     override.par=FALSE, 
+     fix.range=TRUE, 
+     main=paste(year,tims[x]))}
+```
+:::
+
+::: callout-note
+-   In early 2021, event density was relatively sparse, with small clusters emerging in central Myanmar.
+
+-   By Q4 of 2021, the density intensified, revealing a significant hotspot in central Myanmar, indicating escalated conflict.
+
+-   Throughout 2022 and 2023, the central region remained the most active, though the extent and concentration of hotspots fluctuated, suggesting either an escalation or a shift in conflict zones.
+
+-   In 2024, the pattern became very dispersed, indicating further changes in conflict dynamics.
+:::
+
+### 6.2.2 Explosions/Remote violence
 
 ```{r}
   current_event = "Explosions/Remote violence"
@@ -2083,47 +2173,19 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
 ```
 :::
 
-## 6.3 Strategic developments
+::: callout-note
+-   In both 2022 and 2023, the Sagaing region of Myanmar experienced similar significant fluctuations in event density:
 
-### 6.3.1 Overview
+    -   **Q1:** There shows to be a high density of explosions/remote violence in the Sagaing region.
 
-```{r, fig.width=14, fig.height=12}
-#| code-fold: true
-  par(mar = c(2,0,2,0))
-  par(mfrow=c(4,4))
-  current_event = "Strategic developments"
-  
-  # Filter the data
-  strategic_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
-  
-  # Define time slices for plotting
-  tims <- c(
-  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
-  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
-  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
-  "2024 Q1", "2024 Q2"
-)
-  
-  # Convert to ppp object
-  spattemp_ppp <- as.ppp(st_coordinates(strategic_data_sf), st_bbox(strategic_data_sf))
-  # Remove Duplicates
-  if(any(duplicated(spattemp_ppp))){
-    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
-  }
-  # Convert to owin
-  spattemp_ppp <- spattemp_ppp[mmr_owin]
-  
-  # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp)
-  for(x in seq_along(tims)){
-    plot(st_kde, x, 
-     override.par=FALSE, 
-     fix.range=TRUE, 
-     main=paste(tims[x]))
-}
-```
+    -   **Q2 & Q3:** Conflicts subsided, likely due to localized negotiations and strategic withdrawals by armed groups, which reduced hostilities.
 
-### 6.3.2 By Year
+    -   **Q4:** Conflicts yet again intensified, surpassing even Q1. A resurgence of conflict seems to have occurred.
+
+-   In Q4 of 2023, conflicts exhibited a more dispersed pattern, primarily concentrated in the northern region, with Sagaing remaining at the center of this activity.
+:::
+
+### 6.2.3 Strategic developments
 
 ```{r}
   current_event = "Strategic developments"
@@ -2250,46 +2312,11 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
 ```
 :::
 
-## 6.4 Violence against civilians
+::: callout-note
+During Q2 to Q4 of 2023, there was limited activity in strategic developments, but this changed abruptly with a significant intensification in Q1 of 2024.
+:::
 
-### 6.4.1 Overview
-
-```{r, fig.width=14, fig.height=12}
-#| code-fold: true
-  par(mar = c(2,0,2,0))
-  par(mfrow=c(4,4))
-  current_event = "Violence against civilians"
-  # Filter the data
-  violence_data_sf <- grped_acled_sf %>% filter(event_type == current_event)
-  
-  # Define time slices for plotting
-  tims <- c(
-  "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4",
-  "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
-  "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
-  "2024 Q1", "2024 Q2"
-)
-  
-  # Convert to ppp object
-  spattemp_ppp <- as.ppp(st_coordinates(violence_data_sf), st_bbox(violence_data_sf))
-  # Remove Duplicates
-  if(any(duplicated(spattemp_ppp))){
-    rjitter(spattemp_ppp, retry=TRUE, nsim=1, drop=TRUE)
-  }
-  # Convert to owin
-  spattemp_ppp <- spattemp_ppp[mmr_owin]
-  
-  # Compute the spatiotemporal Kernel Density Estimate (KDE)
-  st_kde <- spattemp.density(spattemp_ppp)
-  for(x in seq_along(tims)){
-    plot(st_kde, x, 
-     override.par=FALSE, 
-     fix.range=TRUE, 
-     main=paste(tims[x]))
-}
-```
-
-### 6.4.2 By Year
+### 6.2.4 Violence against civilians
 
 ```{r}
   current_event = "Violence against civilians"
@@ -2415,6 +2442,10 @@ This chunk of code utilizes `spattemp.density()` to compute the spatiotemporal K
      main=paste(year,tims[x]))}
 
 ```
+:::
+
+::: callout-note
+In 2024, incidents of violence against civilians became more dispersed, featuring a significant hotspot of high density in the Sagaing region, there also appears to be some concentration of activity in southern Myanmar that was not commonly observed in other plots.
 :::
 
 # 7. 2nd-Order Spatio-temporal Point Patterns Analysis
@@ -2674,27 +2705,45 @@ plotK(violence_stik_result, type ="image")
 ::: {style="flex: 1; margin: 5px;"}
 ![Violence Image](figure/violence_image.png)
 :::
+
+## 
 :::
 :::
 
-## 7.3 Interpreting the Plots
+## 7.3 Interpreting
 
-# 8. OpenStreetmap
+Difference between the plots
 
-# 9. Overall Insights
+-   The projection plot shows contours of intensity over space and time.
 
-# 10. Reflections
+-   The image plot provides a heatmap view, with darker blue indicating higher intensity.
 
-The biggest challenge I faced in this assignment was definitely in the interpretation of the plots and the analysis. It was difficult to find online resources on how to interpret it, and while there were numerous technical guides on how to calculate spatial statistics, very few focused on providing clear explanations for what the results actually mean in a real-world context.
+-   The perspective plot gives a 3D visualization of the intensity surface.
 
-Understanding how to interpret functions like the G-function and the significance of clustering versus dispersion required a deep dive into spatial theory, which was not always straightforward.
+Overall Insights
 
-Another layer of complexity was in distinguishing between statistical significance and practical relevance. While my results showed clear clustering, translating that into meaningful insights—such as understanding why certain areas experience more conflicts—was not immediately obvious. This challenge highlighted the importance of combining spatial analysis with domain knowledge, in this case, political or socio-economic factors driving conflict.
+-   All four types of event show spatiotemporal clustering, indicating non-random patterns.
 
-Furthermore, I also had to carefully consider the assumptions behind the models I used, particularly the assumption of Complete Spatial Randomness (CSR). In reality, conflicts are rarely random, and this led to questions about how appropriate these models are for analyzing such phenomena. It pushed me to think critically about the limitations of the tools and methods and reminded me that spatial analysis is as much about the context and the data as it is about the statistical techniques.
+-   There's a general trend of increasing intensity over time for all event types, which could suggest an escalation of conflict.
 
-In the end, this assignment taught me the importance of not just relying on statistical results but also developing the ability to interpret and contextualize those results in light of the real-world phenomena they are meant to represent. It also reinforced the need for interdisciplinary approaches, combining quantitative analysis with qualitative insights.
+-   The similar intensity scales across all event types suggest that no single type of event dominates the conflict in terms of frequency or intensity.
 
-# 11. References
+# 8. Overall Insights
+
+In conclusion, the analysis of the Myanmar conflict from 2021 to 2024 reveals significant shifts in patterns of violence, initially marked by fluidity and later stabilizing in key regions such as Southern Sagaing. Both the Kernel Density Estimation (KDE) and spatio-temporal analyses consistently indicate clustering of conflict events, as demonstrated by the G-function and K-function results.
+
+Importantly, the KDE map illustrates a correlation between "Strategic Developments" and "Violence Against Civilians," as evidenced by their similar spatial distributions. The sharp rise in strategic developments in Q1 2024, coupled with the emergence of new hotspots for violence against civilians, underscores the ongoing changes in conflict dynamics.
+
+These findings highlight the urgent need for targeted interventions in entrenched conflict zones, particularly in Southern Sagaing and the newly identified hotspots in southern Myanmar. As the situation continues to evolve, addressing these areas will be crucial for mitigating violence and fostering stability.
+
+# 9. Reflections
+
+The biggest challenge I faced in this assignment was interpreting the plots and analyses. While there are many technical guides on calculating spatial statistics, few provide clear explanations on how to interpret the generated plots. It took hours of research to find suitable resources, and information on STIKhat, in particular, was quite limited. I cannot yet confidently say that I fully understand what it aims to show or how to interpret it.
+
+Distinguishing between statistical significance and practical relevance was also complex. Although my results showed clear clustering, translating this into meaningful insights—such as understanding the factors driving increased conflict in certain areas—proved challenging. While grappling with the G-function and K-function provided valuable insights, it also made me question the appropriateness of these models for analyzing phenomena where conflicts are rarely random.
+
+Ultimately, this assignment reinforced the necessity of not only relying on statistical results but also developing the ability to interpret and contextualize those findings within real-world contexts. Nonetheless, I learned a lot from this experience, and I consider my greatest accomplishment to be mastering the interpretation of the G-function and K-function plots. Overall, it was a truly enriching experience and I learnt a lot.
+
+# 10. References
 
 Baddeley, A., Rubak, E., & Turner, R. (2016). *Spatial point patterns: Methodology and applications with R*. CHAPMAN & HALL CRC.
