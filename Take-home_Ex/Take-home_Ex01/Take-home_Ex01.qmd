@@ -2496,12 +2496,12 @@ This chunk of code converts acled data to continuous quarter for time slices and
 ```
 
 ::: callout-important
-There appears to be an issue where the plots appear in the viewer of Rstudio but yet I am unable to have it render and appear on the Quarto Document. Hence I have made the choice to instead download and display it instead.
+There seems to be an issue where the plots appear in the viewer of Rstudio but yet I am unable to have it rendered and appear on the Quarto Document. Hence I have made the choice to instead download and display it instead.
 :::
 
-This chunk of code utilises `STIKhat()` from the `stpp` package to compute an estimate of the Space-Time Inhomogeneous K-function and `plotK()` to plot the graph.
+This first chunk of code utilises `STIKhat()` from the `stpp` package to compute an estimate of the Space-Time Inhomogeneous K-function and `plotK()` to plot the graph.
 
-The code below plots the different graphical representation of the estimate of the Space-Time Inhomogeneous K-function: Projection, Perspective, Image.
+The second chunk of code then plots the different graphical representation of the estimate of the Space-Time Inhomogeneous K-function: Projection, Perspective, Image so that we are able to get a view of the different graphs.
 
 ::: panel-tabset
 ## Battles
@@ -2547,7 +2547,6 @@ plotK(battle_stik_result, type ="image")
 ![Battle Image](figure/battle_image.png)
 :::
 :::
-
 
 ## Explosions/ Remote Violence
 
@@ -2664,6 +2663,7 @@ plotK(violence_stik_result)
 plotK(violence_stik_result, type ="persp")
 plotK(violence_stik_result, type ="image")
 ```
+
 ::: {style="display: flex; flex-wrap: wrap;"}
 ::: {style="flex: 1; margin: 5px;"}
 ![Violence Projection](figure/violence_proj.png)
@@ -2675,8 +2675,9 @@ plotK(violence_stik_result, type ="image")
 ![Violence Image](figure/violence_image.png)
 :::
 :::
-
 :::
+
+## 7.3 Interpreting the Plots
 
 # 8. OpenStreetmap
 
