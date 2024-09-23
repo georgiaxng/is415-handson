@@ -1,0 +1,13 @@
+---
+title: "Take Home Exercise 2"
+author: "Georgia Ng"
+date: "September 26, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# 1.0 Overview
