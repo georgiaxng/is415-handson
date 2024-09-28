@@ -67,7 +67,7 @@ We will be using the following packages:
 -   `stpp` : Provides tools for spatio-temporal point pattern analysis, including methods for modeling and analyzing the interactions and distributions of points over both space and time.
 
 ```{r}
-pacman::p_load(sf, raster, spNetwork, tmap, tidyverse, RColorBrewer, spatstat, sparr, stpp,lgcp)
+pacman::p_load(sf, raster, spNetwork, tmap, tidyverse, RColorBrewer, spatstat, sparr, stpp)
 ```
 
 ## 1.4 The Data

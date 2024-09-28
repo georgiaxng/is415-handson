@@ -8,6 +8,613 @@ execute:
   echo: true
   warning: false
   freeze: true
+  cache: true
+format:
+  html:
+    code-fold: false
+    code-summary: "Click to view the code"
+    embed-resources: true
 ---
 
-# 1.0 Overview
+# 1. Overview
+
+## 1.1 Introduction
+
+Drug abuse is associated with significant negative health, financial and social consequences. Yet, illicit drug consumption remains highly prevalent and continues to be a growing problem worldwide. In 2021, 1 in 17 people aged 15–64 in the world had used a drug in the past 12 months. Notwithstanding population growth, the estimated number of drug users grew from 240 million in 2011 to 296 million in 2021.
+
+The geopolitics of Thailand which is near the Golden Triangle of Indochina, the largest drug production site in Asia, and the constant transportation infrastructure development made Thailand became market and transit routes for drug trafficking to the third countries.
+
+In Thailand, drug abuse is one of the major social issue. There are about 2.7 million youths using drugs in Thailand. Among youths aged between 15 and 19 years, there are about 300,000 who have needs for drug treatment. Most of Thai youths involved with drugs are vocational-school students, which nearly doubles in number compared to secondary-school students.
+
+## 1.2 Goal
+
+In this exercise, we are going to achieve the following tasks:
+
+-   Using appropriate function of **sf** and **tidyverse**, preparing the following geospatial data layer:
+
+    -   a study area layer in sf polygon features. It must be at [province level](https://en.wikipedia.org/wiki/Provinces_of_Thailand) (including Bangkok) of Thailand.
+
+    -   a drug abuse indicators layer within the study area in sf polygon features.
+
+-   Using the extracted data, perform global spatial autocorrelation analysis by using [sfdep methods](https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex05/in-class_ex05-glsa).
+
+-   Using the extracted data, perform local spatial autocorrelation analysis by using [sfdep methods](https://r4gdsa.netlify.app/chap10.html).
+
+-   Describe the spatial patterns revealed by the analysis above.
+
+## 1.3 Importing of Packages
+
+Before we start off, we will have to import the necessary packages required for us to conduct our analysis.
+
+We will be using the following packages:
+
+-   **`sf`**: Manages spatial vector data, enabling operations like spatial joins, buffering, and transformations for points, lines, and polygons.
+
+-   **`tmap`**: Creates and customizes thematic maps for spatial data visualization, including static and interactive maps with various map elements.
+
+-   **`tidyverse`**: A suite of packages for data manipulation (`dplyr`), visualization (`ggplot2`), and tidying (`tidyr`), facilitating a streamlined workflow for data analysis.
+
+-   **`ggplot2`**: A powerful data visualization package within the tidyverse, allowing the creation of complex and customizable graphs. It supports a wide range of geospatial plotting when combined with `sf` objects, enabling seamless integration of spatial data in layered plots like points, polygons, and lines.
+
+-   **`sfdep`**: Facilitates spatial dependence analysis by providing tools to compute spatial weights, autocorrelation statistics, and other spatial econometric measures. It integrates with the `sf` package, allowing users to easily conduct spatial analysis on spatial data frames.
+
+```{r}
+pacman::p_load(sf, tmap, tidyverse, sfdep, ggplot2)
+```
+
+## 1.4 Dataset
+
+For the purpose of this take-home exercise, two data sets shall be used, they are:
+
+-   Thailand Drug Offenses \[2017-2022\] at Kaggle.
+
+-   Thailand - Subnational Administrative Boundaries at HDX. You are required to use the province boundary data set. Thailand administrative level 0 (country), 1 (province), 2 (district), and 3 (sub-district, tambon) boundaries
+
+# 2. Data Wrangling
+
+## 2.1 Importing Thailand Drug Offenses
+
+This line of code imports the Thailand Drug Offenses dataset from Kaggle while using the `select()` function to remove the `province_th` column which is not useful to us. For this dataset, we have a total of 7392 rows.
+
+```{r}
+drug_offenses_sf <- read_csv("data/aspatial/drug_offence/thai_drug_offenses_2017_2022.csv") %>% select(-province_th)
+```
+
+```{r}
+summary(drug_offenses_sf)
+```
+
+## 2.2 Importing Thailand - Subnational Administrative Boundaries
+
+This line of code imports the Thailand - Subnational Administrative Boundaries dataset using `st_read()`. As shown, there is a total of 77 geographic features, representing the [76 provinces in Thailand as well as one additional special administrative area](https://en.wikipedia.org/wiki/Provinces_of_Thailand) (Bangkok).
+
+```{r}
+thailand_province_sf <- st_read(dsn="data/geospatial/tha_adm_rtsd_itos_20210121_shp/", 
+                   layer="tha_admbnda_adm1_rtsd_20220121") %>%
+  select(ADM1_EN, geometry)  
+```
+
+This line of code checks if all the polygons are valid.
+
+```{r}
+st_is_valid(thailand_province_sf)
+```
+
+This line of code displays the study area.
+
+```{r}
+tm_shape(thailand_province_sf) +
+  tm_polygons() 
+```
+
+## 2.3 Data Cleansing & Extraction
+
+### 2.3.1 Extracting Data
+
+To see the different types of drug offenses currently in the dataset, we can use `unique()`. From this we can see that there a total of 16 types of different offenses.
+
+```{r}
+unique(drug_offenses_sf$types_of_drug_offenses)
+```
+
+However, since the study area for this exercise is on drug abuse specifically, we will only be focusing on drug use cases which we will use `filter()` to do so, limiting the scope of this project to only that.
+
+```{r}
+drug_use_sf <-drug_offenses_sf%>%filter(types_of_drug_offenses=="drug_use_cases")
+summary(drug_use_sf)
+```
+
+### 2.3.2 Performing relational join
+
+#### 2.3.2.1 Failed Attempt
+
+To fix and standardize the data for consistent matching, we will use `toupper()` to ensure the columns `ADM1_EN` of `thailand_province_sf` and `province_en` of `drug_use_sf` can match correctly.
+
+```{r}
+drug_use_sf$province_en <- toupper(drug_use_sf$province_en)
+thailand_province_sf$ADM1_EN <- toupper(thailand_province_sf$ADM1_EN)
+```
+
+And to ensure that the changes are done correctly, we can use `head()` for this. As seen here, the province names are all now in upper cases.
+
+::: panel-tabset
+## drug_use_sf
+
+```{r}
+head(drug_use_sf)
+```
+
+## thailand_province_sf
+
+```{r}
+head(thailand_province_sf)
+```
+:::
+
+The code chunk below will be used to update the attribute table of `drug_use_sf` and `thailand_province_sf` dataframe. This is performed by using `left_join()` of dplyr package.
+
+```{r}
+combined_drug_use_sf <- left_join(thailand_province_sf, drug_use_sf,
+                          by =  c("ADM1_EN" = "province_en"))
+```
+
+After performing the `left_join()` between `thailand_province_sf` and `drug_use_sf`, we can use`summary()` to examine the resulting dataset. The output indicated that the combined dataset contains only **452 rows as compared to the original 462 rows for `drug_use_sf`**.
+
+This suggests that there were rows in `drug_use_sf` that did not successfully join with `thailand_province_sf`.
+
+```{r}
+summary(combined_drug_use_sf)
+```
+
+#### 2.3.2.2 Fixing the Mismatch in Province Names
+
+The most likely reasons for this could be a mismatch in certain Province Names, hence to effectively identified the province names that do not match between the two datasets, we can utilize `anti_join()` to do so, finding the rows in each that did not manage to join in each dataset. This provides a straightforward comparison of the discrepancies between the two datasets.
+
+```{r}
+# Get rows in drug_use_sf that didn't match with thailand_province_sf
+unmatched_in_drug_use <- anti_join(drug_use_sf, thailand_province_sf, 
+                                        by = c("province_en" = "ADM1_EN"))
+
+# Get rows in thailand_province_sf that didn't match with drug_offenses_sf
+unmatched_in_thailand_province <- anti_join(thailand_province_sf, drug_use_sf, 
+                                            by = c("ADM1_EN" = "province_en"))
+
+# Display mismatched values
+unmatched_province_en <- unique(unmatched_in_drug_use$province_en)
+unmatched_adm1_en <- unique(unmatched_in_thailand_province$ADM1_EN)
+
+# View the mismatched sets
+list("Unmatched in drug_use_sf" = unmatched_province_en,
+     "Unmatched in thailand_province_sf" = unmatched_adm1_en)
+
+```
+
+As shown, there is a mismatch in the naming of the two provinces in each dataset although they are referring to the same provinces, hence we will need to standardise that. Since "Lopburi" and "Bueng Kan" were the names used in wikipedia, we will just be sticking with that.
+
+This code performs standardization of province names in two datasets: `drug_offenses_sf` and `thailand_province_sf`, using `recode()` to change specific values.
+
+```{r}
+# Update the values in the province_en column
+drug_use_sf <- drug_use_sf %>%
+  mutate(province_en = recode(province_en,
+                               "LOBURI" = "LOPBURI",
+                               "BUOGKAN" = "BUENG KAN"))
+
+# Update the values in the ADM1_EN column
+thailand_province_sf <- thailand_province_sf %>%
+  mutate(ADM1_EN = recode(ADM1_EN,
+                          "LOP BURI" = "LOPBURI",
+                          "BUENG KAN" = "BUENG KAN"))
+```
+
+#### 2.3.2.3 Reattempt At Performing Relational Join
+
+Finally, let us try to perform the relational join again. As seen, we have a total of 462 rows which aligns with the total number of rows that is in `drug_offenses_sf` and for us to easier refer to it, we will rename the column to `province`.
+
+```{r}
+combined_drug_use_sf <- left_join(thailand_province_sf, drug_use_sf,
+                          by =  c("ADM1_EN" = "province_en")) %>%
+  rename(province = ADM1_EN)
+
+summary(combined_drug_use_sf)
+```
+
+## 2.3 Drug Use Cases Visualisation
+
+```{r}
+#| eval: false
+# Step 1: Aggregate data by year, summing the number of cases
+drug_use_by_year <- combined_drug_use_sf %>% select(fiscal_year, no_cases) %>%
+  group_by(fiscal_year) %>%
+  summarise(total_cases = sum(no_cases), .groups = 'drop')
+
+write_rds(drug_use_by_year, "data/rds/drug_use_by_year.rds")
+```
+
+```{r}
+#| echo: false
+drug_use_by_year <- read_rds( "data/rds/drug_use_by_year.rds")
+```
+
+```{r, fig.height=5}
+# Create the bar plot with exact labels
+ggplot(drug_use_by_year, aes(x = factor(fiscal_year), y = total_cases)) +  # Convert fiscal_year to factor
+  geom_col(fill = "red", color = "black") +  # Use geom_col for the bar plot
+  geom_text(aes(label = total_cases), vjust = -0.5, size = 5) +  # Add text labels on top of bars
+  labs(title = "Total Drug Use Cases by Year", x = "Year", y = "Total Cases") +
+  theme_minimal() +
+  scale_x_discrete(drop = FALSE) + # Ensures all years are shown on the x-axis
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 2.4 Geographic Distribution of Drug Use Cases by Province and by Year
+
+Using the tmap methods below, we can create chloropeth maps to visualise the geographic distribution of the drug use cases by province and by year.
+
+```{r, fig.height=10, fig.width=12}
+# Set tmap mode to view or plot
+tmap_mode("plot")
+
+tm_shape(combined_drug_use_sf) +
+  tm_polygons("no_cases", title = "Drug Use Cases", style = "quantile", palette = "Reds", n=5) +
+  tm_facets(by = "fiscal_year", nrow = 2, ncol = 3) +  # Adjust rows and columns as needed
+    tm_layout(
+    main.title = "Geographic Distribution of Drug Use Cases by Province and by Year",  # Main title for the entire plot
+    legend.position = c("left", "top"),
+    legend.text.size = 1.2,
+    main.title.size = 1.5,  
+    main.title.position = "center"
+  )
+
+```
+
+# 3. Global Measures of Spatial Autocorrelation
+
+```{r}
+# Filter for each year from 2017 to 2022
+drug_use_2017_sf <- combined_drug_use_sf %>% filter(fiscal_year == 2017)
+drug_use_2018_sf <- combined_drug_use_sf %>% filter(fiscal_year == 2018)
+drug_use_2019_sf <- combined_drug_use_sf %>% filter(fiscal_year == 2019)
+drug_use_2020_sf <- combined_drug_use_sf %>% filter(fiscal_year == 2020)
+drug_use_2021_sf <- combined_drug_use_sf %>% filter(fiscal_year == 2021)
+drug_use_2022_sf <- combined_drug_use_sf %>% filter(fiscal_year == 2022)
+```
+
+## 3.1 Computing Contiguity Spatial Weights (QUEEN)
+
+Before calculating global spatial autocorrelation statistics, we first need to construct spatial weights for the study area. These weights define the neighborhood relationships between the geographical units (such as counties) within the study region. To do so, we will use st_conguity() of the sfdep package, the equivalent of `poly2nb()` function from the `spdep` package. This function creates a list of neighboring regions based on shared boundaries and is needed for when we conduct the subsequent tests.
+
+The code chunk below is used to compute Queen contiguity weight matrix.
+
+```{r}
+#| eval: false
+wm_q <- st_contiguity(thailand_province_sf, queen = TRUE)
+
+write_rds(wm_q, "data/rds/wm_q.rds")
+summary(wm_q)
+```
+
+```{r}
+#| echo: false
+wm_q<-read_rds( "data/rds/wm_q.rds")
+summary(wm_q)
+```
+
+::: callout-note
+The most connected area has 9 neighbours. There are two area units with only one heighbours.
+
+-   The summary report above shows that there are 77 area units in Thailand.
+
+-   The least connected province is Trat, with only 1 neighbour.
+
+-   The most connected provinces on the other hand, are Khon Kaen and Tak, with 9 neighbours.
+
+-   A province with no neighbour is Phuket.
+:::
+
+For reference on where these provinces of interest are.
+
+```{r, fig.height= 8}
+#| code-fold: true
+
+# Define the regions and corresponding colors
+highlight_info <- c(
+  "TRAT" = "yellow",     
+  "KHON KAEN" = "red",
+  "TAK" = "blue",
+  "PHUKET" = "green"
+)
+
+# Set tmap mode to plot
+tmap_mode("plot")  # Use "plot" for static maps
+
+# Create the base map with all provinces
+base_map <- tm_shape(thailand_province_sf) +
+  tm_polygons(col = "lightgray", title = "Province Highlight")
+
+# Initialize combined map with the base map
+combined_map <- base_map
+
+# Loop through the highlight_info to add each region
+for (region in names(highlight_info)) {
+  combined_map <- combined_map + 
+    tm_shape(thailand_province_sf[thailand_province_sf$ADM1_EN == region, ]) +
+    tm_polygons(col = highlight_info[region], 
+                 alpha = 0.7)  # No title needed here
+}
+
+# Manually add a legend using tm_add_legend
+legend_elements <- lapply(names(highlight_info), function(region) {
+  list(label = region, col = highlight_info[region])
+})
+
+# Add layout options and custom legend
+combined_map +
+  tm_add_legend(type = "fill", 
+                labels = names(highlight_info), 
+                col = highlight_info, 
+                title = "Highlighted Provinces") +
+  tm_layout(
+    title = "Highlighted Provinces in Thailand", 
+    legend.position = c("right", "bottom"),
+    title.position = c("center", "top"),
+    legend.title.size = 1.2,  # Adjust legend title size
+    legend.text.size = 1      # Adjust legend text size
+  )
+```
+
+To further investigate why Phuket has no neighboring provinces, we can examine the zoomed-in map of the region. The map clearly illustrates that Phuket is an island, situated away from the mainland. This geographical separation accounts for its lack of direct neighboring provinces.
+
+```{r}
+#| code-fold: true
+# Filter the dataset for Phuket province
+phuket_sf <- thailand_province_sf %>% 
+  filter(ADM1_EN == "PHUKET")
+
+# Get bounding box for Phuket and slightly expand it to include surrounding provinces
+bbox_phuket <- st_bbox(phuket_sf)
+
+# Expand the bounding box by a certain factor (e.g., 0.1 degrees in each direction)
+bbox_phuket_expanded <- bbox_phuket
+bbox_phuket_expanded[1] <- bbox_phuket[1] - 0.1  # xmin
+bbox_phuket_expanded[3] <- bbox_phuket[3] + 0.1  # xmax
+bbox_phuket_expanded[2] <- bbox_phuket[2] + 0.1  # ymin (correcting direction)
+bbox_phuket_expanded[4] <- bbox_phuket[4] + 0.1  # ymax
+
+# Create a temporary dataset for plotting
+phuket_plot_data <- thailand_province_sf %>%
+  mutate(is_phuket = ifelse(ADM1_EN == "PHUKET", "Phuket", "Other Provinces"))
+
+# Set the color palette explicitly for Phuket and other provinces
+color_palette <- c("Phuket" = "red", "Other Provinces" = "gray85")
+
+# Plot using tmap and focus on the Phuket region and its surroundings
+tmap_mode("plot")  # Set tmap to static plotting mode
+
+tm_shape(phuket_plot_data, bbox = bbox_phuket_expanded) +
+  tm_borders() +        # Add borders of your spatial data
+  tm_fill(col = "is_phuket", palette = color_palette) +  # Fill Phuket with red, others gray  
+  tm_layout(title = "Phuket and Surrounding Provinces", frame = TRUE)  # Zoom in to Phuket region
+```
+
+## 3.2 Generating Spatial Weights
+
+The chunk of code below utilizes the `st_weights()` function from the sfdep package to generate spatial weights for each neighboring polygon. Specifically, it constructs a weights matrix based on the contiguity defined by the `wm_q` object, allowing for the specification of weights style (here set to "W" for row-standardized weights). The `allow_zero` parameter is set to `TRUE`, which permits the inclusion of polygons with no neighbors in the analysis, ensuring that all spatial units are represented in the weights matrix.
+
+```{r}
+# wm_q is our neighbors list created using st_contiguity
+rswm_q <- st_weights(wm_q, style = "W", allow_zero = TRUE)
+```
+
+## 3.3 Moran's I
+
+We will be using Moran's I to compute global spatial autocorrelation instead of Geary's C because Moran's I provides a more comprehensive measure of spatial autocorrelation. While Geary's C focuses on the squared differences between neighboring observations, which can make it sensitive to local variations and outliers, Moran's I considers the overall correlation between values and their spatial locations. This allows us to capture both positive and negative spatial autocorrelation more effectively.
+
+Furthermore, Moran's I is well-suited for assessing patterns across larger regions, making it ideal for our analysis of spatial relationships of drug use across provinces in Thailand.
+
+### 3.3.1 Moran's I Test
+
+The below line of code uses `global_moran_test()` of sfdep package to performs Moran’s I statistical testing
+
+::: panel-tabset
+
+\## 2017
+
+```{r}
+global_moran_test(drug_use_2017_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
+```
+
+## 2018
+
+```{r}
+global_moran_test(drug_use_2018_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
+```
+
+## 2019
+
+```{r}
+global_moran_test(drug_use_2019_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
+```
+
+## 2020
+
+```{r}
+global_moran_test(drug_use_2020_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
+```
+
+## 2021
+
+```{r}
+global_moran_test(drug_use_2021_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
+```
+
+## 2022
+
+```{r}
+global_moran_test(drug_use_2022_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
+```
+
+:::
+
+### 3.3.2 Computing Monte Carlo Moran’s I
+
+In the code chunk below, `global_moran_perm()` of sfdep is used to perform permutation test for Moran’s I statistic. A total of 1000 simulation will be performed. We will also be using `seed()` to ensure the reproducibility of our code.
+
+::: panel-tabset
+## 2017
+
+```{r}
+set.seed(1234)
+gmc_i_2017<-global_moran_perm(drug_use_2017_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2017
+```
+
+## 2018
+
+```{r}
+set.seed(1234)
+gmc_i_2018<-global_moran_perm(drug_use_2018_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2018
+```
+
+## 2019
+
+```{r}
+set.seed(1234)
+gmc_i_2019<-global_moran_perm(drug_use_2019_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2019
+```
+
+## 2020
+
+```{r}
+set.seed(1234)
+gmc_i_2020<-global_moran_perm(drug_use_2020_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2020
+```
+
+## 2021
+
+```{r}
+set.seed(1234)
+gmc_i_2021<-global_moran_perm(drug_use_2021_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2021
+```
+
+## 2022
+
+```{r}
+set.seed(1234)
+gmc_i_2022<-global_moran_perm(drug_use_2022_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2022
+```
+:::
+
+## 3.4 Visualising Monte Carlo Moran’s I
+
+In order to examine the simulated Moran’s I test statistics in greater detail. We can do so by plotting the distribution of the statistical values as a histogram by using the code chunk below.
+
+In the code chunk below hist() and abline() of R Graphics are used.
+
+### 3.4.1 Descriptive Statistics of Simulated Moran's I
+
+::: panel-tabset
+## Summary
+
+```{r}
+# 2017
+print(summary(gmc_i_2017$res[1:999]))
+# 2018
+print(summary(gmc_i_2018$res[1:999]))
+# 2019
+print(summary(gmc_i_2019$res[1:999]))
+# 2020
+print(summary(gmc_i_2020$res[1:999]))
+# 2021
+print(summary(gmc_i_2021$res[1:999]))
+# 2022
+print(summary(gmc_i_2022$res[1:999]))
+```
+
+## Variance
+
+```{r}
+# Calculating variances and storing them in variables
+gmc_i_var_2017 <- var(gmc_i_2017$res[1:999])
+gmc_i_var_2018 <- var(gmc_i_2018$res[1:999])
+gmc_i_var_2019 <- var(gmc_i_2019$res[1:999])
+gmc_i_var_2020 <- var(gmc_i_2020$res[1:999])
+gmc_i_var_2021 <- var(gmc_i_2021$res[1:999])
+gmc_i_var_2022 <- var(gmc_i_2022$res[1:999])
+
+# Printing the variances
+cat(sprintf("Variance of '2017': %f\n", gmc_i_var_2017))
+cat(sprintf("Variance of '2018': %f\n", gmc_i_var_2018))
+cat(sprintf("Variance of '2019': %f\n", gmc_i_var_2019))
+cat(sprintf("Variance of '2020': %f\n", gmc_i_var_2020))
+cat(sprintf("Variance of '2021': %f\n", gmc_i_var_2021))
+cat(sprintf("Variance of '2022': %f\n", gmc_i_var_2022))
+
+```
+:::
+
+### 3.4.2 Histogram of Simulated Values
+
+```{r, fig.height=10}
+#| code-fold: true
+# Set up the plotting area for 2 columns and 3 rows
+par(mfrow = c(3, 2)) 
+
+# Histogram for 2017
+hist(gmc_i_2017$res, 
+     freq = TRUE, 
+     breaks = 20, 
+     xlab = "Simulated Moran's I", 
+     main = "Histogram for 2017")
+abline(v = 0, col = "red")
+
+# Histogram for 2018
+hist(gmc_i_2018$res, 
+     freq = TRUE, 
+     breaks = 20, 
+     xlab = "Simulated Moran's I", 
+     main = "Histogram for 2018")
+abline(v = 0, col = "red")
+
+# Histogram for 2019
+hist(gmc_i_2019$res, 
+     freq = TRUE, 
+     breaks = 20, 
+     xlab = "Simulated Moran's I", 
+     main = "Histogram for 2019")
+abline(v = 0, col = "red")
+
+# Histogram for 2020
+hist(gmc_i_2020$res, 
+     freq = TRUE, 
+     breaks = 20, 
+     xlab = "Simulated Moran's I", 
+     main = "Histogram for 2020")
+abline(v = 0, col = "red")
+
+# Histogram for 2021
+hist(gmc_i_2021$res, 
+     freq = TRUE, 
+     breaks = 20, 
+     xlab = "Simulated Moran's I", 
+     main = "Histogram for 2021")
+abline(v = 0, col = "red")
+
+# Histogram for 2022
+hist(gmc_i_2022$res, 
+     freq = TRUE, 
+     breaks = 20, 
+     xlab = "Simulated Moran's I", 
+     main = "Histogram for 2022")
+abline(v = 0, col = "red")
+
+```
+
+## 3.5 Spatial Correlogram
+
+### 3.5.1 Computing Moran’s I correlogram
