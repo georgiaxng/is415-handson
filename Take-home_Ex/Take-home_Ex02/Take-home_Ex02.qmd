@@ -560,7 +560,7 @@ cat(sprintf("Variance of '2022': %f\n", gmc_i_var_2022))
 
 ### 3.4.2 Histogram of Simulated Values
 
-```{r, fig.height=10}
+```{r, fig.height=8}
 #| code-fold: true
 # Set up the plotting area for 2 columns and 3 rows
 par(mfrow = c(3, 2)) 
