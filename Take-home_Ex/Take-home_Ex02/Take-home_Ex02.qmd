@@ -59,7 +59,7 @@ We will be using the following packages:
 -   **`sfdep`**: Facilitates spatial dependence analysis by providing tools to compute spatial weights, autocorrelation statistics, and other spatial econometric measures. It integrates with the `sf` package, allowing users to easily conduct spatial analysis on spatial data frames.
 
 ```{r}
-pacman::p_load(sf, tmap, tidyverse, sfdep, ggplot2)
+pacman::p_load(sf, tmap, tidyverse, sfdep, ggplot2, e1071)
 ```
 
 ## 1.4 Dataset
@@ -268,7 +268,7 @@ tm_shape(combined_drug_use_sf) +
 
 ```
 
-# 3. Global Measures of Spatial Autocorrelation
+# 3. Global Spatial Autocorrelation Analysis
 
 ```{r}
 # Filter for each year from 2017 to 2022
@@ -282,26 +282,28 @@ drug_use_2022_sf <- combined_drug_use_sf %>% filter(fiscal_year == 2022)
 
 ## 3.1 Computing Contiguity Spatial Weights (QUEEN)
 
-Before calculating global spatial autocorrelation statistics, we first need to construct spatial weights for the study area. These weights define the neighborhood relationships between the geographical units (such as counties) within the study region. To do so, we will use st_conguity() of the sfdep package, the equivalent of `poly2nb()` function from the `spdep` package. This function creates a list of neighboring regions based on shared boundaries and is needed for when we conduct the subsequent tests.
+Before calculating global spatial autocorrelation statistics, we first need to construct spatial weights for the study area. These weights define the neighborhood relationships between the geographical units (such as counties) within the study region. To do so, we will use `st_conguity()` of the `sfdep` package, the equivalent of `poly2nb()` function from the `spdep` package. This function creates a list of neighboring regions based on shared boundaries and is needed for when we conduct the subsequent tests.
+
+In particular, we are using the Queen contiguity criterion, which defines neighbors as regions that share either a boundary or a vertex. This method is often preferred for creating spatial weights because it includes more neighboring units than the Rook criterion (which only considers shared boundaries).
 
 The code chunk below is used to compute Queen contiguity weight matrix.
 
 ```{r}
 #| eval: false
-wm_q <- st_contiguity(thailand_province_sf, queen = TRUE)
+nb_list <- st_contiguity(thailand_province_sf, queen = TRUE)
 
-write_rds(wm_q, "data/rds/wm_q.rds")
-summary(wm_q)
+write_rds(nb_list, "data/rds/nb_list.rds")
+summary(nb_list)
 ```
 
 ```{r}
 #| echo: false
-wm_q<-read_rds( "data/rds/wm_q.rds")
-summary(wm_q)
+nb_list<-read_rds( "data/rds/nb_list.rds")
+summary(nb_list)
 ```
 
 ::: callout-note
-The most connected area has 9 neighbours. There are two area units with only one heighbours.
+The most connected area has 9 neighbours. There are two area units with only one neighbours.
 
 -   The summary report above shows that there are 77 area units in Thailand.
 
@@ -314,15 +316,15 @@ The most connected area has 9 neighbours. There are two area units with only one
 
 For reference on where these provinces of interest are.
 
-```{r, fig.height= 8}
+```{r, fig.height= 6}
 #| code-fold: true
 
 # Define the regions and corresponding colors
 highlight_info <- c(
   "TRAT" = "yellow",     
-  "KHON KAEN" = "red",
+  "KHON KAEN" = "green",
   "TAK" = "blue",
-  "PHUKET" = "green"
+  "PHUKET" = "red"
 )
 
 # Set tmap mode to plot
@@ -399,167 +401,129 @@ tm_shape(phuket_plot_data, bbox = bbox_phuket_expanded) +
 
 ## 3.2 Generating Spatial Weights
 
-The chunk of code below utilizes the `st_weights()` function from the sfdep package to generate spatial weights for each neighboring polygon. Specifically, it constructs a weights matrix based on the contiguity defined by the `wm_q` object, allowing for the specification of weights style (here set to "W" for row-standardized weights). The `allow_zero` parameter is set to `TRUE`, which permits the inclusion of polygons with no neighbors in the analysis, ensuring that all spatial units are represented in the weights matrix.
+The chunk of code below utilizes the `st_weights()` function from the sfdep package to generate spatial weights for each neighboring polygon. Specifically, it constructs a weights matrix based on the contiguity defined by the `nb_list` object, allowing for the specification of weights style (here set to "W" for row-standardized weights). The `allow_zero` parameter is set to `TRUE`, which permits the inclusion of polygons with no neighbors in the analysis, ensuring that all spatial units are represented in the weights matrix.
 
 ```{r}
-# wm_q is our neighbors list created using st_contiguity
-rswm_q <- st_weights(wm_q, style = "W", allow_zero = TRUE)
+# nb_list is our neighbors list created using st_contiguity
+gm_wt <- st_weights(nb_list, style = "W", allow_zero = TRUE)
 ```
 
-## 3.3 Moran's I
+## 3.3 Moran's I Test
 
 We will be using Moran's I to compute global spatial autocorrelation instead of Geary's C because Moran's I provides a more comprehensive measure of spatial autocorrelation. While Geary's C focuses on the squared differences between neighboring observations, which can make it sensitive to local variations and outliers, Moran's I considers the overall correlation between values and their spatial locations. This allows us to capture both positive and negative spatial autocorrelation more effectively.
 
-Furthermore, Moran's I is well-suited for assessing patterns across larger regions, making it ideal for our analysis of spatial relationships of drug use across provinces in Thailand.
+Furthermore, Moran's I is well-suited for assessing patterns across larger regions, making it ideal for our analysis of spatial relationships of drug use across provinces in Thailand. The confidence interval for this experiment will be set at 95%.
 
-### 3.3.1 Moran's I Test
+**Hypothesis Testing:**
 
-The below line of code uses `global_moran_test()` of sfdep package to performs Moran’s I statistical testing
+Null Hypothesis: The spatial distribution of drug use cases resemble random distribution.
 
-::: panel-tabset
+Alternative Hypothesis: The spatial distribution of drug use cases does not resemble random distribution.
 
-\## 2017
-
-```{r}
-global_moran_test(drug_use_2017_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
-```
-
-## 2018
-
-```{r}
-global_moran_test(drug_use_2018_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
-```
-
-## 2019
-
-```{r}
-global_moran_test(drug_use_2019_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
-```
-
-## 2020
-
-```{r}
-global_moran_test(drug_use_2020_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
-```
-
-## 2021
-
-```{r}
-global_moran_test(drug_use_2021_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
-```
-
-## 2022
-
-```{r}
-global_moran_test(drug_use_2022_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE)
-```
-
-:::
-
-### 3.3.2 Computing Monte Carlo Moran’s I
-
-In the code chunk below, `global_moran_perm()` of sfdep is used to perform permutation test for Moran’s I statistic. A total of 1000 simulation will be performed. We will also be using `seed()` to ensure the reproducibility of our code.
+The below line of code uses `global_moran_test()` of sfdep package to performs Moran’s I statistical testing and `global_moran_perm()` of sfdep is used to perform permutation testing for Moran’s I statistic. A total of 1000 simulation will be performed. We will also be using `seed()` to ensure the reproducibility of our code.
 
 ::: panel-tabset
 ## 2017
 
 ```{r}
+global_moran_test(drug_use_2017_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE)
+```
+
+```{r}
 set.seed(1234)
-gmc_i_2017<-global_moran_perm(drug_use_2017_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2017<-global_moran_perm(drug_use_2017_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2017
 ```
+The statistical report for 2017 above show that the p-value is greater than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering.
 
 ## 2018
 
 ```{r}
+global_moran_test(drug_use_2018_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE)
+```
+
+```{r}
 set.seed(1234)
-gmc_i_2018<-global_moran_perm(drug_use_2018_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2018<-global_moran_perm(drug_use_2018_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2018
 ```
+
+The statistical report for 2018 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. 
 
 ## 2019
 
 ```{r}
+global_moran_test(drug_use_2019_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE)
+```
+
+```{r}
 set.seed(1234)
-gmc_i_2019<-global_moran_perm(drug_use_2019_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2019<-global_moran_perm(drug_use_2019_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2019
 ```
+The statistical report for 2019 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. This number (`0.13805`) is however greater than the previous years, a sign that stronger clustering occurred in this year as compared to the previous.
+
 
 ## 2020
 
 ```{r}
+global_moran_test(drug_use_2020_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE)
+```
+
+```{r}
 set.seed(1234)
-gmc_i_2020<-global_moran_perm(drug_use_2020_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2020<-global_moran_perm(drug_use_2020_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2020
 ```
+
+The statistical report for 2020 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. 
 
 ## 2021
 
 ```{r}
+global_moran_test(drug_use_2021_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE)
+```
+
+```{r}
 set.seed(1234)
-gmc_i_2021<-global_moran_perm(drug_use_2021_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2021<-global_moran_perm(drug_use_2021_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2021
 ```
+
+The statistical report for 2021 above show that the p-value is lower than alpha value of 0.05. Hence, we have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. Overall, this shows a weak but significant positive spatial autocorrelation in drug use cases.
 
 ## 2022
 
 ```{r}
+global_moran_test(drug_use_2022_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE)
+```
+
+```{r}
 set.seed(1234)
-gmc_i_2022<-global_moran_perm(drug_use_2022_sf$no_cases,wm_q,rswm_q, zero.policy = TRUE, nsim=999)
+gmc_i_2022<-global_moran_perm(drug_use_2022_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2022
 ```
+The statistical report for 2022 above show that the p-value is lower than alpha value of 0.05. Hence, we have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. Overall, this shows a weak but significant positive spatial autocorrelation in drug use cases.
+:::
+
+::: callout-note
+- Over the years, we can observe that the Moran's I statistics is displaying an increasing trend all the way until 2020 when it decreased and then reaching an all-time high in 2021.
+
+- We can also observe that the drug use cases in 2021 and 2022 no longer resemble random distribution, indicating significant spatial autocorrelation. This change suggests that drug use is becoming increasingly concentrated in specific geographic areas, warranting further investigation into the factors contributing to this clustering.
+
+- The observed clustering, particularly in 2021 and 2022, suggests that policymakers should consider region-specific interventions. Identifying hotspots for drug use can help allocate resources more effectively and develop targeted prevention and treatment programs.
+
 :::
 
 ## 3.4 Visualising Monte Carlo Moran’s I
 
-In order to examine the simulated Moran’s I test statistics in greater detail. We can do so by plotting the distribution of the statistical values as a histogram by using the code chunk below.
+In order to examine the simulated Moran’s I test statistics in greater detail, we can collate the descriptive statistics of the test and plot the distribution of the statistical values as a histogram by using the code chunk below.
 
-In the code chunk below hist() and abline() of R Graphics are used.
-
-### 3.4.1 Descriptive Statistics of Simulated Moran's I
+In the code chunk below `summary()`, `var()`, `hist()` and `abline()` are used.
 
 ::: panel-tabset
-## Summary
 
-```{r}
-# 2017
-print(summary(gmc_i_2017$res[1:999]))
-# 2018
-print(summary(gmc_i_2018$res[1:999]))
-# 2019
-print(summary(gmc_i_2019$res[1:999]))
-# 2020
-print(summary(gmc_i_2020$res[1:999]))
-# 2021
-print(summary(gmc_i_2021$res[1:999]))
-# 2022
-print(summary(gmc_i_2022$res[1:999]))
-```
-
-## Variance
-
-```{r}
-# Calculating variances and storing them in variables
-gmc_i_var_2017 <- var(gmc_i_2017$res[1:999])
-gmc_i_var_2018 <- var(gmc_i_2018$res[1:999])
-gmc_i_var_2019 <- var(gmc_i_2019$res[1:999])
-gmc_i_var_2020 <- var(gmc_i_2020$res[1:999])
-gmc_i_var_2021 <- var(gmc_i_2021$res[1:999])
-gmc_i_var_2022 <- var(gmc_i_2022$res[1:999])
-
-# Printing the variances
-cat(sprintf("Variance of '2017': %f\n", gmc_i_var_2017))
-cat(sprintf("Variance of '2018': %f\n", gmc_i_var_2018))
-cat(sprintf("Variance of '2019': %f\n", gmc_i_var_2019))
-cat(sprintf("Variance of '2020': %f\n", gmc_i_var_2020))
-cat(sprintf("Variance of '2021': %f\n", gmc_i_var_2021))
-cat(sprintf("Variance of '2022': %f\n", gmc_i_var_2022))
-
-```
-:::
-
-### 3.4.2 Histogram of Simulated Values
-
+## Histogram
 ```{r, fig.height=8}
 #| code-fold: true
 # Set up the plotting area for 2 columns and 3 rows
@@ -615,6 +579,300 @@ abline(v = 0, col = "red")
 
 ```
 
-## 3.5 Spatial Correlogram
+## Summary
 
-### 3.5.1 Computing Moran’s I correlogram
+```{r}
+# 2017
+print(summary(gmc_i_2017$res[1:999]))
+# 2018
+print(summary(gmc_i_2018$res[1:999]))
+# 2019
+print(summary(gmc_i_2019$res[1:999]))
+# 2020
+print(summary(gmc_i_2020$res[1:999]))
+# 2021
+print(summary(gmc_i_2021$res[1:999]))
+# 2022
+print(summary(gmc_i_2022$res[1:999]))
+```
+
+## Variance
+
+```{r}
+# Calculating variances and storing them in variables
+gmc_i_var_2017 <- var(gmc_i_2017$res[1:999])
+gmc_i_var_2018 <- var(gmc_i_2018$res[1:999])
+gmc_i_var_2019 <- var(gmc_i_2019$res[1:999])
+gmc_i_var_2020 <- var(gmc_i_2020$res[1:999])
+gmc_i_var_2021 <- var(gmc_i_2021$res[1:999])
+gmc_i_var_2022 <- var(gmc_i_2022$res[1:999])
+
+# Printing the variances
+cat(sprintf("Variance of '2017': %f\n", gmc_i_var_2017))
+cat(sprintf("Variance of '2018': %f\n", gmc_i_var_2018))
+cat(sprintf("Variance of '2019': %f\n", gmc_i_var_2019))
+cat(sprintf("Variance of '2020': %f\n", gmc_i_var_2020))
+cat(sprintf("Variance of '2021': %f\n", gmc_i_var_2021))
+cat(sprintf("Variance of '2022': %f\n", gmc_i_var_2022))
+
+```
+
+
+:::
+
+::: callout-note
+- Right skewed histogram: Majority of the data have negative spatial autocorrelation but there are some regions with significantly higher positive spatial autocorrelation (high drug use cases in certain neighborhoods, low or moderate in majority).
+- Negative Median: Indicates negative spatial autocorrelation, majority of provinces have low or moderate drug use)
+- Low Variance (Range from 0.003 to 0.0055): Suggests consistency across simulations, indicating that the presence of spatial patterns are not influenced by local conditions
+:::
+
+
+# 4. Local Spatial Autocorrelation Analysis
+
+## 4.1 Visualising Local Moran's I & p-value of Local Moran's I
+
+In the code chunk below, we are are using `local_moran()` of `sfdep` package to performs Moran’s I statistical testing and tmap functions to prepare a choropleth map by using value in the p_ii_sim field.
+
+For consistency sake, we will be sticking to `p_ii_sim` for the entire experiment.
+
+::: panel-tabset
+## 2017
+
+```{r,fig.height=6}
+#| code-fold: true
+set.seed(1234)
+lisa_2017 <- drug_use_2017_sf %>% 
+  mutate(local_moran = local_moran(
+    no_cases, nb_list, gm_wt, nsim = 999, zero.policy=TRUE),
+         .before = 1) %>%
+  unnest(local_moran)
+
+tmap_mode("plot")
+map1_2017 <- tm_shape(lisa_2017) +
+  tm_fill("ii") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Local Moran's I of Drug Use Cases in 2017",
+            main.title.size = 0.8)
+
+map2_2017 <- tm_shape(lisa_2017) +
+  tm_fill("p_ii_sim",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "P-value of Local Moran's I in 2017",
+            main.title.size = 0.8)
+
+tmap_arrange(map1_2017, map2_2017, ncol = 2)
+```
+
+## 2018
+
+```{r,fig.height=6}
+#| code-fold: true
+set.seed(1234)
+lisa_2018 <- drug_use_2018_sf %>% 
+  mutate(local_moran = local_moran(
+    no_cases, nb_list, gm_wt, nsim = 999, zero.policy=TRUE),
+         .before = 1) %>%
+  unnest(local_moran)
+
+tmap_mode("plot")
+map1_2018 <- tm_shape(lisa_2018) +
+  tm_fill("ii") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Local Moran's I of Drug Use Cases in 2018",
+            main.title.size = 0.8)
+
+map2_2018 <- tm_shape(lisa_2018) +
+  tm_fill("p_ii_sim",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "P-value of Local Moran's I in 2018",
+            main.title.size = 0.8)
+
+tmap_arrange(map1_2018, map2_2018, ncol = 2)
+
+```
+
+
+## 2019
+```{r,fig.height=6}
+#| code-fold: true
+set.seed(1234)
+lisa_2019 <- drug_use_2019_sf %>% 
+  mutate(local_moran = local_moran(
+    no_cases, nb_list, gm_wt, nsim = 999, zero.policy=TRUE),
+         .before = 1) %>%
+  unnest(local_moran)
+
+tmap_mode("plot")
+map1_2019 <- tm_shape(lisa_2019) +
+  tm_fill("ii") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Local Moran's I of Drug Use Cases in 2019",
+            main.title.size = 0.8)
+
+map2_2019 <- tm_shape(lisa_2019) +
+  tm_fill("p_ii_sim",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "P-value of Local Moran's I in 2019",
+            main.title.size = 0.8)
+
+tmap_arrange(map1_2019, map2_2019, ncol = 2)
+
+```
+
+
+## 2020
+
+```{r,fig.height=6}
+#| code-fold: true
+set.seed(1234)
+lisa_2020 <- drug_use_2020_sf %>% 
+  mutate(local_moran = local_moran(
+    no_cases, nb_list, gm_wt, nsim = 999, zero.policy=TRUE),
+         .before = 1) %>%
+  unnest(local_moran)
+
+tmap_mode("plot")
+map1_2020 <- tm_shape(lisa_2020) +
+  tm_fill("ii") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Local Moran's I of Drug Use Cases in 2020",
+            main.title.size = 0.8)
+
+map2_2020 <- tm_shape(lisa_2020) +
+  tm_fill("p_ii_sim",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "P-value of Local Moran's I in 2020",
+            main.title.size = 0.8)
+
+tmap_arrange(map1_2020, map2_2020, ncol = 2)
+
+```
+
+## 2021
+```{r,fig.height=6}
+#| code-fold: true
+set.seed(1234)
+lisa_2021 <- drug_use_2021_sf %>% 
+  mutate(local_moran = local_moran(
+    no_cases, nb_list, gm_wt, nsim = 999, zero.policy=TRUE),
+         .before = 1) %>%
+  unnest(local_moran)
+
+tmap_mode("plot")
+map1_2021 <- tm_shape(lisa_2021) +
+  tm_fill("ii") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Local Moran's I of Drug Use Cases in 2021",
+            main.title.size = 0.8)
+
+map2_2021 <- tm_shape(lisa_2021) +
+  tm_fill("p_ii_sim",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "P-value of Local Moran's I in 2021",
+            main.title.size = 0.8)
+
+tmap_arrange(map1_2021, map2_2021, ncol = 2)
+
+```
+
+
+## 2022
+```{r,fig.height=6}
+#| code-fold: true
+set.seed(1234)
+lisa_2022 <- drug_use_2022_sf %>% 
+  mutate(local_moran = local_moran(
+    no_cases, nb_list, gm_wt, nsim = 999, zero.policy=TRUE),
+         .before = 1) %>%
+  unnest(local_moran)
+
+tmap_mode("plot")
+map1_2022 <- tm_shape(lisa_2022) +
+  tm_fill("ii") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Local Moran's I of Drug Use Cases in 2022",
+            main.title.size = 0.8)
+
+map2_2022 <- tm_shape(lisa_2022) +
+  tm_fill("p_ii_sim",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "P-value of Local Moran's I in 2022",
+            main.title.size = 0.8)
+
+tmap_arrange(map1_2022, map2_2022, ncol = 2)
+
+```
+
+:::
+
+## 4.2 Skewness of Lisa
+In order to determine whether to use mean or median for the subsequent visualisation, we will need to check if the data has a normal distribution of if its skewed.
+## 4.2 Visualising Lisa Map
+
+LISA map is a categorical map showing outliers and clusters. Below are the different types:
+Two types of outliers: 
+- High-Low and Low-High outliers. 
+Two type of clusters: 
+- High-High and Low-Low clusters.
+
+```{r}
+skewness(lisa_2017$p_ii_sim, na.rm = TRUE)
+skewness(lisa_2018$p_ii_sim, na.rm = TRUE)
+skewness(lisa_2019$p_ii_sim, na.rm = TRUE)
+skewness(lisa_2020$p_ii_sim, na.rm = TRUE)
+skewness(lisa_2021$p_ii_sim, na.rm = TRUE)
+skewness(lisa_2022$p_ii_sim, na.rm = TRUE)
+
+mean(lisa_2017$skewness, na.rm = TRUE)
+mean(lisa_2018$skewness, na.rm = TRUE)
+mean(lisa_2019$skewness, na.rm = TRUE)
+mean(lisa_2020$skewness, na.rm = TRUE)
+mean(lisa_2021$skewness, na.rm = TRUE)
+mean(lisa_2022$skewness, na.rm = TRUE)
+
+colnames(lisa_2017)
+```
+
+
+::: panel-tabset
+## 2017
+```{r,fig.height=6}
+lisa_sig_2017 <- lisa_2017  %>%
+  filter(p_ii < 0.05)
+tmap_mode("plot")
+tm_shape(lisa_2017) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig_2017) +
+  tm_fill("mean") + 
+  tm_borders(alpha = 0.4)
+```
+
+## 2018
+## 2019
+## 2020
+## 2021
+## 2022
+
+:::
+
+
+# 5. Hot Spot and Cold Spot Area Analysis (HCSA)
