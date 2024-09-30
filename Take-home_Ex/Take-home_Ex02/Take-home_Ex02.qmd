@@ -59,7 +59,7 @@ We will be using the following packages:
 -   **`sfdep`**: Facilitates spatial dependence analysis by providing tools to compute spatial weights, autocorrelation statistics, and other spatial econometric measures. It integrates with the `sf` package, allowing users to easily conduct spatial analysis on spatial data frames.
 
 ```{r}
-pacman::p_load(sf, tmap, tidyverse, sfdep, ggplot2, e1071)
+pacman::p_load(sf, tmap, tidyverse, sfdep, ggplot2, RColorBrewer)
 ```
 
 ## 1.4 Dataset
@@ -434,6 +434,7 @@ set.seed(1234)
 gmc_i_2017<-global_moran_perm(drug_use_2017_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2017
 ```
+
 The statistical report for 2017 above show that the p-value is greater than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering.
 
 ## 2018
@@ -448,7 +449,7 @@ gmc_i_2018<-global_moran_perm(drug_use_2018_sf$no_cases,nb_list,gm_wt, zero.poli
 gmc_i_2018
 ```
 
-The statistical report for 2018 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. 
+The statistical report for 2018 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering.
 
 ## 2019
 
@@ -461,8 +462,8 @@ set.seed(1234)
 gmc_i_2019<-global_moran_perm(drug_use_2019_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2019
 ```
-The statistical report for 2019 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. This number (`0.13805`) is however greater than the previous years, a sign that stronger clustering occurred in this year as compared to the previous.
 
+The statistical report for 2019 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. This number (`0.13805`) is however greater than the previous years, a sign that stronger clustering occurred in this year as compared to the previous.
 
 ## 2020
 
@@ -476,7 +477,7 @@ gmc_i_2020<-global_moran_perm(drug_use_2020_sf$no_cases,nb_list,gm_wt, zero.poli
 gmc_i_2020
 ```
 
-The statistical report for 2020 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. 
+The statistical report for 2020 above show that the p-value is higher than alpha value of 0.05. Hence, we do not have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering.
 
 ## 2021
 
@@ -503,16 +504,16 @@ set.seed(1234)
 gmc_i_2022<-global_moran_perm(drug_use_2022_sf$no_cases,nb_list,gm_wt, zero.policy = TRUE, nsim=999)
 gmc_i_2022
 ```
+
 The statistical report for 2022 above show that the p-value is lower than alpha value of 0.05. Hence, we have enough statistical evidence to reject the null hypothesis that the spatial distribution of drug use cases resemble random distribution (i.e. independent from spatial). Because the Moran’s I statistics is greater than 0 but not close to 1, we can infer that the spatial distribution shows weak signs of clustering. Overall, this shows a weak but significant positive spatial autocorrelation in drug use cases.
 :::
 
 ::: callout-note
-- Over the years, we can observe that the Moran's I statistics is displaying an increasing trend all the way until 2020 when it decreased and then reaching an all-time high in 2021.
+-   Over the years, we can observe that the Moran's I statistics is displaying an increasing trend all the way until 2020 when it decreased and then reaching an all-time high in 2021.
 
-- We can also observe that the drug use cases in 2021 and 2022 no longer resemble random distribution, indicating significant spatial autocorrelation. This change suggests that drug use is becoming increasingly concentrated in specific geographic areas, warranting further investigation into the factors contributing to this clustering.
+-   We can also observe that the drug use cases in 2021 and 2022 no longer resemble random distribution, indicating significant spatial autocorrelation. This change suggests that drug use is becoming increasingly concentrated in specific geographic areas, warranting further investigation into the factors contributing to this clustering.
 
-- The observed clustering, particularly in 2021 and 2022, suggests that policymakers should consider region-specific interventions. Identifying hotspots for drug use can help allocate resources more effectively and develop targeted prevention and treatment programs.
-
+-   The observed clustering, particularly in 2021 and 2022, suggests that policymakers should consider region-specific interventions. Identifying hotspots for drug use can help allocate resources more effectively and develop targeted prevention and treatment programs.
 :::
 
 ## 3.4 Visualising Monte Carlo Moran’s I
@@ -522,8 +523,8 @@ In order to examine the simulated Moran’s I test statistics in greater detail,
 In the code chunk below `summary()`, `var()`, `hist()` and `abline()` are used.
 
 ::: panel-tabset
-
 ## Histogram
+
 ```{r, fig.height=8}
 #| code-fold: true
 # Set up the plotting area for 2 columns and 3 rows
@@ -616,16 +617,13 @@ cat(sprintf("Variance of '2021': %f\n", gmc_i_var_2021))
 cat(sprintf("Variance of '2022': %f\n", gmc_i_var_2022))
 
 ```
-
-
 :::
 
 ::: callout-note
-- Right skewed histogram: Majority of the data have negative spatial autocorrelation but there are some regions with significantly higher positive spatial autocorrelation (high drug use cases in certain neighborhoods, low or moderate in majority).
-- Negative Median: Indicates negative spatial autocorrelation, majority of provinces have low or moderate drug use)
-- Low Variance (Range from 0.003 to 0.0055): Suggests consistency across simulations, indicating that the presence of spatial patterns are not influenced by local conditions
+-   Right skewed histogram: Majority of the data have negative spatial autocorrelation but there are some regions with significantly higher positive spatial autocorrelation (high drug use cases in certain neighborhoods, low or moderate in majority).
+-   Negative Median: Indicates negative spatial autocorrelation, majority of provinces have low or moderate drug use)
+-   Low Variance (Range from 0.003 to 0.0055): Suggests consistency across simulations, indicating that the presence of spatial patterns are not influenced by local conditions
 :::
-
 
 # 4. Local Spatial Autocorrelation Analysis
 
@@ -697,8 +695,8 @@ tmap_arrange(map1_2018, map2_2018, ncol = 2)
 
 ```
 
-
 ## 2019
+
 ```{r,fig.height=6}
 #| code-fold: true
 set.seed(1234)
@@ -727,7 +725,6 @@ map2_2019 <- tm_shape(lisa_2019) +
 tmap_arrange(map1_2019, map2_2019, ncol = 2)
 
 ```
-
 
 ## 2020
 
@@ -761,6 +758,7 @@ tmap_arrange(map1_2020, map2_2020, ncol = 2)
 ```
 
 ## 2021
+
 ```{r,fig.height=6}
 #| code-fold: true
 set.seed(1234)
@@ -790,8 +788,8 @@ tmap_arrange(map1_2021, map2_2021, ncol = 2)
 
 ```
 
-
 ## 2022
+
 ```{r,fig.height=6}
 #| code-fold: true
 set.seed(1234)
@@ -820,59 +818,153 @@ map2_2022 <- tm_shape(lisa_2022) +
 tmap_arrange(map1_2022, map2_2022, ncol = 2)
 
 ```
-
 :::
 
 ## 4.2 Skewness of Lisa
-In order to determine whether to use mean or median for the subsequent visualisation, we will need to check if the data has a normal distribution of if its skewed.
-## 4.2 Visualising Lisa Map
 
-LISA map is a categorical map showing outliers and clusters. Below are the different types:
-Two types of outliers: 
-- High-Low and Low-High outliers. 
-Two type of clusters: 
-- High-High and Low-Low clusters.
+In order to determine whether to use mean or median for the subsequent visualisation, we will need to check if the data has a normal distribution of if its skewed.
 
 ```{r}
-skewness(lisa_2017$p_ii_sim, na.rm = TRUE)
-skewness(lisa_2018$p_ii_sim, na.rm = TRUE)
-skewness(lisa_2019$p_ii_sim, na.rm = TRUE)
-skewness(lisa_2020$p_ii_sim, na.rm = TRUE)
-skewness(lisa_2021$p_ii_sim, na.rm = TRUE)
-skewness(lisa_2022$p_ii_sim, na.rm = TRUE)
-
-mean(lisa_2017$skewness, na.rm = TRUE)
-mean(lisa_2018$skewness, na.rm = TRUE)
-mean(lisa_2019$skewness, na.rm = TRUE)
-mean(lisa_2020$skewness, na.rm = TRUE)
-mean(lisa_2021$skewness, na.rm = TRUE)
-mean(lisa_2022$skewness, na.rm = TRUE)
-
-colnames(lisa_2017)
+summary(lisa_2017$skewness)
+summary(lisa_2018$skewness)
+summary(lisa_2019$skewness)
+summary(lisa_2020$skewness)
+summary(lisa_2021$skewness)
+summary(lisa_2022$skewness)
 ```
 
+The median of the skewness statistics are in the negative range, from -0.32683 to -1.8628 which is close to 0. Hence we will be using mean to perform classification.
+
+## 4.3 Visualising Lisa Map
+
+LISA map is a categorical map showing outliers and clusters.
+
+**Two Types of Outliers:**
+
+**High-Low**:
+
+-   Areas that have high values (e.g., a high incidence of a certain event) that are surrounded by areas with low values. This pattern may suggest that the high value is an anomaly compared to the neighboring areas.
+
+**Low-High**:
+
+-   Areas that exhibit low values surrounded by areas with high values. This situation may suggest that the low value is an anomaly or an area of concern, indicating that it is isolated from surrounding regions with higher levels of the phenomenon.
+
+**Two Types of Clusters:**
+
+**High-High**:
+
+-   Areas where high values are surrounded by other high values. This indicates a cluster of similar high values, suggesting positive spatial autocorrelation. This pattern may reflect shared influences or conditions contributing to the elevated values in those regions. For instance, areas with high rates of drug use that are geographically close may indicate a pervasive issue or common underlying factors.
+
+**Low-Low**:
+
+-   Areas where low values are surrounded by other low values. This pattern indicates a cluster of similar low values, suggesting that these areas consistently experience lower levels of the phenomenon in question.
+
+The below chunk of code generates the lisa map for each year based on the parameter `mean`.
 
 ::: panel-tabset
 ## 2017
+
 ```{r,fig.height=6}
-lisa_sig_2017 <- lisa_2017  %>%
-  filter(p_ii < 0.05)
+#| code-fold: true
+lisa_sig_2017 <- lisa_2017 %>%
+  filter(p_ii_sim < 0.05)
+
 tmap_mode("plot")
 tm_shape(lisa_2017) +
   tm_polygons() +
   tm_borders(alpha = 0.5) +
 tm_shape(lisa_sig_2017) +
-  tm_fill("mean") + 
-  tm_borders(alpha = 0.4)
+  tm_fill("mean", palette = brewer.pal(4, "Set1")) +  # Change the color palette here
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Lisa Map for 2017", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
 ```
 
 ## 2018
+
+```{r,fig.height=6}
+#| code-fold: true
+lisa_sig_2018 <- lisa_2018 %>%
+  filter(p_ii_sim < 0.05)
+
+tmap_mode("plot")
+tm_shape(lisa_2018) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig_2018) +
+  tm_fill("mean", palette = brewer.pal(4, "Set1")) +  # Change the color palette here
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Lisa Map for 2018", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+```
+
 ## 2019
+
+```{r,fig.height=6}
+#| code-fold: true
+lisa_sig_2019 <- lisa_2019 %>%
+  filter(p_ii_sim < 0.05)
+
+tmap_mode("plot")
+tm_shape(lisa_2019) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(lisa_sig_2019) +
+  tm_fill("mean", palette = brewer.pal(4, "Set1")) + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Lisa Map for 2019", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+```
+
 ## 2020
+
+```{r,fig.height=6}
+#| code-fold: true
+lisa_sig_2020 <- lisa_2020 %>%
+  filter(p_ii_sim < 0.05)
+
+tmap_mode("plot")
+tm_shape(lisa_2020) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(lisa_sig_2020) +
+  tm_fill("mean", palette = brewer.pal(4, "Set1")) + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Lisa Map for 2020", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+
+```
+
 ## 2021
+
+```{r,fig.height=6}
+#| code-fold: true
+lisa_sig_2021 <- lisa_2021 %>%
+  filter(p_ii_sim < 0.05)
+
+tmap_mode("plot")
+tm_shape(lisa_2021) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(lisa_sig_2021) +
+  tm_fill("mean", palette = brewer.pal(4, "Set1")) + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Lisa Map for 2021", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+```
+
 ## 2022
 
-:::
+```{r,fig.height=6}
+#| code-fold: true
 
+lisa_sig_2022 <- lisa_2022 %>%
+  filter(p_ii_sim < 0.05)
+
+tmap_mode("plot")
+tm_shape(lisa_2022) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(lisa_sig_2022) +
+  tm_fill("mean", palette = brewer.pal(4, "Set1")) + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Lisa Map for 2022", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+```
+:::
 
 # 5. Hot Spot and Cold Spot Area Analysis (HCSA)
