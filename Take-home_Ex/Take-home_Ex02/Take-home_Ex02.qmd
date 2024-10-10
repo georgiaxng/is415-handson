@@ -26,6 +26,8 @@ The geopolitics of Thailand which is near the Golden Triangle of Indochina, the 
 
 In Thailand, drug abuse is one of the major social issue. There are about 2.7 million youths using drugs in Thailand. Among youths aged between 15 and 19 years, there are about 300,000 who have needs for drug treatment. Most of Thai youths involved with drugs are vocational-school students, which nearly doubles in number compared to secondary-school students.
 
+In particular, we will only be focusing on drug use cases since
+
 ## 1.2 Goal
 
 In this exercise, we are going to achieve the following tasks:
@@ -59,7 +61,7 @@ We will be using the following packages:
 -   **`sfdep`**: Facilitates spatial dependence analysis by providing tools to compute spatial weights, autocorrelation statistics, and other spatial econometric measures. It integrates with the `sf` package, allowing users to easily conduct spatial analysis on spatial data frames.
 
 ```{r}
-pacman::p_load(sf, tmap, tidyverse, sfdep, ggplot2, RColorBrewer)
+pacman::p_load(sf, tmap, tidyverse, sfdep, ggplot2,RColorBrewer)
 ```
 
 ## 1.4 Dataset
@@ -117,7 +119,7 @@ To see the different types of drug offenses currently in the dataset, we can use
 unique(drug_offenses_sf$types_of_drug_offenses)
 ```
 
-However, since the study area for this exercise is on drug abuse specifically, we will only be focusing on drug use cases which we will use `filter()` to do so, limiting the scope of this project to only that.
+For this study, we will only be focusing on **drug use cases** which we will use `filter()` to do so, limiting the scope of this project to only that.
 
 ```{r}
 drug_use_sf <-drug_offenses_sf%>%filter(types_of_drug_offenses=="drug_use_cases")
@@ -246,6 +248,10 @@ ggplot(drug_use_by_year, aes(x = factor(fiscal_year), y = total_cases)) +  # Con
   scale_x_discrete(drop = FALSE) + # Ensures all years are shown on the x-axis
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+::: callout-note
+We can see that 2021 has the most drug use cases recorded out of all these years.
+:::
 
 ## 2.4 Geographic Distribution of Drug Use Cases by Province and by Year
 
@@ -401,7 +407,7 @@ tm_shape(phuket_plot_data, bbox = bbox_phuket_expanded) +
 
 ## 3.2 Generating Spatial Weights
 
-The chunk of code below utilizes the `st_weights()` function from the sfdep package to generate spatial weights for each neighboring polygon. Specifically, it constructs a weights matrix based on the contiguity defined by the `nb_list` object, allowing for the specification of weights style (here set to "W" for row-standardized weights). The `allow_zero` parameter is set to `TRUE`, which permits the inclusion of polygons with no neighbors in the analysis, ensuring that all spatial units are represented in the weights matrix.
+The chunk of code below utilizes the `st_weights()` function from the `sfdep` package to generate spatial weights for each neighboring polygon. Specifically, it constructs a weights matrix based on the contiguity defined by the `nb_list` object, allowing for the specification of weights style (here set to "W" for row-standardized weights). The `allow_zero` parameter is set to `TRUE`, which permits the inclusion of polygons with no neighbors in the analysis, ensuring that all spatial units are represented in the weights matrix.
 
 ```{r}
 # nb_list is our neighbors list created using st_contiguity
@@ -877,6 +883,8 @@ tm_shape(lisa_sig_2017) +
   tm_fill("mean", palette = brewer.pal(4, "Set1")) +  # Change the color palette here
   tm_borders(alpha = 0.4) +
   tm_layout(main.title = "Lisa Map for 2017", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+
+print(lisa_sig_2017 %>%  select(province, mean))
 ```
 
 ## 2018
@@ -894,6 +902,8 @@ tm_shape(lisa_sig_2018) +
   tm_fill("mean", palette = brewer.pal(4, "Set1")) +  # Change the color palette here
   tm_borders(alpha = 0.4) +
   tm_layout(main.title = "Lisa Map for 2018", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+
+print(lisa_sig_2018 %>%  select(province, mean))
 ```
 
 ## 2019
@@ -911,6 +921,8 @@ tm_shape(lisa_2019) +
   tm_fill("mean", palette = brewer.pal(4, "Set1")) + 
   tm_borders(alpha = 0.4) +
   tm_layout(main.title = "Lisa Map for 2019", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+
+print(lisa_sig_2019 %>%  select(province, mean))
 ```
 
 ## 2020
@@ -929,6 +941,8 @@ tm_shape(lisa_2020) +
   tm_borders(alpha = 0.4) +
   tm_layout(main.title = "Lisa Map for 2020", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
 
+print(lisa_sig_2020 %>%  select(province, mean))
+
 ```
 
 ## 2021
@@ -946,6 +960,8 @@ tm_shape(lisa_2021) +
   tm_fill("mean", palette = brewer.pal(4, "Set1")) + 
   tm_borders(alpha = 0.4) +
   tm_layout(main.title = "Lisa Map for 2021", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+
+print(lisa_sig_2021 %>%  select(province, mean))
 ```
 
 ## 2022
@@ -964,7 +980,444 @@ tm_shape(lisa_2022) +
   tm_fill("mean", palette = brewer.pal(4, "Set1")) + 
   tm_borders(alpha = 0.4) +
   tm_layout(main.title = "Lisa Map for 2022", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+
+print(lisa_sig_2022 %>%  select(province, mean))
 ```
 :::
 
+::: callout-note
+High-High Clusters
+
+-   From 2017-2020, we can observe Chachoengsao being in the "High-High" category, suggesting that this province consistently has a high number of drug cases surrounded by other provinces with similarly high numbers. This type of spatial autocorrelation indicates a cluster of high drug use incidents in that region.
+
+-   Possible Reason: A likely reason for this observation is the geographic location of this province. Chachoengsao is strategically located near major transportation routes, including highways and railways, facilitating the movement of drugs. Its proximity to Bangkok and other major urban centers may have also contribute to increased drug trafficking and distribution.
+
+-   We can also observe that in the same time period, there exists different provinces (e.g Nonthaburi, Samut Prakan) close by in the "Low-High" category west of Chachoengsao, suggesting that these provinces are outliers with low drug uses surrounded by provinces with high drug uses.
+
+-   For 2021, we can observe that the "High-High" cluster has moved to the eastern region of Thailand to Yasothon.
+
+-   In the subsequent year 2022 however, this "High-High" cluster has moved slightly north of Yasothon and now includes 4 provinces: Nong Khai, Maha Sarakham Kalasin and Sakon Nakhon.
+
+-   This indicates a continued eastward movement of drug use, reflecting ongoing dynamics in drug trafficking and consumption.
+:::
+
 # 5. Hot Spot and Cold Spot Area Analysis (HCSA)
+
+## 5.1 **Computing local Gi* statistics**
+
+As usual, we will need to derive a spatial weight matrix before we can compute local Gi* statistics.
+
+The code chunk below is used to firstly derive a spatial weight matrix by using `sfdep` functions and `tidyverse` approach and secondly, compute the local Gi*.
+
+::: panel-tabset
+## 2017
+```{r}
+#| eval: false
+#| code-fold: true
+set.seed(1234)
+wm_idw_2017 <- drug_use_2017_sf %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+HCSA_2017 <- wm_idw_2017 %>% 
+  mutate(local_Gi = local_gstar_perm(
+    no_cases, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+write_rds(HCSA_2017, "data/rds/HCSA_2017.rds")
+```
+
+```{r}
+#| echo: false
+HCSA_2017 <- read_rds( "data/rds/HCSA_2017.rds")
+HCSA_2017
+```
+
+::: callout-note
+
+:::
+
+## 2018
+```{r}
+#| eval: false
+#| code-fold: true
+set.seed(1234)
+wm_idw_2018 <- drug_use_2018_sf %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+HCSA_2018 <- wm_idw_2018 %>% 
+  mutate(local_Gi = local_gstar_perm(
+    no_cases, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+write_rds(HCSA_2018, "data/rds/HCSA_2018.rds")
+
+```
+
+```{r}
+#| echo: false
+HCSA_2018 <- read_rds( "data/rds/HCSA_2018.rds")
+HCSA_2018
+```
+
+## 2019
+
+```{r}
+#| eval: false
+#| code-fold: true
+set.seed(1234)
+wm_idw_2019 <- drug_use_2019_sf %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+HCSA_2019 <- wm_idw_2019 %>% 
+  mutate(local_Gi = local_gstar_perm(
+    no_cases, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+write_rds(HCSA_2019, "data/rds/HCSA_2019.rds")
+
+```
+
+```{r}
+#| echo: false
+HCSA_2019 <- read_rds( "data/rds/HCSA_2019.rds")
+HCSA_2019
+```
+
+
+## 2020
+```{r}
+#| eval: false
+#| code-fold: true
+set.seed(1234)
+wm_idw_2020 <- drug_use_2020_sf %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+HCSA_2020 <- wm_idw_2020 %>% 
+  mutate(local_Gi = local_gstar_perm(
+    no_cases, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+write_rds(HCSA_2020, "data/rds/HCSA_2020.rds")
+
+```
+
+```{r}
+#| echo: false
+HCSA_2020 <- read_rds( "data/rds/HCSA_2020.rds")
+HCSA_2020
+```
+## 2021
+
+```{r}
+#| eval: false
+#| code-fold: true
+set.seed(1234)
+wm_idw_2021 <- drug_use_2021_sf %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+HCSA_2021 <- wm_idw_2021 %>% 
+  mutate(local_Gi = local_gstar_perm(
+    no_cases, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+write_rds(HCSA_2021, "data/rds/HCSA_2021.rds")
+
+```
+
+```{r}
+#| echo: false
+HCSA_2021 <- read_rds( "data/rds/HCSA_2021.rds")
+HCSA_2021
+```
+
+## 2022
+```{r}
+#| eval: false
+#| code-fold: true
+set.seed(1234)
+wm_idw_2022 <- drug_use_2022_sf %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+HCSA_2022 <- wm_idw_2022 %>% 
+  mutate(local_Gi = local_gstar_perm(
+    no_cases, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+write_rds(HCSA_2022, "data/rds/HCSA_2022.rds")
+
+```
+
+```{r}
+#| echo: false
+HCSA_2022 <- read_rds( "data/rds/HCSA_2022.rds")
+HCSA_2022
+```
+
+:::
+## 5.2 Visualising Local HCSA 
+To visualise local HCSA, we can plot the gi* value and the p-value of each year side by side.
+
+The chunk of code below uses `tmap()` to plot and visualize the spatial distribution of the Gi* statistic for the different years. For this section we have the maps of Gi* and the p-value arranged side by side for easier comparisons.
+::: panel-tabset
+## 2017
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+map1 <- tm_shape(HCSA_2017) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(main.title = "Gi* of 2017",
+            main.title.size = 0.8)
+map2 <- tm_shape(HCSA_2017) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi* of 2017",
+            main.title.size = 0.8)
+tmap_arrange(map1, map2, ncol = 2)
+```
+## 2018
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+map1 <- tm_shape(HCSA_2018) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))+
+  tm_layout(main.title = "Gi* of 2018",
+            main.title.size = 0.8)
+
+map2 <- tm_shape(HCSA_2018) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi* of 2018",
+            main.title.size = 0.8)
+tmap_arrange(map1, map2, ncol = 2)
+
+```
+
+
+## 2019
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+map1 <- tm_shape(HCSA_2019) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))+
+  tm_layout(main.title = "Gi* of 2019",
+            main.title.size = 0.8)
+
+map2 <- tm_shape(HCSA_2019) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi* of 2019",
+            main.title.size = 0.8)
+tmap_arrange(map1, map2, ncol = 2)
+
+```
+## 2020
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+map1 <- tm_shape(HCSA_2020) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))+
+  tm_layout(main.title = "Gi* of 2020",
+            main.title.size = 0.8)
+
+map2 <- tm_shape(HCSA_2020) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi* of 2020",
+            main.title.size = 0.8)
+tmap_arrange(map1, map2, ncol = 2)
+
+```
+
+## 2021
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+map1 <- tm_shape(HCSA_2021) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))+
+  tm_layout(main.title = "Gi* of 2021",
+            main.title.size = 0.8)
+
+map2 <- tm_shape(HCSA_2021) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi* of 2021",
+            main.title.size = 0.8)
+tmap_arrange(map1, map2, ncol = 2)
+
+```
+
+## 2022
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+map1 <- tm_shape(HCSA_2022) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))+
+  tm_layout(main.title = "Gi* of 2022",
+            main.title.size = 0.8)
+
+map2 <- tm_shape(HCSA_2022) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi* of 2022",
+            main.title.size = 0.8)
+tmap_arrange(map1, map2, ncol = 2)
+```
+:::
+
+
+## 5.3 Visualising Hot Spot & Cold Spot Areas
+Here, we will plot the significant (i.e. p-values less than 0.05)  hot spot and cold spot areas by using the appropriate tmap functions.
+
+::: panel-tabset
+## 2017, 2018
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+
+HCSA_2017_sig <- HCSA_2017  %>%
+  filter(p_sim < 0.05)
+HCSA_2018_sig <- HCSA_2018  %>%
+  filter(p_sim < 0.05)
+
+map1<- tm_shape(HCSA_2017) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(HCSA_2017_sig) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "HCSA of 2017",
+            main.title.size = 0.8)
+map2<- tm_shape(HCSA_2018) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(HCSA_2018_sig) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "HCSA of 2018",
+            main.title.size = 0.8)
+
+tmap_arrange(map1, map2, ncol = 2)
+```
+
+## 2019, 2020
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+
+HCSA_2019_sig <- HCSA_2019  %>%
+  filter(p_sim < 0.05)
+HCSA_2020_sig <- HCSA_2020  %>%
+  filter(p_sim < 0.05)
+
+map1<- tm_shape(HCSA_2019) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(HCSA_2019_sig) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "HCSA of 2019",
+            main.title.size = 0.8)
+map2<- tm_shape(HCSA_2020) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(HCSA_2020_sig) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "HCSA of 2020",
+            main.title.size = 0.8)
+
+tmap_arrange(map1, map2, ncol = 2)
+```
+
+## 2021, 2022
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+
+HCSA_2021_sig <- HCSA_2021  %>%
+  filter(p_sim < 0.05)
+HCSA_2022_sig <- HCSA_2022  %>%
+  filter(p_sim < 0.05)
+
+map1<- tm_shape(HCSA_2021) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(HCSA_2021_sig) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "HCSA of 2021",
+            main.title.size = 0.8)
+map2<- tm_shape(HCSA_2022) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(HCSA_2022_sig) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "HCSA of 2022",
+            main.title.size = 0.8)
+
+tmap_arrange(map1, map2, ncol = 2)
+```
+
+:::
+
+# 6. Conclusion
+
+To conclude,
