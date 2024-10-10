@@ -1003,14 +1003,15 @@ High-High Clusters
 
 # 5. Hot Spot and Cold Spot Area Analysis (HCSA)
 
-## 5.1 **Computing local Gi* statistics**
+## 5.1 Computing local Gi\* statistics
 
-As usual, we will need to derive a spatial weight matrix before we can compute local Gi* statistics.
+As usual, we will need to derive a spatial weight matrix before we can compute local Gi\* statistics.
 
-The code chunk below is used to firstly derive a spatial weight matrix by using `sfdep` functions and `tidyverse` approach and secondly, compute the local Gi*.
+The code chunk below is used to firstly derive a spatial weight matrix by using `sfdep` functions and `tidyverse` approach and secondly, compute the local Gi\*.
 
 ::: panel-tabset
 ## 2017
+
 ```{r}
 #| eval: false
 #| code-fold: true
@@ -1037,10 +1038,10 @@ HCSA_2017
 ```
 
 ::: callout-note
-
 :::
 
 ## 2018
+
 ```{r}
 #| eval: false
 #| code-fold: true
@@ -1097,8 +1098,8 @@ HCSA_2019 <- read_rds( "data/rds/HCSA_2019.rds")
 HCSA_2019
 ```
 
-
 ## 2020
+
 ```{r}
 #| eval: false
 #| code-fold: true
@@ -1125,6 +1126,7 @@ write_rds(HCSA_2020, "data/rds/HCSA_2020.rds")
 HCSA_2020 <- read_rds( "data/rds/HCSA_2020.rds")
 HCSA_2020
 ```
+
 ## 2021
 
 ```{r}
@@ -1155,6 +1157,7 @@ HCSA_2021
 ```
 
 ## 2022
+
 ```{r}
 #| eval: false
 #| code-fold: true
@@ -1181,14 +1184,17 @@ write_rds(HCSA_2022, "data/rds/HCSA_2022.rds")
 HCSA_2022 <- read_rds( "data/rds/HCSA_2022.rds")
 HCSA_2022
 ```
-
 :::
-## 5.2 Visualising Local HCSA 
-To visualise local HCSA, we can plot the gi* value and the p-value of each year side by side.
 
-The chunk of code below uses `tmap()` to plot and visualize the spatial distribution of the Gi* statistic for the different years. For this section we have the maps of Gi* and the p-value arranged side by side for easier comparisons.
+## 5.2 Visualising Local HCSA
+
+To visualise local HCSA, we can plot the gi\* value and the p-value of each year side by side.
+
+The chunk of code below uses `tmap()` to plot and visualize the spatial distribution of the Gi\* statistic for the different years. For this section we have the maps of Gi\* and the p-value arranged side by side for easier comparisons.
+
 ::: panel-tabset
 ## 2017
+
 ```{r}
 #| code-fold: true
 tmap_mode("plot")
@@ -1207,7 +1213,9 @@ map2 <- tm_shape(HCSA_2017) +
             main.title.size = 0.8)
 tmap_arrange(map1, map2, ncol = 2)
 ```
+
 ## 2018
+
 ```{r}
 #| code-fold: true
 tmap_mode("plot")
@@ -1228,7 +1236,6 @@ map2 <- tm_shape(HCSA_2018) +
 tmap_arrange(map1, map2, ncol = 2)
 
 ```
-
 
 ## 2019
 
@@ -1252,6 +1259,7 @@ map2 <- tm_shape(HCSA_2019) +
 tmap_arrange(map1, map2, ncol = 2)
 
 ```
+
 ## 2020
 
 ```{r}
@@ -1276,6 +1284,7 @@ tmap_arrange(map1, map2, ncol = 2)
 ```
 
 ## 2021
+
 ```{r}
 #| code-fold: true
 tmap_mode("plot")
@@ -1320,12 +1329,13 @@ tmap_arrange(map1, map2, ncol = 2)
 ```
 :::
 
-
 ## 5.3 Visualising Hot Spot & Cold Spot Areas
-Here, we will plot the significant (i.e. p-values less than 0.05)  hot spot and cold spot areas by using the appropriate tmap functions.
+
+Here, we will plot the significant (i.e. p-values less than 0.05) hot spot and cold spot areas by using the appropriate tmap functions.
 
 ::: panel-tabset
 ## 2017, 2018
+
 ```{r}
 #| code-fold: true
 tmap_mode("plot")
@@ -1356,6 +1366,7 @@ tmap_arrange(map1, map2, ncol = 2)
 ```
 
 ## 2019, 2020
+
 ```{r}
 #| code-fold: true
 tmap_mode("plot")
@@ -1415,7 +1426,6 @@ map2<- tm_shape(HCSA_2022) +
 
 tmap_arrange(map1, map2, ncol = 2)
 ```
-
 :::
 
 # 6. Conclusion
