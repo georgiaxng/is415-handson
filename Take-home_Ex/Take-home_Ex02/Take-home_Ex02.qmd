@@ -986,28 +986,36 @@ print(lisa_sig_2022 %>%  select(province, mean))
 :::
 
 ::: callout-note
-High-High Clusters
+High-High Clusters in 2017-2020
 
 -   From 2017-2020, we can observe Chachoengsao being in the "High-High" category, suggesting that this province consistently has a high number of drug cases surrounded by other provinces with similarly high numbers. This type of spatial autocorrelation indicates a cluster of high drug use incidents in that region.
 
 -   Possible Reason: A likely reason for this observation is the geographic location of this province. Chachoengsao is strategically located near major transportation routes, including highways and railways, facilitating the movement of drugs. Its proximity to Bangkok and other major urban centers may have also contribute to increased drug trafficking and distribution.
 
+Outliers: Nonthaburi, Samut Prakan
+
 -   We can also observe that in the same time period, there exists different provinces (e.g Nonthaburi, Samut Prakan) close by in the "Low-High" category west of Chachoengsao, suggesting that these provinces are outliers with low drug uses surrounded by provinces with high drug uses.
+
+Trend of High-High Clusters
 
 -   For 2021, we can observe that the "High-High" cluster has moved to the eastern region of Thailand to Yasothon.
 
 -   In the subsequent year 2022 however, this "High-High" cluster has moved slightly north of Yasothon and now includes 4 provinces: Nong Khai, Maha Sarakham Kalasin and Sakon Nakhon.
 
 -   This indicates a continued eastward movement of drug use, reflecting ongoing dynamics in drug trafficking and consumption.
+
+Low-Low Clusters
+
+-   Between 2017 - 2022, we can observe that there are clusters of provinces with low drug use cases in the west of Thailand.
 :::
 
 # 5. Hot Spot and Cold Spot Area Analysis (HCSA)
 
-## 5.1 Computing local Gi\* statistics
+## 5.1 Computing Local Gi\* Statistics
 
-As usual, we will need to derive a spatial weight matrix before we can compute local Gi\* statistics.
+As usual, we will need to derive a spatial weight matrix before we can compute local Gi\* statistics. This weight matrix defines the spatial relationships (such as neighbors or distance) between the regions or areas and determines how much influence neighboring areas have on each other, which is crucial for calculating spatial autocorrelation (like Gi\*)
 
-The code chunk below is used to firstly derive a spatial weight matrix by using `sfdep` functions and `tidyverse` approach and secondly, compute the local Gi\*.
+The code chunk below is used to firstly derive a spatial weight matrix by using `sfdep` functions and `tidyverse` approach and secondly, compute the local Gi\*. Since the geometry column of our dataset contains multipolygons (which represent areas with multiple disjointed sections) instead of polygons, we will be calculating the centroid which will help simplify the spatial relationships by reducing the complex shapes into single points. This makes it easier to compute distance-based spatial statistics.
 
 ::: panel-tabset
 ## 2017
@@ -1018,7 +1026,8 @@ The code chunk below is used to firstly derive a spatial weight matrix by using 
 set.seed(1234)
 wm_idw_2017 <- drug_use_2017_sf %>%
   mutate(nb = st_contiguity(geometry),
-         wts = st_inverse_distance(nb, geometry,
+         centroid = st_centroid(geometry), 
+         wts = st_inverse_distance(nb, centroid,
                                    scale = 1,
                                    alpha = 1),
          .before = 1)
@@ -1048,7 +1057,8 @@ HCSA_2017
 set.seed(1234)
 wm_idw_2018 <- drug_use_2018_sf %>%
   mutate(nb = st_contiguity(geometry),
-         wts = st_inverse_distance(nb, geometry,
+         centroid = st_centroid(geometry), 
+         wts = st_inverse_distance(nb, centroid,
                                    scale = 1,
                                    alpha = 1),
          .before = 1)
@@ -1077,7 +1087,8 @@ HCSA_2018
 set.seed(1234)
 wm_idw_2019 <- drug_use_2019_sf %>%
   mutate(nb = st_contiguity(geometry),
-         wts = st_inverse_distance(nb, geometry,
+         centroid = st_centroid(geometry),
+         wts = st_inverse_distance(nb, centroid,
                                    scale = 1,
                                    alpha = 1),
          .before = 1)
@@ -1106,7 +1117,8 @@ HCSA_2019
 set.seed(1234)
 wm_idw_2020 <- drug_use_2020_sf %>%
   mutate(nb = st_contiguity(geometry),
-         wts = st_inverse_distance(nb, geometry,
+         centroid = st_centroid(geometry),
+         wts = st_inverse_distance(nb, centroid,
                                    scale = 1,
                                    alpha = 1),
          .before = 1)
@@ -1135,7 +1147,8 @@ HCSA_2020
 set.seed(1234)
 wm_idw_2021 <- drug_use_2021_sf %>%
   mutate(nb = st_contiguity(geometry),
-         wts = st_inverse_distance(nb, geometry,
+         centroid = st_centroid(geometry),
+         wts = st_inverse_distance(nb, centroid,
                                    scale = 1,
                                    alpha = 1),
          .before = 1)
@@ -1164,7 +1177,8 @@ HCSA_2021
 set.seed(1234)
 wm_idw_2022 <- drug_use_2022_sf %>%
   mutate(nb = st_contiguity(geometry),
-         wts = st_inverse_distance(nb, geometry,
+         centroid = st_centroid(geometry),
+         wts = st_inverse_distance(nb, centroid,
                                    scale = 1,
                                    alpha = 1),
          .before = 1)
@@ -1365,6 +1379,13 @@ map2<- tm_shape(HCSA_2018) +
 tmap_arrange(map1, map2, ncol = 2)
 ```
 
+```{r}
+HCSA_2017_sig %>%
+  select(gi_star, province)
+HCSA_2018_sig %>%
+  select(gi_star, province)
+```
+
 ## 2019, 2020
 
 ```{r}
@@ -1394,6 +1415,13 @@ map2<- tm_shape(HCSA_2020) +
             main.title.size = 0.8)
 
 tmap_arrange(map1, map2, ncol = 2)
+```
+
+```{r}
+HCSA_2019_sig %>%
+  select(gi_star, province)
+HCSA_2020_sig %>%
+  select(gi_star, province)
 ```
 
 ## 2021, 2022
@@ -1426,8 +1454,81 @@ map2<- tm_shape(HCSA_2022) +
 
 tmap_arrange(map1, map2, ncol = 2)
 ```
+
+```{r}
+HCSA_2021_sig %>%
+  select(gi_star, province)
+HCSA_2022_sig %>%
+  select(gi_star, province)
+```
+:::
+
+::: callout-note
+-   Between 2017 - 2019, we can observe that Samut Prakan and Samut Sakhon are both hotspots of drug uses, with Samut Prakan continuing this trend even in 2020.
+
+-   Besides that however, there are no other hotspots or coldspots identified in 2020, showing that there are no significant data for the rest of the provinces.
+
+-   In 2021, we can observe a large area of coldspots in the west and interestingly, this aligns with the observations we have made in the LISA map where this area was observed as a Low-Low cluster.
+
+-   In 2022, we can observe a hotspot area spanning several provinces in the east of Thailand. This is a trend that was not observed in the previous years, showing that the concentrations of drug use has changed significantly from the previous years.
+:::
+
+## 5.4 Interesting Observations
+
+### 5.4.1 Seemingly Contradictory Results in LISA map & HCSA for 2017
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+
+map1<-tm_shape(lisa_2017) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig_2017) +
+  tm_fill("mean", palette = brewer.pal(4, "Set1")) +  # Change the color palette here
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Lisa Map for 2017", main.title.size = 1.2, main.title.position = "center", legend.text.size = 1.2)
+
+map2<- tm_shape(HCSA_2017) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+  tm_shape(HCSA_2017_sig) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "HCSA of 2017",
+            main.title.size = 0.8)
+tmap_arrange(map1, map2, ncol = 2)
+```
+
+::: callout-note
+In the LISA map, we can observe that **Samut Prakan and Samut Sakhon** (the green parts) were identified as Low-High clusters, meaning areas with low drug uses surrounded by areas with high drug uses. However, when observing the HCSA map for the same year, the same provinces were however identified as "hotspots" which could possibly seem contradictory.
+
+However, these two methods, though related, measure different aspects of spatial patterns and their interpretation varies. LISA measures local spatial autocorrelation whereas the HCSA method identifies hot and cold spots by assessing the concentration of high or low values within an area, considering the values of the area itself and those of its neighbors.
+
+Why the Area is a Low-High Cluster in LISA but Has a High Gi\* Value:
+
+LISA vs HCSA:
+
+-   In LISA, the area is classified as **low-high** because **its value is lower than its neighbors**. Even though its neighbors have higher values, the area itself might be somewhat lower in comparison, creating a spatial outlier (a low value in a region of high values).
+
+-   Gi\* (used in HCSA), on the other hand, assesses the **collective clustering** of values. Even if the area has a lower value compared to its neighbors, the fact that it is part of a **larger high-value cluster** (with its neighbors) results in a **high Gi**\* score.
+
+Therefore, in this case, these areas are **low-high** cluster in the LISA map because they have a lower value than its neighbors, but still contributes to a **high-value hotspot** in the Gi\* analysis, leading to a high positive Gi\* score.
 :::
 
 # 6. Conclusion
 
-To conclude,
+To conclude, we can derive the following insights from the combined analysis of Moran's I statistics, LISA, and HCSA which reveals important trends in the spatial distribution of drug use across Thailand between 2017 and 2022.
+
+1.  Moran's I Trend:\
+    Over the years, the Moran's I statistic shows an increasing trend, peaking in 2021, indicating rising spatial autocorrelation in drug use cases. This suggests that drug use has become more geographically concentrated, moving away from random distribution. This increase in clustering signals a shift in how drug-related issues are spreading across regions, with specific areas experiencing higher concentrations.
+
+2.  LISA Insights:\
+    The LISA maps further support this finding by identifying significant High-High clusters in certain regions, notably Samut Prakan and Samut Sakhon (excluded from 2019) as a consistent hotspot from 2017 to 2020. In 2021, new Low-Low clusters emerged in the western provinces, aligning with reduced drug use, while eastern provinces became new High-High clusters in 2022, reflecting a shift in drug activity patterns. The consistent clustering patterns observed in both high and low drug use areas underscore the strong spatial dependence across provinces.
+
+3.  HCSA Observations:\
+    The HCSA analysis highlights key hotspots in Samut Prakan and Samut Sakhon in the earlier years, with Samut Prakan remaining a focal point of drug use through 2020. In 2021, we started observing a large area of coldspots in the west and in 2022, we observe a shift of hotspot activity toward eastern Thailand. (similar to what we have observed in the LISA map)
+
+From the above insights, we can observe that the drug use trends and patterns stayed generally consistent between the years of 2017 to 2020. However, from 2021 onwards, we observe significant changes in the distribution, with new areas—particularly in the **east**—emerging as hotspots. The most significant event during this time period was the **COVID-19 pandemic**, which likely influenced these shifts. This disruption could have affected how the drug distribution network and supply chains operated, as well as how local communities responded to these changes. Lockdowns and movement restrictions may have altered drug trafficking routes and supply availability, leading to new areas becoming focal points for drug activity.
+
+It is important for drug enforcement efforts to take note of these trends and focus on these newly emerging areas of drug use. By further identifying the root causes behind this shift, authorities can better tailor their strategies to curb the rising drug activity
