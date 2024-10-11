@@ -26,7 +26,7 @@ The geopolitics of Thailand which is near the Golden Triangle of Indochina, the 
 
 In Thailand, drug abuse is one of the major social issue. There are about 2.7 million youths using drugs in Thailand. Among youths aged between 15 and 19 years, there are about 300,000 who have needs for drug treatment. Most of Thai youths involved with drugs are vocational-school students, which nearly doubles in number compared to secondary-school students.
 
-In particular, we will only be focusing on drug use cases since
+In particular, we will only be **focusing on drug use cases** since my analysis aims to provide insights into the spatial distribution and trends of drug abuse across Thailand.
 
 ## 1.2 Goal
 
@@ -60,6 +60,8 @@ We will be using the following packages:
 
 -   **`sfdep`**: Facilitates spatial dependence analysis by providing tools to compute spatial weights, autocorrelation statistics, and other spatial econometric measures. It integrates with the `sf` package, allowing users to easily conduct spatial analysis on spatial data frames.
 
+-   **`RColorBrewer`**: Provides a collection of color palettes specifically designed for data visualization.
+
 ```{r}
 pacman::p_load(sf, tmap, tidyverse, sfdep, ggplot2,RColorBrewer)
 ```
@@ -70,7 +72,7 @@ For the purpose of this take-home exercise, two data sets shall be used, they ar
 
 -   Thailand Drug Offenses \[2017-2022\] at Kaggle.
 
--   Thailand - Subnational Administrative Boundaries at HDX. You are required to use the province boundary data set. Thailand administrative level 0 (country), 1 (province), 2 (district), and 3 (sub-district, tambon) boundaries
+-   Thailand - Subnational Administrative Boundaries at HDX.
 
 # 2. Data Wrangling
 
@@ -273,6 +275,10 @@ tm_shape(combined_drug_use_sf) +
   )
 
 ```
+
+::: callout-note
+We can observe that the northern and eastern regions take up the bulk of the numbers at different time periods.
+:::
 
 # 3. Global Spatial Autocorrelation Analysis
 
@@ -865,7 +871,7 @@ LISA map is a categorical map showing outliers and clusters.
 
 -   Areas where low values are surrounded by other low values. This pattern indicates a cluster of similar low values, suggesting that these areas consistently experience lower levels of the phenomenon in question.
 
-The below chunk of code generates the lisa map for each year based on the parameter `mean`.
+The below chunk of code generates the lisa map for each year based on the parameter `mean`, we will also be filtering for only significant data (\>95%).
 
 ::: panel-tabset
 ## 2017
@@ -1045,9 +1051,6 @@ write_rds(HCSA_2017, "data/rds/HCSA_2017.rds")
 HCSA_2017 <- read_rds( "data/rds/HCSA_2017.rds")
 HCSA_2017
 ```
-
-::: callout-note
-:::
 
 ## 2018
 
@@ -1529,6 +1532,6 @@ To conclude, we can derive the following insights from the combined analysis of 
 3.  HCSA Observations:\
     The HCSA analysis highlights key hotspots in Samut Prakan and Samut Sakhon in the earlier years, with Samut Prakan remaining a focal point of drug use through 2020. In 2021, we started observing a large area of coldspots in the west and in 2022, we observe a shift of hotspot activity toward eastern Thailand. (similar to what we have observed in the LISA map)
 
-From the above insights, we can observe that the drug use trends and patterns stayed generally consistent between the years of 2017 to 2020. However, from 2021 onwards, we observe significant changes in the distribution, with new areas—particularly in the **east**—emerging as hotspots. The most significant event during this time period was the **COVID-19 pandemic**, which likely influenced these shifts. This disruption could have affected how the drug distribution network and supply chains operated, as well as how local communities responded to these changes. Lockdowns and movement restrictions may have altered drug trafficking routes and supply availability, leading to new areas becoming focal points for drug activity.
+From the above insights, we can observe that the drug use trends and patterns stayed generally consistent between the years of 2017 to 2020. However, from 2021 onwards, we observe significant changes in the distribution, with new areas—particularly in the east—emerging as hotspots. The most significant event during this time period was the COVID-19 pandemic, which likely influenced these shifts. This disruption could have affected how the drug distribution network and supply chains operated, as well as how local communities responded to these changes. Lockdowns and movement restrictions may have altered drug trafficking routes and supply availability, leading to new areas becoming focal points for drug activity.
 
 It is important for drug enforcement efforts to take note of these trends and focus on these newly emerging areas of drug use. By further identifying the root causes behind this shift, authorities can better tailor their strategies to curb the rising drug activity
