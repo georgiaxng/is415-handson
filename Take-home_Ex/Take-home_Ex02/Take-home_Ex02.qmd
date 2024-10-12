@@ -832,6 +832,10 @@ tmap_arrange(map1_2022, map2_2022, ncol = 2)
 ```
 :::
 
+::: callout-note
+We can observe from the p-value plot that generally most of the data are not considered to be significant from the year of 2018 - 2020, this trend however did not follow from 2021 onwards.
+:::
+
 ## 4.2 Skewness of Lisa
 
 In order to determine whether to use mean or median for the subsequent visualisation, we will need to check if the data has a normal distribution of if its skewed.
