@@ -131,7 +131,7 @@ resale_sf <- resale_sf %>%
     floor_area_sqft > 619 & floor_area_sqft <= 862 ~ "3 Rm",  # Closer to 754 sqft
     floor_area_sqft > 862 & floor_area_sqft <= 1076 ~ "4 Rm",  # Closer to 969 sqft
     floor_area_sqft > 1076 & floor_area_sqft <= 1399 ~ "5 Rm",  # Closer to 1184 sqft
-    floor_area_sqft > 1399 & floor_area_sqft <= 1615 ~ "EA/EM/6 Rm",  # Closer to 1615 sqft
+    floor_area_sqft > 1399 ~ "EA/EM/6 Rm",  # Closer to 1615 sqft
   ))
 
 ```
@@ -181,12 +181,55 @@ resale_sf <- resale_sf %>%
   mutate(remaining_lease_range = cut(remaining_lease_total_months, breaks = breaks, labels = labels))
 ```
 
-###  2.3.3 Time Period Selection for Analysis
+### 2.3.3 Removal of Redundant Columns
+
+```{r}
+# Define columns to be removed
+columns_to_remove <- c("floor_area_sqm", "flat_model", "lease_commence_date", "remaining_lease", "blk_no", "road_name", "building", "address", "lease_commence_date_r", "postal")
+
+# Remove columns only if they exist in the dataframe
+resale_sf <- resale_sf %>%
+  dplyr::select(-all_of(columns_to_remove[columns_to_remove %in% names(resale_sf)]))
+```
+
+### 2.3.4 Time Period Selection for Analysis
 
 ```{r}
 resale_5yr_sf <- resale_sf %>% filter (year(month) >= 2020)
 write_rds(resale_5yr_sf,'data/rds/resale_5yr_sf.rds')
 ```
+
+## 2.4 Overview Of Dataset
+
+```{r}
+colnames(resale_5yr_sf)
+```
+
+**Explanatory Variables:**
+
+Continuous
+
+-   Remaining Lease: `remaining_lease_total_months`
+
+-   Size of flat: `floor_area_sqft`
+
+-   Distance to transport: `distance_to_mrt_meters`
+
+-   Distance to amenities: `distance_to_pri_school_meters`
+
+-   Distance to central business district: `distance_to_cbd`
+
+Categorical
+
+-   Remaining Lease: `remaining_lease_period`
+
+-   Storey Height: `storey_range`
+
+-   Housing Type: `housing_type`
+
+**Dependent Variables:**
+
+-   Resale Price: `resale_price`, `price_per_sqft`
 
 # 3. Distribution
 
@@ -235,24 +278,26 @@ ggplot(count_data, aes(x = storey_range, y = count)) +
   theme_minimal()
 ```
 
-{r}
-colnames(resale_sf)
+```{r}
+resale_2020_sf <- resale_5yr_sf %>% filter (year(month) == 2020)
+resale_2021_sf <- resale_5yr_sf %>% filter (year(month) == 2021)
+resale_2022_sf <- resale_5yr_sf %>% filter (year(month) == 2022)
+resale_2023_sf <- resale_5yr_sf %>% filter (year(month) == 2023)
+resale_2024_sf <- resale_5yr_sf %>% filter (year(month) == 2024)
+```
 
-{r}
-resale_2020_sf \<- resale_sf %\>% filter (year(month) == 2020)
-resale_2021_sf \<- resale_sf %\>% filter (year(month) == 2021)
-resale_2022_sf \<- resale_sf %\>% filter (year(month) == 2022)
-resale_2023_sf \<- resale_sf %\>% filter (year(month) == 2023)
-
-{r}
+```{r}
 tmap_mode('plot')
-tm_shape(mpsz)+
-tm_polygons()+
-tm_shape(resale_2023_sf)+
-tm_dots()
+tm_shape(mpsz%>% filter(PLN_AREA_N == 'ANG MO KIO'))+
+  tm_polygons()+
+tm_shape(resale_2023_sf %>% filter(planning_area_ura == 'ANG MO KIO'))+
+  tm_dots()
+```
 
-{r}
-tm_shape(mpsz)+
-tm_polygons()+
-tm_shape(resale_2022_sf)+
-tm_dots()
+```{r}
+tmap_mode('plot')
+tm_shape(mpsz%>% filter(PLN_AREA_N == 'ANG MO KIO'))+
+  tm_polygons()+
+tm_shape(resale_2024_sf %>% filter(planning_area_ura == 'ANG MO KIO'))+
+  tm_dots()
+```

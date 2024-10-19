@@ -521,6 +521,7 @@ The code chunk below is used to compute the proximity matrix using *euclidean* m
 
 ```{r}
 proxmat <- dist(shan_ict, method = 'euclidean')
+write_rds(proxmat, 'data/rds/proxmat.rds')
 ```
 
 The code chunk below can then be used to list the content of *proxmat* for visual inspection.
@@ -680,6 +681,8 @@ The code chunk below form the join in three steps:
 ```{r}
 shan_sf_cluster <- cbind(shan_sf, as.matrix(groups)) %>%
   rename(`CLUSTER`=`as.matrix.groups.`)
+
+write_rds(shan_sf_cluster, 'data/rds/shan_sf_cluster.rds')
 ```
 
 Next, *qtm()* of **tmap** package is used to plot the choropleth map showing the cluster formed.
