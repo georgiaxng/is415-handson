@@ -512,12 +512,12 @@ B 55 3025 76267.65 58260785 522016004</code></pre>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(shan.mst)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     [,1] [,2]      [,3]
-[1,]   24   34 113.80917
-[2,]   34   16 119.86993
-[3,]   16   13 131.67061
-[4,]   13   28  92.79567
-[5,]   28   12  78.78999
-[6,]   12   49  59.69478</code></pre>
+[1,]   30   27  57.60801
+[2,]   27   41  78.29342
+[3,]   30   51 108.37735
+[4,]   51   38 146.66661
+[5,]   41   39 162.80878
+[6,]   39   19  79.41836</code></pre>
 </div>
 </div>
 <p>The plot method for the MST include a way to show the observation numbers of the nodes in addition to the edge. As before, we plot this together with the township boundaries. We can see how the initial neighbour list is simplified to just one edge connecting each of the nodes, while passing through all the nodes.</p>
@@ -557,13 +557,13 @@ B 55 3025 76267.65 58260785 522016004</code></pre>
  $ groups      : num [1:55] 3 3 6 3 3 3 3 3 3 3 ...
  $ edges.groups:List of 6
   ..$ :List of 3
-  .. ..$ node: num [1:22] 13 48 45 55 52 37 34 16 25 24 ...
-  .. ..$ edge: num [1:21, 1:3] 48 55 45 37 34 34 52 25 16 13 ...
-  .. ..$ ssw : num 3423
-  ..$ :List of 3
   .. ..$ node: num [1:18] 47 27 53 38 42 15 41 51 43 32 ...
   .. ..$ edge: num [1:17, 1:3] 53 15 42 38 41 51 15 27 15 43 ...
   .. ..$ ssw : num 3759
+  ..$ :List of 3
+  .. ..$ node: num [1:22] 13 48 54 55 45 37 34 16 25 52 ...
+  .. ..$ edge: num [1:21, 1:3] 48 55 54 37 34 16 45 25 13 13 ...
+  .. ..$ ssw : num 3423
   ..$ :List of 3
   .. ..$ node: num [1:11] 2 6 8 1 36 4 10 9 46 5 ...
   .. ..$ edge: num [1:10, 1:3] 6 1 8 36 4 6 8 10 10 9 ...
@@ -595,8 +595,8 @@ B 55 3025 76267.65 58260785 522016004</code></pre>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ccs6 <span class="ot">&lt;-</span> clust6<span class="sc">$</span>groups</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>ccs6</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] 3 3 6 3 3 3 3 3 3 3 2 1 1 1 2 1 1 1 2 4 1 2 5 1 1 1 2 1 2 2 1 2 2 1 1 3 1 2
-[39] 2 2 2 2 2 4 1 3 2 1 1 1 2 1 2 1 1</code></pre>
+<pre><code> [1] 3 3 6 3 3 3 3 3 3 3 1 2 2 2 1 2 2 2 1 4 2 1 5 2 2 2 1 2 1 1 2 1 1 2 2 3 2 1
+[39] 1 1 1 1 1 4 2 3 1 2 2 2 1 2 1 2 2</code></pre>
 </div>
 </div>
 <p>We can find out how many observations are in each cluster by means of the table command. Parenthetially, we can also find this as the dimension of each vector in the lists contained in edges.groups. For example, the first list has node with dimension 12, which is also the number of observations in the first cluster.</p>
@@ -605,7 +605,7 @@ B 55 3025 76267.65 58260785 522016004</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>ccs6
  1  2  3  4  5  6 
-22 18 11  2  1  1 </code></pre>
+18 22 11  2  1  1 </code></pre>
 </div>
 </div>
 <p>Lastly, we can also plot the pruned tree that shows the five clusters on top of the townshop area.</p>

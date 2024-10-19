@@ -8,7 +8,6 @@ execute:
   echo: true
   warning: false
   freeze: true
-  cache: true
 format:
   html:
     code-fold: false
@@ -233,7 +232,7 @@ Categorical
 
 # 3. Distribution
 
-##  3.1 Lease Range
+## 3.1 Lease Range
 
 ```{r}
 # Create a summary of counts for each remaining lease range
