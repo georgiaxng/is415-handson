@@ -8,6 +8,7 @@ execute:
   echo: true
   warning: false
   freeze: true
+  cache: true
 format:
   html:
     code-fold: false
@@ -28,7 +29,7 @@ format:
 Here, we have loaded the following packages:
 
 ```{r}
-pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2)
+pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2, spatstat)
 ```
 
 # 2. The Data
@@ -47,9 +48,13 @@ For this project, we will be using the following data sets.
 
         4.  the URA planning area (or town) of the flat.
 
+-   MP
+
+-   HDB Property Info from [data.gov.sg](https://data.gov.sg/collections/150/view)
+
 ## 2.1 Importing Geospatial Data
 
-The code chunk below is used to import *MP_SUBZONE_WEB_PL* shapefile by using `st_read()` of **sf**packages.
+The code chunk below is used to import *MP_SUBZONE_WEB_PL* shapefile by using `st_read()` of **sf**packages.
 
 ```{r}
 mpsz <- st_read(dsn = "data/geospatial/MasterPlan2014SubzoneBoundaryWebSHP/", layer = "MP14_SUBZONE_WEB_PL")
@@ -63,6 +68,8 @@ plot(mpsz)
 
 ## 2.2 Importing Aspatial Data
 
+### 2.2.1 Importing Resale Flat Prices
+
 The code chunk below is used to import the Resale Flat Prices dataset from Kaggle.
 
 ```{r}
@@ -74,7 +81,7 @@ To get a brief overview of existing columns of this dataset, we can use `colname
 ```{r}
 colnames(resale_df)
 ```
-
+#### 2.2.1.1 CRS Adjustments
 Another important step after importing the dataset is checking the coordinate system used, as seen in the result below using `st_crs()`, we can see that there is no CRS.
 
 ```{r}
@@ -97,6 +104,12 @@ st_crs(resale_sf)
 
 ```{r}
 head(resale_df)
+```
+
+### 2.2.2 Importing HDB Property Information
+
+```{r}
+hdb_info_df <- read_csv('data/aspatial/HDB Property Information.csv')
 ```
 
 ## 2.3 Data Wrangling
@@ -184,14 +197,60 @@ resale_sf <- resale_sf %>%
 
 ```{r}
 # Define columns to be removed
-columns_to_remove <- c("floor_area_sqm", "flat_model", "lease_commence_date", "remaining_lease", "blk_no", "road_name", "building", "address", "lease_commence_date_r", "postal")
+columns_to_remove <- c("floor_area_sqm", "flat_model", "lease_commence_date", "remaining_lease", "blk_no", "road_name", "building", "address", "lease_commence_date_r", "postal","...1")
 
 # Remove columns only if they exist in the dataframe
 resale_sf <- resale_sf %>%
   dplyr::select(-all_of(columns_to_remove[columns_to_remove %in% names(resale_sf)]))
 ```
 
-### 2.3.4 Time Period Selection for Analysis
+### 2.3.4 Adjustments to Storey Ranges
+Through the histogram of the storey ranges, we can observe a right skewed distribution which shows that higher storeys are of a much lower frequency among resale flats. This is likely due to the fact that most HDB flats in Singapore are lower-rise buildings.
+
+```{r, fig.width=12}
+# Create a summary of counts for each remaining lease range
+count_data <- resale_sf %>%
+  group_by(storey_range) %>%
+  summarise(count = n())
+
+# Create the bar plot with labels
+ggplot(count_data, aes(x = storey_range, y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue") + 
+  geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars
+  labs(title = "Count of Storey Range",
+       x = "Storey Range",
+       y = "Count") +
+  theme_minimal()
+```
+
+Here is a summary of the maximum floor levels of all the HDB flats in Singapore. As shown here we can observe that both the mean and median maximum floor is a mere 12.
+
+```{r}
+summary(hdb_info_df$max_floor_lvl)
+```
+
+Thus, to simplify our analysis and make the visualization easier to interpret, we can combine the higher storey ranges into a single broader range. In particular, we will group the floors 16 or higher together to form the 16+ floors range.
+```{r}
+resale_sf <- resale_sf %>%
+    mutate(storey_range_grouped = case_when(
+        storey_range %in% c("01 TO 03", "04 TO 06", "07 TO 09", "10 TO 12", "13 TO 15") ~ storey_range,
+        storey_range %in% c("16 TO 18", "19 TO 21", "22 TO 24", "25 TO 27", "28 TO 30", "31 TO 33", "34 TO 36", "37 TO 39", "40 TO 42", "43 TO 45", "46 TO 48", "49 TO 51") ~ "16+",
+        TRUE ~ storey_range
+    ))
+
+# Plot the grouped data
+ggplot(resale_sf, aes(x = storey_range_grouped)) +
+    geom_bar() +
+    geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+    labs(title = "Count of Storey Range (Grouped)",
+         x = "Storey Range",
+         y = "Count") +
+    theme_minimal()
+```
+### 2.3.5 Checking for NA values
+
+
+### 2.3.6 Time Period Selection for Analysis
 
 ```{r}
 resale_5yr_sf <- resale_sf %>% filter (year(month) >= 2020)
@@ -230,9 +289,12 @@ Categorical
 
 -   Resale Price: `resale_price`, `price_per_sqft`
 
-# 3. Distribution
+# 3. Shiny Storyboard 
+# 4. Distribution
 
-## 3.1 Lease Range
+## 4.1 Categorical Variables
+
+### 4.1.1 Remaining Lease Range
 
 ```{r}
 # Create a summary of counts for each remaining lease range
@@ -250,31 +312,73 @@ ggplot(count_data, aes(x = remaining_lease_range, y = count)) +
   theme_minimal()
 ```
 
-```{r}
-test <- resale_5yr_sf %>% filter(is.na(remaining_lease_range))
-test
-```
-
-## 3.2 Storey Range
-
-```{r}
-unique(resale_5yr_sf$storey_range)
-```
+### 4.1.2 Storey Range
 
 ```{r, fig.width=12}
 # Create a summary of counts for each remaining lease range
 count_data <- resale_5yr_sf %>%
-  group_by(storey_range) %>%
+  group_by(storey_range_grouped) %>%
   summarise(count = n())
 
 # Create the bar plot with labels
-ggplot(count_data, aes(x = storey_range, y = count)) +
+ggplot(count_data, aes(x = storey_range_grouped, y = count)) +
   geom_bar(stat = "identity", fill = "steelblue") + 
   geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars
   labs(title = "Count of Storey Range",
        x = "Storey Range",
        y = "Count") +
   theme_minimal()
+```
+
+### 4.1.3 Housing Type
+
+```{r}
+# Create a summary of counts for each remaining lease range
+count_data <- resale_5yr_sf %>%
+  group_by(housing_type) %>%
+  summarise(count = n())
+
+# Create the bar plot with labels
+ggplot(count_data, aes(x = housing_type, y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue") + 
+  geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars
+  labs(title = "Count of Housing Type",
+       x = "Housing Type",
+       y = "Count") +
+  theme_minimal()
+```
+
+# Bivariate Analysis
+
+# Correlation Matrix
+
+
+# Drafts
+
+```{r, fig.width=12}
+lease_storey_table <- table(resale_5yr_sf$storey_range_grouped, resale_5yr_sf$remaining_lease_range)
+lease_storey_df <- as.data.frame(lease_storey_table)
+
+# Heatmap with ggplot
+ggplot(lease_storey_df, aes(Var1, Var2, fill = Freq)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +
+  labs(title = "Heatmap: Storey Range vs. Remaining Lease Range",
+       x = "Storey Range",
+       y = "Remaining Lease Range") +
+  theme_minimal()
+```
+
+```{r}
+mpsz_main <- st_union(mpsz) %>%
+    st_cast("POLYGON")
+mpsz_main <- mpsz_main[c(12)]
+
+mpsz_owin <- as.owin(mpsz_main)
+```
+
+```{r}
+plot(mpsz_owin)
 ```
 
 ```{r}
@@ -299,4 +403,9 @@ tm_shape(mpsz%>% filter(PLN_AREA_N == 'ANG MO KIO'))+
   tm_polygons()+
 tm_shape(resale_2024_sf %>% filter(planning_area_ura == 'ANG MO KIO'))+
   tm_dots()
+```
+
+```{r}
+test <- resale_5yr_sf %>% filter(housing_type == 'EA/EM/6 Rm')
+test
 ```
