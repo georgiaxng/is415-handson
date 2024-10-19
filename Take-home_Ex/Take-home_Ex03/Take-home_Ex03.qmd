@@ -1,0 +1,258 @@
+---
+title: "Take Home Exercise 3"
+author: "Georgia Ng"
+date: "October 17, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+  cache: true
+format:
+  html:
+    code-fold: false
+    code-summary: "Click to view the code"
+    embed-resources: true
+---
+
+# 1. Overview
+
+## 1.1 Introduction
+
+## 1.2 My Responsibilities
+
+-   Data Preparation, Preprocessing
+
+## 1.3 Importing Packages
+
+Here, we have loaded the following packages:
+
+```{r}
+pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2)
+```
+
+# 2. The Data
+
+For this project, we will be using the following data sets.
+
+-   Singapore Resale Flat Prices (Jan-17 to Sep-24) from [Kaggle](https://www.kaggle.com/datasets/lzytim/hdb-resale-prices?select=resale_hdb_price_for_kaggle_2024-30sep.csv), an accumulation of information relating to the sale of Singapore's public housing apartments colloquially referred to as flats
+
+    -   This dataset augments the original dataset by including 4 important categories of information:
+
+        1.  X/Y lat/lng coordinates, which can be used for geospatial plotting.
+
+        2.  Information about the closest MRT station to the flat
+
+        3.  Information about the closest primary school to flat
+
+        4.  the URA planning area (or town) of the flat.
+
+## 2.1 Importing Geospatial Data
+
+The code chunk below is used to import *MP_SUBZONE_WEB_PL* shapefile by using `st_read()` of **sf**packages.
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial/MasterPlan2014SubzoneBoundaryWebSHP/", layer = "MP14_SUBZONE_WEB_PL")
+```
+
+Here is a plot of Singapore.
+
+```{r}
+plot(mpsz)
+```
+
+## 2.2 Importing Aspatial Data
+
+The code chunk below is used to import the Resale Flat Prices dataset from Kaggle.
+
+```{r}
+resale_df = read_csv('data/aspatial/resale_hdb_price_for_kaggle_2024-30sep.csv')
+```
+
+To get a brief overview of existing columns of this dataset, we can use `colnames()` to do so.
+
+```{r}
+colnames(resale_df)
+```
+
+Another important step after importing the dataset is checking the coordinate system used, as seen in the result below using `st_crs()`, we can see that there is no CRS.
+
+```{r}
+st_crs(resale_df)
+```
+
+Therefore, we need to convert the longitude and latitude columns into a spatial format. Since our dataset is based in Singapore and it uses the SVY21 coordinate reference system (CRS Code: 3414), we will use the `st_transform()` function to perform the conversion and create the geometry column.
+
+```{r}
+resale_sf <- resale_df %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326) %>%
+  st_transform(crs = 3414)
+```
+
+Using `st_crs()`, we can check and verify that the conversion is successful.
+
+```{r}
+st_crs(resale_sf)
+```
+
+```{r}
+head(resale_df)
+```
+
+## 2.3 Data Wrangling
+
+### 2.3.1 Adding Housing Type for Flats
+
+To assess whether the housing type influences the resale price of flats, we need to include this variable in our analysis. However, the current dataset lacks this information and thus we will be deriving it using other relevant variables. Specifically, we can use the floor area of the flats to determine the housing type, based on the guidelines provided on [data.gov.sg](https://www.data.com.sg/template-m.jsp?p=my/1.html).
+
+-   2 Rm (2 room HDB Flat). 1 bedroom with a built-in area of about 45 sq m or 485 sq ft.
+
+-   3 Rm (3 room HDB Flat). 2 bedrooms with a built-in area of about 70 sq m or 754 sq ft.
+
+-   4 Rm (4 room HDB Flat). 3 bedrooms with a built-in area of about 90 sq m or 969 sq ft.
+
+-   5 Rm (5 room HDB Flat). 3 bedrooms with a built-in area of about 110 sq m or 1,184 sq ft.
+
+-   EA (Executive Apartment). 3/4 bedrooms with built-in area of about 150 sqm or 1,615 sqft.
+
+-   EM (Executive Mansionette). Same as Executive apartment, except it has two levels.
+
+-   6 Rm (6 room HDB Flat). Jumbo flat joint by two 3 room flats
+
+Particularly, we will just group EA, EM and 6 rm flats into one category since there is no way for us right now to differentiate just by the size of the flats.
+
+This chunk of code below derives the housing type for each flat by using conditional statements to check if the stated floor area is closer to that of a particular housing type and add the value in the new column created using `mutate()`.
+
+```{r}
+resale_sf <- resale_sf %>%
+  mutate(housing_type = case_when(
+    floor_area_sqft <= 619 ~ "2 Rm",  # Closer to 485 sqft
+    floor_area_sqft > 619 & floor_area_sqft <= 862 ~ "3 Rm",  # Closer to 754 sqft
+    floor_area_sqft > 862 & floor_area_sqft <= 1076 ~ "4 Rm",  # Closer to 969 sqft
+    floor_area_sqft > 1076 & floor_area_sqft <= 1399 ~ "5 Rm",  # Closer to 1184 sqft
+    floor_area_sqft > 1399 & floor_area_sqft <= 1615 ~ "EA/EM/6 Rm",  # Closer to 1615 sqft
+  ))
+
+```
+
+### 2.3.2 Grouping Remaining Lease By Range
+
+First, let us convert the lease period from `chr` to total months. Below, we extract the different year and month from the string and then make the calculations to convert it to total months.
+
+```{r}
+# Function to convert lease period to total months
+convert_to_months <- function(lease) {
+  parts <- strsplit(lease, " ")[[1]]  # Split by space
+  years <- as.numeric(parts[1])        # Extract years
+  # Check if months are present
+  if (length(parts) > 2) {
+    months <- as.numeric(parts[3])       # Extract months if present
+  } else {
+    months <- 0                           # Set months to 0 if not present
+  }
+  
+  total_months <- years * 12 + months  # Convert to total months
+  return(total_months)
+}
+resale_sf <- resale_sf %>%
+  mutate(remaining_lease_total_months = sapply(remaining_lease, convert_to_months))
+
+```
+
+Using the number of total months, we can then get a brief overview of the remaining lease of the resale flat including the mins and max. In this case, we can see that the minimum number of months is 497 (ard 41 years) and maximum is 1173 (around 97 years). This information will later be useful in setting the ranges for the remaining lease.
+
+```{r}
+summary(resale_sf['remaining_lease_total_months'])
+```
+
+Since the minimum is 41 years, our date range can start from 40-49 years onwards.
+
+::: callout-note
+E.g. 40-49 years refers to 40 years 0 months to 49 years 11 months.
+:::
+
+```{r}
+# Define the ranges and labels
+breaks <- c(480, 600, 720, 840, 960, 1080, 1200)
+labels <- c( "40-49 years", "50-59 years", "60-69 years", "70-79 years", "80-89 years", "90-99 years")
+
+resale_sf <- resale_sf %>%
+  mutate(remaining_lease_range = cut(remaining_lease_total_months, breaks = breaks, labels = labels))
+```
+
+###  2.3.3 Time Period Selection for Analysis
+
+```{r}
+resale_5yr_sf <- resale_sf %>% filter (year(month) >= 2020)
+write_rds(resale_5yr_sf,'data/rds/resale_5yr_sf.rds')
+```
+
+# 3. Distribution
+
+##  3.1 Lease Range
+
+```{r}
+# Create a summary of counts for each remaining lease range
+count_data <- resale_5yr_sf %>%
+  group_by(remaining_lease_range) %>%
+  summarise(count = n())
+
+# Create the bar plot with labels
+ggplot(count_data, aes(x = remaining_lease_range, y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue") + 
+  geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars
+  labs(title = "Count of Remaining Lease Ranges",
+       x = "Remaining Lease Range",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r}
+test <- resale_5yr_sf %>% filter(is.na(remaining_lease_range))
+test
+```
+
+## 3.2 Storey Range
+
+```{r}
+unique(resale_5yr_sf$storey_range)
+```
+
+```{r, fig.width=12}
+# Create a summary of counts for each remaining lease range
+count_data <- resale_5yr_sf %>%
+  group_by(storey_range) %>%
+  summarise(count = n())
+
+# Create the bar plot with labels
+ggplot(count_data, aes(x = storey_range, y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue") + 
+  geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars
+  labs(title = "Count of Storey Range",
+       x = "Storey Range",
+       y = "Count") +
+  theme_minimal()
+```
+
+{r}
+colnames(resale_sf)
+
+{r}
+resale_2020_sf \<- resale_sf %\>% filter (year(month) == 2020)
+resale_2021_sf \<- resale_sf %\>% filter (year(month) == 2021)
+resale_2022_sf \<- resale_sf %\>% filter (year(month) == 2022)
+resale_2023_sf \<- resale_sf %\>% filter (year(month) == 2023)
+
+{r}
+tmap_mode('plot')
+tm_shape(mpsz)+
+tm_polygons()+
+tm_shape(resale_2023_sf)+
+tm_dots()
+
+{r}
+tm_shape(mpsz)+
+tm_polygons()+
+tm_shape(resale_2022_sf)+
+tm_dots()
