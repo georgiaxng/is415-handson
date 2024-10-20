@@ -29,7 +29,7 @@ format:
 Here, we have loaded the following packages:
 
 ```{r}
-pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2, spatstat)
+pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2, spatstat, jsonlite, units, matrixStats)
 ```
 
 # 2. The Data
@@ -48,12 +48,22 @@ For this project, we will be using the following data sets.
 
         4.  the URA planning area (or town) of the flat.
 
--   mpsz_sf
+-   Master Plan 2014 Subzone Boundary (Web) from data.gov.sg
 
 -   HDB Property Info from [data.gov.sg](https://data.gov.sg/collections/150/view)
 
+-   Hawker Centres Dataset from [data.gov.sg](https://data.gov.sg/datasets?formats=GEOJSON%7CKML%7CSHP%7CKMZ&sort=relevancy&page=1&resultId=d_4a086da0a5553be1d89383cd90d07ecd)
+
+-   Kindergarten, Childcare datasets from [OneMap API](https://www.onemap.gov.sg/apidocs/)
+
+-   Bus Stops Location from [LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop)
+
+-   Shopping Mall Coordinates from [Kaggle](https://www.kaggle.com/datasets/karthikgangula/shopping-mall-coordinates?resource=download)
+
 ## 2.1 Importing Geospatial Data
+
 ### 2.1.1 Importing Singapore Subzone Boundaries
+
 The code chunk below is used to import *MP_SUBZONE_WEB_PL* shapefile by using `st_read()` of **sf**packages.
 
 ```{r}
@@ -65,23 +75,138 @@ write_rds(mpsz_sf, 'data/rds/mpsz_sf.rds')
 st_crs(mpsz_sf)
 ```
 
-2.1.1.1 Checking Validity of Geometries
+#### 2.1.1.1 Checking Validity of Geometries
+
 Using st_is_valid, we can check to see whether all the polygons are valid or not. From the results, we can see a total of 9 not valid.
+
 ```{r}
 # checks for the number of geometries that are invalid
 length(which(st_is_valid(mpsz_sf) == FALSE))
 ```
+
 To rectify this, we can use `st_make_valid()` to correct these invalid geometries as demonstrated in the code chunk below.
+
 ```{r}
 mpsz_sf <- st_make_valid(mpsz_sf)
 length(which(st_is_valid(mpsz_sf) == FALSE))
 ```
 
-
 Here is a plot of Singapore.
 
 ```{r}
 plot(mpsz_sf)
+```
+
+### 2.1.2 Importing Kindergartens
+
+```{r}
+#| code-fold: true
+kindergarten_json <- fromJSON("data/geospatial/kindergartens.json")
+
+kindergarten_cleaned <- kindergarten_json$SrchResults[-1, ]
+
+kindergarten_df <- data.frame(
+  NAME = kindergarten_cleaned$NAME,
+  latitude = sapply(kindergarten_cleaned$LatLng, function(x) as.numeric(unlist(strsplit(x, ","))[1])),
+  longitude = sapply(kindergarten_cleaned$LatLng, function(x) as.numeric(unlist(strsplit(x, ","))[2]))
+)
+
+kindergarten_sf <- kindergarten_df %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326) %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+tmap_mode('plot')
+tm_shape(mpsz_sf) +
+  tm_polygons()+
+  tm_shape(kindergarten_sf) +
+  tm_dots()
+```
+
+### 2.1.3 Importing Childcare
+
+```{r}
+#| code-fold: true
+childcare_json <- fromJSON("data/geospatial/childcare.json")
+
+childcare_cleaned <- childcare_json$SrchResults[-1, ]
+
+childcare_df <- data.frame(
+  NAME = childcare_cleaned$NAME,
+  latitude = sapply(childcare_cleaned$LatLng, function(x) as.numeric(unlist(strsplit(x, ","))[1])),
+  longitude = sapply(childcare_cleaned$LatLng, function(x) as.numeric(unlist(strsplit(x, ","))[2]))
+)
+
+childcare_sf <- childcare_df %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326) %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+tmap_mode('plot')
+tm_shape(mpsz_sf) +
+  tm_polygons()+
+  tm_shape(childcare_sf) +
+  tm_dots()
+```
+
+### 2.1.4 Importing Hawker Centre
+
+```{r}
+hawker_sf <- st_read('data/geospatial/HawkerCentresGEOJSON.geojson')
+# Function to extract name from description
+extract_name <- function(description) {
+  if (!is.na(description)) {
+    # Use regular expression to extract the NAME 
+    name <- sub(".*<th>NAME</th> <td>(.*?)</td>.*", "\\1", description)
+    if (name == description) {
+      return(NA)  # Return NA if no match is found
+    }
+    return(name)
+  } else {
+    return(NA) 
+  }
+}
+
+# Apply the extraction function to every row
+hawker_sf <- hawker_sf %>%
+  mutate(Name = sapply(Description, extract_name)) %>% select (-Description)
+
+# Verify the results
+glimpse(hawker_sf)
+```
+
+As shown above, we can see that the geographic coordinate system for the hawker dataset is in WGS84 and has XYZ coordinates, among which contains the Z-coordinates we do not need. Thus, we can use `st_zm()` to remove the Z-coordinate and project it to the SVY21 coordiate system using `st_transform()`.
+
+```{r}
+hawker_sf <- st_zm(hawker_sf) %>%
+  st_transform(crs = 3414)
+
+head(hawker_sf)
+```
+
+```{r}
+tmap_mode('plot')
+tm_shape(mpsz_sf) +
+  tm_polygons()+
+  tm_shape(hawker_sf) +
+  tm_dots()
+```
+
+### 2.1.5 Importing Bus Stops
+
+```{r}
+busstop_sf <- st_read(dsn = "data/geospatial/BusStopLocation_Jul2024/", layer = "BusStop")%>%
+  st_transform(crs = 3414)
+```
+
+### 2.1.6 Importing Shopping Malls
+
+```{r}
+shoppingmall_sf <- read_csv('data/geospatial/shopping_mall_coordinates.csv') %>%
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs=4326) %>%
+  st_transform(crs = 3414)
 ```
 
 ## 2.2 Importing Aspatial Data
@@ -99,7 +224,9 @@ To get a brief overview of existing columns of this dataset, we can use `colname
 ```{r}
 colnames(resale_df)
 ```
+
 #### 2.2.1.1 CRS Adjustments
+
 Another important step after importing the dataset is checking the coordinate system used, as seen in the result below using `st_crs()`, we can see that there is no CRS.
 
 ```{r}
@@ -123,13 +250,22 @@ st_crs(resale_sf)
 ```{r}
 head(resale_df)
 ```
+
 #### 2.2.1.2 Checking for NA values
+
 This chunk of code checks the dataset for any na values in all of the columns. As shown below, there is none.
+
 ```{r}
 resale_sf %>%
   summarise(across(everything(), ~ sum(is.na(.)))) -> extra_NA 
 extra_NA
 ```
+
+#### 2.2.1.3 Time Period Selection
+```{r}
+resale_sf <- resale_sf %>% filter (year(month) >= 2020)
+```
+
 
 ### 2.2.2 Importing HDB Property Information
 
@@ -176,6 +312,7 @@ resale_sf <- resale_sf %>%
 ## 3.2 Remaining Lease
 
 ### 3.2.1 Grouping Remaining Lease By Range
+
 First, let us convert the lease period from `chr` to total months. Below, we extract the different year and month from the string and then make the calculations to convert it to total months.
 
 ```{r}
@@ -220,6 +357,7 @@ resale_sf <- resale_sf %>%
 ```
 
 ### 3.2.2 Converting Remaining Lease to Year
+
 ```{r}
 # Function to convert lease period to total years
 convert_to_years <- function(lease) {
@@ -242,7 +380,6 @@ resale_sf <- resale_sf %>%
 
 ```
 
-
 ## 3.3 Removal of Redundant Columns
 
 ```{r}
@@ -255,7 +392,9 @@ resale_sf <- resale_sf %>%
 ```
 
 ## 3.4 Storey Ranges
+
 ### 3.4.1 Grouping of High Storeys
+
 Through the histogram of the storey ranges, we can observe a right skewed distribution which shows that higher storeys are of a much lower frequency among resale flats. This is likely due to the fact that most HDB flats in Singapore are lower-rise buildings.
 
 ```{r, fig.width=12}
@@ -280,9 +419,10 @@ Here is a summary of the maximum floor levels of all the HDB flats in Singapore.
 summary(hdb_info_df$max_floor_lvl)
 ```
 
-Thus, to simplify our analysis and make the visualization easier to interpret, we can combine the higher storey ranges into a single broader range. In particular, we will group the floors 16 or higher together to form the 16+ floors range. As seen below, the results are 6 categories of storey ranges. 
+Thus, to simplify our analysis and make the visualization easier to interpret, we can combine the higher storey ranges into a single broader range. In particular, we will group the floors 16 or higher together to form the 16+ floors range. As seen below, the results are 6 categories of storey ranges.
 
 Note: storey_range_grouped is duplicated twice so that one column can be used for the subsequent dummy coding of the storey ranges which will later be replaced.
+
 ```{r}
 resale_sf <- resale_sf %>%
     mutate(storey_range_grouped = case_when(
@@ -305,10 +445,13 @@ ggplot(resale_sf, aes(x = storey_range_grouped)) +
          y = "Count") +
     theme_minimal()
 ```
+
 ### 3.4.2 Dummy Coding of Storey Ranges
+
 To convert categorical variables into a numerical format that can be easily used in regression models, we can perform dummy coding which is basically statistical technique involving creating binary (0 or 1) variables for each category of a categorical variable, allowing the model to interpret and analyze categorical data.
 
-For e.g. if a flat falls within the "01 TO 03" storey range, the corresponding dummy variable is coded as 1, and all others are coded as 0 ([1,0,0,0,0,0])
+For e.g. if a flat falls within the "01 TO 03" storey range, the corresponding dummy variable is coded as 1, and all others are coded as 0 (\[1,0,0,0,0,0\])
+
 ```{r}
 resale_sf <- resale_sf %>%
   pivot_wider(
@@ -317,24 +460,61 @@ resale_sf <- resale_sf %>%
 ) 
 ```
 
-```{r}
-glimpse(resale_sf)
-```
+## 3.5 Calculate Number of Amenities Within 1km & Proximity To Nearest Amenity
 
-## 3.5 
-
-
-## 3.6 Time Period Selection for Analysis
 
 ```{r}
-resale_5yr_sf <- resale_sf %>% filter (year(month) >= 2020)
-write_rds(resale_5yr_sf,'data/rds/resale_5yr_sf.rds')
+calculate_amenities_and_proximity <- function(dataset1, dataset2, name_of_col_amenities, name_of_col_proximity, radius) {
+  # Calculate distance matrix
+  dist_matrix <- st_distance(dataset1, dataset2) %>%
+    drop_units()
+  
+  # Calculate the number of amenities within the specified radius
+  dataset1[[name_of_col_amenities]] <- rowSums(dist_matrix <= radius)
+  
+  # Calculate the proximity to the nearest amenity
+  dataset1[[name_of_col_proximity]] <- rowMins(dist_matrix)
+  
+  return(dataset1)
+}
+
 ```
+
+
+```{r}
+#| eval: false
+resale_sf <- 
+  calculate_amenities_and_proximity(
+    resale_sf, kindergarten_sf, "no_of_kindergarten_500m", "prox_kindergarten", 500
+  ) %>%
+  calculate_amenities_and_proximity(
+    ., childcare_sf, "no_of_childcare_500m", "prox_childcare", 500
+  ) %>%
+  calculate_amenities_and_proximity(
+    ., hawker_sf, "no_of_hawker_500m", "prox_hawker", 500
+  ) %>%
+  calculate_amenities_and_proximity(
+    ., busstop_sf, "no_of_busstop_500m", "prox_busstop", 500
+  ) %>%
+  calculate_amenities_and_proximity(
+    ., shoppingmall_sf, "no_of_shoppingmall_1km", "prox_shoppingmall", 1000
+  )
+
+# Writing to RDS
+write_rds(resale_sf,'data/rds/resale_sf.rds')
+
+```
+
 
 # 4. Overview Of Dataset
 
 ```{r}
-colnames(resale_5yr_sf)
+resale_sf <- read_rds('data/rds/resale_sf.rds')
+```
+
+
+```{r}
+colnames(resale_sf)
 ```
 
 **Explanatory Variables:**
@@ -351,7 +531,7 @@ Continuous
 
 -   Distance to central business district: `distance_to_cbd`
 
--   Housing Type: `housing_type` 
+-   Housing Type: `housing_type`
 
 Categorical
 
@@ -359,14 +539,16 @@ Categorical
 
 -   Storey Height: `storey_range`
 
-
 **Dependent Variables:**
 
 -   Resale Price: `resale_price`, `price_per_sqft`
 
 # 3. Shiny Storyboard (EDA)
+
 ## 3.1 Distribution
+
 ## 3.2
+
 # 4. Distribution
 
 ## 4.1 Categorical Variables
@@ -375,7 +557,7 @@ Categorical
 
 ```{r}
 # Create a summary of counts for each remaining lease range
-count_data <- resale_5yr_sf %>%
+count_data <- resale_sf %>%
   group_by(remaining_lease_range) %>%
   summarise(count = n())
 
@@ -393,7 +575,7 @@ ggplot(count_data, aes(x = remaining_lease_range, y = count)) +
 
 ```{r, fig.width=12}
 # Create a summary of counts for each remaining lease range
-count_data <- resale_5yr_sf %>%
+count_data <- resale_sf %>%
   group_by(storey_range_grouped) %>%
   summarise(count = n())
 
@@ -411,7 +593,7 @@ ggplot(count_data, aes(x = storey_range_grouped, y = count)) +
 
 ```{r}
 # Create a summary of counts for each remaining lease range
-count_data <- resale_5yr_sf %>%
+count_data <- resale_sf %>%
   group_by(housing_type) %>%
   summarise(count = n())
 
@@ -429,11 +611,10 @@ ggplot(count_data, aes(x = housing_type, y = count)) +
 
 # Correlation Matrix
 
-
 # Drafts
 
 ```{r, fig.width=12}
-lease_storey_table <- table(resale_5yr_sf$storey_range_grouped, resale_5yr_sf$remaining_lease_range)
+lease_storey_table <- table(resale_sf$storey_range_grouped, resale_sf$remaining_lease_range)
 lease_storey_df <- as.data.frame(lease_storey_table)
 
 # Heatmap with ggplot
@@ -459,11 +640,11 @@ plot(mpsz_sf_owin)
 ```
 
 ```{r}
-resale_2020_sf <- resale_5yr_sf %>% filter (year(month) == 2020)
-resale_2021_sf <- resale_5yr_sf %>% filter (year(month) == 2021)
-resale_2022_sf <- resale_5yr_sf %>% filter (year(month) == 2022)
-resale_2023_sf <- resale_5yr_sf %>% filter (year(month) == 2023)
-resale_2024_sf <- resale_5yr_sf %>% filter (year(month) == 2024)
+resale_2020_sf <- resale_sf %>% filter (year(month) == 2020)
+resale_2021_sf <- resale_sf %>% filter (year(month) == 2021)
+resale_2022_sf <- resale_sf %>% filter (year(month) == 2022)
+resale_2023_sf <- resale_sf %>% filter (year(month) == 2023)
+resale_2024_sf <- resale_sf %>% filter (year(month) == 2024)
 ```
 
 ```{r}
@@ -483,6 +664,6 @@ tm_shape(resale_2024_sf %>% filter(planning_area_ura == 'ANG MO KIO'))+
 ```
 
 ```{r}
-test <- resale_5yr_sf %>% filter(housing_type == 'EA/EM/6 Rm')
+test <- resale_sf %>% filter(housing_type == 'EA/EM/6 Rm')
 test
 ```
