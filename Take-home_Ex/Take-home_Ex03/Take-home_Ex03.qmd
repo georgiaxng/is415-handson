@@ -533,6 +533,10 @@ Continuous
 
 -   Housing Type: `housing_type`
 
+-   Prox_to: 
+
+- 
+
 Categorical
 
 -   Remaining Lease: `remaining_lease_range`
