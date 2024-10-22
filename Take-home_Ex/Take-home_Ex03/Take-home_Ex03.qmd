@@ -310,6 +310,18 @@ tm_shape(mpsz_sf)+
   tm_dots(col='red')
 ```
 
+### 2.1.9 Inferring CBD
+Finally, let us factor in the proximity to the Central Business District - in the Downtown Core. For this, let us take the coordinates of Downtown Core to be the coordinates of the CBD:
+```{r}
+lat <- 1.287953
+lng <- 103.851784
+
+cbd_sf <- data.frame(lat, lng) %>%
+  st_as_sf(coords = c("lng", "lat"), crs=4326) %>%
+  st_transform(crs=3414)
+```
+
+
 ## 2.2 Importing Aspatial Data
 
 ### 2.2.1 Importing Rental Flat
@@ -437,7 +449,33 @@ rental_sf <- rental_sf %>%
   dplyr::select(-all_of(columns_to_remove[columns_to_remove %in% names(rental_sf)]))
 ```
 
-## 3.2 Calculate Number of Amenities Within 1km & Proximity To Nearest Amenity
+## 3.2 Filter By Flat Type
+
+Let us get an overview of the distributions of the housing types. As shown in the histogram, we can see that there is significantly less data for flat types like 1-room, 2-room, and executive housing.
+
+```{r}
+# Create a summary of counts for each remaining lease range
+count_data <- rental_sf %>%
+  group_by(flat_type) %>%
+  summarise(count = n())
+
+# Create the bar plot with labels
+ggplot(count_data, aes(x = flat_type, y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue") + 
+  geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars
+  labs(title = "Count of Flat Type",
+       x = "Flat Type",
+       y = "Count") +
+  theme_minimal()
+```
+
+Hence, we will focus on analyzing the 3-room, 4-room, and 5-room flats since they show a more substantial presence in the dataset compared to smaller flat types.
+
+```{r}
+rental_sf <- rental_sf %>% filter (flat_type == '3-ROOM' | flat_type == '4-ROOM' |flat_type == '5-ROOM' )
+```
+
+## 3.3 Calculate Number of Amenities Within 1km & Proximity To Nearest Amenity
 
 ```{r}
 #| code-fold: true
@@ -478,10 +516,13 @@ rental_sf <-
     ., shoppingmall_sf, "no_of_shoppingmall_1km", "prox_shoppingmall", 1000, TRUE
   ) %>% 
   calculate_amenities_and_proximity(
-    ., mrt_sf, "no_of_mrt_1km", "prox_mrt", 1000, FALSE
+    ., mrt_sf, "x", "prox_mrt", 1000, FALSE
   ) %>%
   calculate_amenities_and_proximity(
-    ., primarysch_sf, "no_of_pri_1km", "prox_prisch", 1000, FALSE
+    ., primarysch_sf, "x", "prox_prisch", 1000, FALSE
+  ) %>%
+  calculate_amenities_and_proximity(
+    ., cbd_sf, "x", "prox_cbd", 1000, FALSE
   )
 
 
@@ -495,31 +536,7 @@ rental_sf <- read_rds('data/rds/rental_sf.rds')
 head(rental_sf)
 ```
 
-## 3.3 Filter By Flat Type
 
-Let us get an overview of the distributions of the housing types. As shown in the histogram, we can see that there is significantly less data for flat types like 1-room, 2-room, and executive housing.
-
-```{r}
-# Create a summary of counts for each remaining lease range
-count_data <- rental_sf %>%
-  group_by(flat_type) %>%
-  summarise(count = n())
-
-# Create the bar plot with labels
-ggplot(count_data, aes(x = flat_type, y = count)) +
-  geom_bar(stat = "identity", fill = "steelblue") + 
-  geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars
-  labs(title = "Count of Flat Type",
-       x = "Flat Type",
-       y = "Count") +
-  theme_minimal()
-```
-
-Hence, we will focus on analyzing the 3-room, 4-room, and 5-room flats since they show a more substantial presence in the dataset compared to smaller flat types.
-
-```{r}
-rental_sf <- rental_sf %>% filter (flat_type == '3-ROOM' | flat_type == '4-ROOM' |flat_type == '5-ROOM' )
-```
 
 # 4. Overview Of Dataset
 
@@ -531,17 +548,13 @@ colnames(rental_sf)
 
 Continuous
 
--   Remaining Lease: `remaining_lease_total_months`
-
--   Size of flat: `floor_area_sqft`
-
 -   Distance to transport: `distance_to_mrt_meters`
 
 -   Distance to amenities: `distance_to_pri_school_meters`
 
 -   Distance to central business district: `distance_to_cbd`
 
--   Housing Type: `housing_type`
+-   Flat Type: `flat_type`
 
 -   Prox_to:
 
@@ -555,7 +568,7 @@ Categorical
 
 **Dependent Variables:**
 
--   rental Price: `rental_price`, `price_per_sqft`
+-   Monthly Rental: `monthly_rental`, `price_per_sqft`
 
 # 3. Shiny Storyboard (EDA)
 
