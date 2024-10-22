@@ -29,7 +29,7 @@ format:
 Here, we have loaded the following packages:
 
 ```{r}
-pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2, spatstat, jsonlite, units, matrixStats)
+pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2, spatstat, jsonlite, units, matrixStats, httr)
 ```
 
 # 2. The Data
@@ -262,10 +262,10 @@ extra_NA
 ```
 
 #### 2.2.1.3 Time Period Selection
-```{r}
-resale_sf <- resale_sf %>% filter (year(month) >= 2020)
-```
 
+```{r}
+resale_sf <- resale_sf %>% filter (year(month) == 2024)
+```
 
 ### 2.2.2 Importing HDB Property Information
 
@@ -426,13 +426,19 @@ Note: storey_range_grouped is duplicated twice so that one column can be used fo
 ```{r}
 resale_sf <- resale_sf %>%
     mutate(storey_range_grouped = case_when(
-        storey_range %in% c("01 TO 03", "04 TO 06", "07 TO 09", "10 TO 12", "13 TO 15") ~ storey_range,
-        storey_range %in% c("16 TO 18", "19 TO 21", "22 TO 24", "25 TO 27", "28 TO 30", "31 TO 33", "34 TO 36", "37 TO 39", "40 TO 42", "43 TO 45", "46 TO 48", "49 TO 51") ~ "16+",
+        storey_range %in% c("01 TO 03", "04 TO 06", "07 TO 09", "10 TO 12", "13 TO 15") ~ 
+            gsub("^0*([0-9]+) TO 0*([0-9]+)$", "floor_\\1_to_\\2", storey_range),  # Remove leading 0s
+        storey_range %in% c("16 TO 18", "19 TO 21", "22 TO 24", "25 TO 27", "28 TO 30", 
+                             "31 TO 33", "34 TO 36", "37 TO 39", "40 TO 42", 
+                             "43 TO 45", "46 TO 48", "49 TO 51") ~ "floor_16_and_above",
         TRUE ~ storey_range
     )) %>%
     mutate(storey_range_grouped_dummy = case_when(
-        storey_range %in% c("01 TO 03", "04 TO 06", "07 TO 09", "10 TO 12", "13 TO 15") ~ storey_range,
-        storey_range %in% c("16 TO 18", "19 TO 21", "22 TO 24", "25 TO 27", "28 TO 30", "31 TO 33", "34 TO 36", "37 TO 39", "40 TO 42", "43 TO 45", "46 TO 48", "49 TO 51") ~ "16+",
+        storey_range %in% c("01 TO 03", "04 TO 06", "07 TO 09", "10 TO 12", "13 TO 15") ~ 
+            gsub("^0*([0-9]+) TO 0*([0-9]+)$", "floor_\\1_to_\\2", storey_range),  # Remove leading 0s
+        storey_range %in% c("16 TO 18", "19 TO 21", "22 TO 24", "25 TO 27", "28 TO 30", 
+                             "31 TO 33", "34 TO 36", "37 TO 39", "40 TO 42", 
+                             "43 TO 45", "46 TO 48", "49 TO 51") ~ "floor_16_and_above", # Change format for 16+
         TRUE ~ storey_range
     ))
 
@@ -462,7 +468,6 @@ resale_sf <- resale_sf %>%
 
 ## 3.5 Calculate Number of Amenities Within 1km & Proximity To Nearest Amenity
 
-
 ```{r}
 calculate_amenities_and_proximity <- function(dataset1, dataset2, name_of_col_amenities, name_of_col_proximity, radius) {
   # Calculate distance matrix
@@ -479,7 +484,6 @@ calculate_amenities_and_proximity <- function(dataset1, dataset2, name_of_col_am
 }
 
 ```
-
 
 ```{r}
 #| eval: false
@@ -505,13 +509,11 @@ write_rds(resale_sf,'data/rds/resale_sf.rds')
 
 ```
 
-
 # 4. Overview Of Dataset
 
 ```{r}
 resale_sf <- read_rds('data/rds/resale_sf.rds')
 ```
-
 
 ```{r}
 colnames(resale_sf)
@@ -533,9 +535,9 @@ Continuous
 
 -   Housing Type: `housing_type`
 
--   Prox_to: 
+-   Prox_to:
 
-- 
+-   
 
 Categorical
 
