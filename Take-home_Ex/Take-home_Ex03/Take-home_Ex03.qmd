@@ -42,11 +42,11 @@ For this project, we will be using the following data sets.
 
 -   Hawker Centres Dataset from [data.gov.sg](https://data.gov.sg/datasets?formats=GEOJSON%7CKML%7CSHP%7CKMZ&sort=relevancy&page=1&resultId=d_4a086da0a5553be1d89383cd90d07ecd)
 
--   Kindergarten, Childcare Datasets from [OneMap API](https://www.onemap.gov.sg/apidocs/)
+-   Kindergarten, Childcare, Primary School Datasets from [OneMap API](https://www.onemap.gov.sg/apidocs/)
 
--   Bus Stops Location, MRT/ LRT Locations from [LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop)
+-   Bus Stops Location, MRT/ LRT Locations from [LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html)
 
--   Shopping Mall Coordinates through wikipedia and webscraping with the coordinates retrieved through OneMap API
+-   Shopping Malls Coordinates through wikipedia and webscraping with the coordinates retrieved through OneMap API
 
 ## 2.1 Importing Geospatial Data
 
@@ -58,6 +58,8 @@ The code chunk below is used to import *MP_SUBZONE_WEB_PL* shapefile by using `s
 mpsz_sf <- st_read(dsn = "data/geospatial/MasterPlan2014SubzoneBoundaryWebSHP/", layer = "MP14_SUBZONE_WEB_PL")
 write_rds(mpsz_sf, 'data/rds/mpsz_sf.rds')
 ```
+
+Using `st_crs`, we can check the coordinate system.
 
 ```{r}
 st_crs(mpsz_sf)
@@ -79,16 +81,16 @@ mpsz_sf <- st_make_valid(mpsz_sf)
 length(which(st_is_valid(mpsz_sf) == FALSE))
 ```
 
-Here is a plot of Singapore.
-
 ```{r}
+#| echo: false
 plot(mpsz_sf)
 ```
 
 ### 2.1.2 Importing Kindergartens
 
+This chunk of code imports the kindergartens data.
+
 ```{r}
-#| code-fold: true
 kindergarten_json <- fromJSON("data/geospatial/kindergartens.json")
 
 kindergarten_cleaned <- kindergarten_json$SrchResults[-1, ]
@@ -104,14 +106,11 @@ kindergarten_sf <- kindergarten_df %>%
   st_transform(crs = 3414)
 ```
 
-```{r}
-head(kindergarten_sf)
-```
-
 ### 2.1.3 Importing Childcare
 
+This chunk of code imports the childcare data.
+
 ```{r}
-#| code-fold: true
 childcare_json <- fromJSON("data/geospatial/childcare.json")
 
 childcare_cleaned <- childcare_json$SrchResults[-1, ]
@@ -127,16 +126,17 @@ childcare_sf <- childcare_df %>%
   st_transform(crs = 3414)
 ```
 
-```{r}
-head(childcare_sf)
-```
-
 ### 2.1.4 Importing Hawker Centre
 
-Similarly here, we will use `st_read` to read the geojson information, however since the columns values are in the format of \`\<th\></th>\` etc we will need to use a regex which is what we have done below to extract the name of the hawker centres.
+Similarly here, we will use `st_read` to read the geojson information, however since the columns values are in the format of html code of '
+
+<th>
+
+<td>
+
+' etc we will need to use a function to apply a regex expression in order to extract the name of the hawker centres.
 
 ```{r}
-#| code-fold: true
 hawker_sf <- st_read('data/geospatial/HawkerCentresGEOJSON.geojson')
 # Function to extract name from description
 extract_name <- function(description) {
@@ -157,7 +157,10 @@ hawker_sf <- hawker_sf %>%
   mutate(Name = sapply(Description, extract_name)) %>% select (-Description)
 ```
 
+Here, we can see that the hawker centres are now appropriately named.
+
 ```{r}
+#| echo: false
 head(hawker_sf)
 ```
 
@@ -170,27 +173,18 @@ hawker_sf <- st_zm(hawker_sf) %>%
 head(hawker_sf)
 ```
 
-```{r}
-#| code-fold: true
-tmap_mode('plot')
-tm_shape(mpsz_sf) +
-  tm_polygons()+
-  tm_shape(hawker_sf) +
-  tm_dots(col='red')
-```
-
 ### 2.1.5 Importing Bus Stops
+
+Here we are importing the bus stop locations using `st_read` and also converting it to the SVY21 coordinate system.
 
 ```{r}
 busstop_sf <- st_read(dsn = "data/geospatial/BusStopLocation_Jul2024/", layer = "BusStop")%>%
   st_transform(crs = 3414)
 ```
 
-```{r}
-head(busstop_sf)
-```
-
 ### 2.1.6 Importing Shopping Malls
+
+Here we are importing the shopping mall locations using `read_csv` and also converting it to the SVY21 coordinate system.
 
 ```{r}
 shoppingmall_sf <- read_csv('data/geospatial/shopping_mall_coordinates.csv') %>%
@@ -198,17 +192,15 @@ shoppingmall_sf <- read_csv('data/geospatial/shopping_mall_coordinates.csv') %>%
   st_transform(crs = 3414)
 ```
 
-```{r}
-head(shoppingmall_sf)
-```
-
 ### 2.1.7 Importing MRT
+
+Here we are importing the mrt locations using `st_read`.
 
 ```{r}
 mrt_sf <- st_read(dsn = "data/geospatial/TrainStation_Jul2024/", layer = "RapidTransitSystemStation")
 ```
 
-Having imported the dataset, we will now need to check for both invalid geometries and NA values before proceeding. The chunk of code detects not only these but also resolves it.
+Having imported the dataset, we will now need to check for both invalid geometries and NA values before proceeding. The chunk of code below detects not only these but also resolves it. The final printed result shows that all geometries are now valid.
 
 ```{r}
 # Check for invalid geometries and NA values
@@ -231,14 +223,6 @@ mrt_sf <- mrt_sf %>%
   st_transform(crs = 3414)
 ```
 
-```{r}
-tmap_mode('plot')
-tm_shape(mpsz_sf)+
-  tm_polygons() +
-  tm_shape(mrt_sf) +
-  tm_dots(col='red')
-```
-
 ### 2.1.8 Importing Primary School
 
 This chunk of code imports the primary school dataset from data.gov.sg and uses the `select()` function to select the relevant columns through the input of the column numbers.
@@ -248,6 +232,8 @@ primarysch_df = read_csv('data/geospatial/Generalinformationofschools.csv') %>% 
 ```
 
 #### 2.1.8.1 Geocoding Primary School Data using OneMap API
+
+Since this dataset only has the addresses and not the actual coordinates, we will need to use the OneMapAPI to geocode these addresses. This chunk of code contains a function whereby the OneMapApi is called upon and returns the actual latitude and longitude of the addresses inputted.
 
 ```{r}
 #| code-fold: true
@@ -270,6 +256,8 @@ geocode <- function(address, postal) {
 }
 ```
 
+This chunk of code creates two columns for latitude and longitude and sets the default values to 0. Then it loops through every single row of the primary school dataset and calls upon the above function to populate the respective latitude and longitude values for each row.
+
 ```{r}
 #| code-fold: true
 #| eval: false
@@ -289,7 +277,7 @@ write_rds(primarysch_df, 'data/rds/geocoded_primarysch.rds')
 As shown below, using `head()` we can see that the new columns for lat and long has been added with the values fetched using the OneMap API.
 
 ```{r}
-head(primarysch_df)
+glimpse(primarysch_df)
 ```
 
 Using `read_rds`, we can access the already processed and geocoded data from rds without needing to run through the geocoding function again. Since the data is in the WGS coordinate system, we can use `st_transform()` to project it to the `SVY21` coordinate system we will be using.
@@ -301,17 +289,10 @@ primarysch_sf <- primarysch_df %>%
   st_transform(crs = 3414)
 ```
 
-```{r}
-#| code-fold: true
-tmap_mode('plot')
-tm_shape(mpsz_sf)+
-  tm_polygons() +
-  tm_shape(primarysch_sf) +
-  tm_dots(col='red')
-```
-
 ### 2.1.9 Inferring CBD
+
 Finally, let us factor in the proximity to the Central Business District - in the Downtown Core. For this, let us take the coordinates of Downtown Core to be the coordinates of the CBD:
+
 ```{r}
 lat <- 1.287953
 lng <- 103.851784
@@ -321,12 +302,11 @@ cbd_sf <- data.frame(lat, lng) %>%
   st_transform(crs=3414)
 ```
 
-
 ## 2.2 Importing Aspatial Data
 
 ### 2.2.1 Importing Rental Flat
 
-The code chunk below is used to import the rental
+The code chunk below is used to import the rental data from data.gov.sg.
 
 ```{r}
 rental_df = read_csv('data/aspatial/RentingOutofFlats2024CSV.csv')
@@ -340,11 +320,15 @@ colnames(rental_df)
 
 #### 2.2.1.1 Converting `rent_approval_date` to a Valid Date Format
 
+Since the `rent_approval_date` is in the chr format, we will want to convert it to the date format so that we can later better access and use this variable. This is done so by the `ym()` as shown in the chunk of code below.
+
 ```{r}
 rental_df$rent_approval_date <- ym(rental_df$rent_approval_date)
 ```
 
-#### 2.2.1.2 Filtering For Selected Time Frame
+#### 2.2.1.2 Filtering For 2024
+
+Since the dataset is rather large, we want to size down our scope and instead focus on only the 2024 data, which in this case is from Jan 2024 to Sep 2024.
 
 ```{r}
 rental_df <- rental_df %>%
@@ -353,7 +337,10 @@ rental_df <- rental_df %>%
 
 #### 2.2.1.3 Geocoding Rental Flat Data Using OneMap API
 
+Like the primary school data, we face the similar problem here thus we will need to go through the geocoding process similarly to what we have done above. The geocoding function:
+
 ```{r}
+#| code-fold: true
 geocode <- function(block, streetname) {
   base_url <- "https://www.onemap.gov.sg/api/common/elastic/search"
   address <- paste(block, streetname, sep = " ")
@@ -373,6 +360,8 @@ geocode <- function(block, streetname) {
 }
 ```
 
+This chunk of code then calls upon the above function for every single row of the `rental_df` and writes it to the rds.
+
 ```{r}
 #| eval: false
 rental_df$LATITUDE <- 0
@@ -388,13 +377,15 @@ for (i in 1:nrow(rental_df)){
 write_rds(rental_df, 'data/rds/geocoded_rental_2024.rds')
 ```
 
+Without needing to run the above time-consuming method yet again, we can just read the data from the rds here.
+
 ```{r}
 rental_df <- read_rds('data/rds/geocoded_rental_2024.rds')
 ```
 
 #### 2.2.1.4 CRS Adjustments
 
-Another important step after importing the dataset is checking the coordinate system used, as seen in the result below using `st_crs()`, we can see that there is no CRS.
+Another important step after importing the dataset is checking the coordinate system used, as seen in the result below using `st_crs()`, we can see that there is no CRS stated for `rental_df`.
 
 ```{r}
 st_crs(rental_df)
@@ -415,15 +406,8 @@ st_crs(rental_sf)
 ```
 
 ```{r}
+#| echo: false
 head(rental_sf)
-```
-
-```{r}
-tmap_mode('plot')
-tm_shape(mpsz_sf) +
-  tm_polygons()+
-  tm_shape(rental_sf) +
-  tm_dots()
 ```
 
 #### 2.2.1.5 Checking for NA values
@@ -439,6 +423,8 @@ extra_NA
 # 3. Data Wrangling
 
 ## 3.1 Removal of Redundant Columns
+
+To increase efficiency and reduce the data size, we can remove columns we do not need like the `block` and `street_name` in which we have already utilised previously and now have no use for.
 
 ```{r}
 # Define columns to be removed
@@ -475,20 +461,77 @@ Hence, we will focus on analyzing the 3-room, 4-room, and 5-room flats since the
 rental_sf <- rental_sf %>% filter (flat_type == '3-ROOM' | flat_type == '4-ROOM' |flat_type == '5-ROOM' )
 ```
 
-## 3.3 Calculate Number of Amenities Within 1km & Proximity To Nearest Amenity
+## 3.3 Adding Region to Rental Data
+
+This chunk of code performs a left join with `mpsz_sf`to categorise the different flats into different regions in order to better understand the rental trends.
+
+### 3.3.1 Left Joining with `mpsz_sf`
+
+```{r}
+# Perform the left join by dropping the geometry from 'datab' and only bringing in 'region_n'
+rental_sf <- rental_sf %>%
+  left_join(st_drop_geometry(mpsz_sf) %>% select(PLN_AREA_N, REGION_N) %>% distinct(PLN_AREA_N, .keep_all = TRUE), 
+            by = c("town" = "PLN_AREA_N"))
+```
+
+### 3.3.2 Identifying Rows with NA values
+
+Then, let's perform a check to see if any of the rows have na values in the newly created column and display it. As shown here we can see that there are multiple rows in which the `town` column was unable to find a matching value in the `mpsz_sf` `PLN_AREA_N` column.
+
+```{r}
+rental_sf_with_na <- rental_sf %>%
+  filter(is.na(REGION_N))
+
+rental_sf_with_na
+```
+
+Using unique, we can identify the `town` values of these problematic rows and also the available regions in `mpsz_sf` so that we have a brief idea of what are the possible values we can later use. In particular, the problematic values are 'Kallang/Whampoa' and 'Central'.
+
+```{r}
+unique (rental_sf_with_na$town)
+unique(mpsz_sf$REGION_N)
+```
+
+Since the value is Kallang/Whampoa, let's try to find the region of either Kallang or Whampoa through the filter()\` function.
+
+```{r}
+test <- mpsz_sf%>% filter(PLN_AREA_N == 'KALLANG' | PLN_AREA_N == 'WHAMPOA') %>% select(PLN_AREA_N,REGION_N)
+test
+```
+
+While we can't find a match for Whampoa, we can see that Kallang falls under the Central Region. From the naming, we can also make the deduction that the town 'Central' likely falls under the same region. Thus by using a `if_else` statement we can assign the region Central Region to these towns.
+
+```{r}
+rental_sf <- rental_sf %>%
+  mutate(REGION_N = if_else(town == 'CENTRAL' | town == 'KALLANG/WHAMPOA', 'CENTRAL REGION', REGION_N))
+```
+
+Let us also rename the column to standardise the namings.
+
+```{r}
+rental_sf <- rental_sf %>% rename(region = REGION_N)
+```
+
+## 3.4 Calculate Number of Facilities Within A Certain Distance & Proximity To Nearest Facility
+
+Since the number of facilities within range and proximity to certain facilities are some of the most important factors of rental prices, it is important for us to include that in our analysis as well. Thus to do so we have the below function to made these calculations based on the locations of the different facilities' datasets we have imported compared with the individual rental flats themselves.
+
+::: callout-note
+Note: the calculateNumberOffacilities is a parameter used to indicate if the calculation of facilities for a particular facility is required.
+:::
 
 ```{r}
 #| code-fold: true
-calculate_amenities_and_proximity <- function(dataset1, dataset2, name_of_col_amenities, name_of_col_proximity, radius, calculateNumberOfAmenities) {
+calculate_facilities_and_proximity <- function(dataset1, dataset2, name_of_col_facilities, name_of_col_proximity, radius, calculateNumberOfFacilities) {
   # Calculate distance matrix
   dist_matrix <- st_distance(dataset1, dataset2) %>%
     drop_units()
   
-  if (calculateNumberOfAmenities){
-  # Calculate the number of amenities within the specified radius
-    dataset1[[name_of_col_amenities]] <- rowSums(dist_matrix <= radius)
+  if (calculateNumberOfFacilities){
+  # Calculate the number of facilities within the specified radius
+    dataset1[[name_of_col_facilities]] <- rowSums(dist_matrix <= radius)
   }
-  # Calculate the proximity to the nearest amenity
+  # Calculate the proximity to the nearest facility
   dataset1[[name_of_col_proximity]] <- rowMins(dist_matrix)
   
   return(dataset1)
@@ -496,32 +539,34 @@ calculate_amenities_and_proximity <- function(dataset1, dataset2, name_of_col_am
 
 ```
 
+The below chunk of code calls upon the `calculate_facilities_and_proximity()` based on the different parameters stated for each facility. We indicated for the mrt and primary school to not be included in the calculations for the count within a certain radius as the distance to such facilities has way more importance than the actual count of it which is usually one within a certain range since these facilities are more spread out.
+
 ```{r}
 #| code-fold: true
 #| eval: false
 rental_sf <- 
-  calculate_amenities_and_proximity(
+  calculate_facilities_and_proximity(
     rental_sf, kindergarten_sf, "no_of_kindergarten_500m", "prox_kindergarten", 500, TRUE
   ) %>%
-  calculate_amenities_and_proximity(
+  calculate_facilities_and_proximity(
     ., childcare_sf, "no_of_childcare_500m", "prox_childcare", 500, TRUE
   ) %>%
-  calculate_amenities_and_proximity(
+  calculate_facilities_and_proximity(
     ., hawker_sf, "no_of_hawker_500m", "prox_hawker", 500, TRUE
   ) %>%
-  calculate_amenities_and_proximity(
+  calculate_facilities_and_proximity(
     ., busstop_sf, "no_of_busstop_500m", "prox_busstop", 500, TRUE
   ) %>%
-  calculate_amenities_and_proximity(
+  calculate_facilities_and_proximity(
     ., shoppingmall_sf, "no_of_shoppingmall_1km", "prox_shoppingmall", 1000, TRUE
   ) %>% 
-  calculate_amenities_and_proximity(
+  calculate_facilities_and_proximity(
     ., mrt_sf, "x", "prox_mrt", 1000, FALSE
   ) %>%
-  calculate_amenities_and_proximity(
+  calculate_facilities_and_proximity(
     ., primarysch_sf, "x", "prox_prisch", 1000, FALSE
   ) %>%
-  calculate_amenities_and_proximity(
+  calculate_facilities_and_proximity(
     ., cbd_sf, "x", "prox_cbd", 1000, FALSE
   )
 
@@ -531,12 +576,12 @@ write_rds(rental_sf,'data/rds/rental_sf.rds')
 
 ```
 
+Likewise, to skip the whole time-consuming process, we can instead read the rds data using the below code.
+
 ```{r}
 rental_sf <- read_rds('data/rds/rental_sf.rds')
-head(rental_sf)
+glimpse(rental_sf)
 ```
-
-
 
 # 4. Overview Of Dataset
 
@@ -544,31 +589,25 @@ head(rental_sf)
 colnames(rental_sf)
 ```
 
+**Dependent Variables:**
+
+-   Monthly Rental: `monthly_rent`
+
 **Explanatory Variables:**
 
 Continuous
 
--   Distance to transport: `distance_to_mrt_meters`
+-   Prox\_ \[distance to closest\]: kindergarten, childcare, hawker, bus stops, shopping mall, mrt, primary schools, cbd
 
--   Distance to amenities: `distance_to_pri_school_meters`
-
--   Distance to central business district: `distance_to_cbd`
-
--   Flat Type: `flat_type`
-
--   Prox_to:
-
--   
+-   Count of xx within xx distance: `no_of_kindergarten_500m`, `no_of_childcare_500m`, `no_of_hawker_500m`, `no_of_busstop_500m`, `no_of_shoppingmall_1km`
 
 Categorical
 
--   Remaining Lease: `remaining_lease_range`
+-   Flat Type: `flat_type`
 
--   Storey Height: `storey_range`
+-   Town: `town`
 
-**Dependent Variables:**
-
--   Monthly Rental: `monthly_rental`, `price_per_sqft`
+-   Region: `region`
 
 # 3. Shiny Storyboard (EDA)
 
