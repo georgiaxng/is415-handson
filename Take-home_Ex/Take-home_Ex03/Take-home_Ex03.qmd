@@ -625,19 +625,25 @@ For my part I am in charge of the explanatory data analysis.
 
 ## 5.1 Histogram
 
+![](images/clipboard-2250997801.png){width="676"}
+
 ## 5.2 Chloropleth Map
+
+![](images/clipboard-2681238715.png){width="683"}
+
+## 5.3 Scatterplot
 
 # 6. Histograms
 
 For the histogram, the user will be given the options to:
 
--   Filter by: `month_year`, `flat_type`, `town`
+-   Filter by (Only for plot for continuous variables): `month_year`, `flat_type`, `town`
 
 -   Plot different variables: Categorical & Continuous
 
-## 4.1 Categorical Variables
+## 6.1 Categorical Variables
 
-### 4.1.1 Housing Type
+6.1.1 Plotting by count of data
 
 ```{r}
 # Create a summary of counts for each remaining lease range
@@ -653,6 +659,42 @@ ggplot(count_data, aes(x = flat_type, y = count)) +
        x = "Flat Type",
        y = "Count") +
   theme_minimal()
+```
+
+6.1.2 Plotting By Median Rental Price
+
+## 6.2 Continuous Variables
+
+```{r}
+selected_month = "2024 Jan"
+selected_flat_type = '3-ROOM'
+selected_town = 'ANG MO KIO'
+selected_plot_variable = 'monthly_rent'
+bin_number = 10
+# Filter based on params
+histo_filtered_rental_sf <- rental_sf %>%
+      mutate(year_month = format(rent_approval_date, "%Y %b")) %>%
+      filter (if (selected_month == "2024 Jan to Sep") {
+        TRUE  # No additional filtering by month
+      } else {
+        format(rent_approval_date, "%Y %b") == selected_month  # Filter by selected year-month
+      }) %>%
+      filter(flat_type == selected_flat_type) %>%
+      filter(town == selected_town)
+
+# Create the histogram with labels
+ggplot(histo_filtered_rental_sf,
+                  aes_string(x = selected_plot_variable)) +
+        geom_histogram(
+          bins = bin_number,
+          fill = "blue",
+          color = "black"
+        ) +  
+        labs(
+          title = paste("Histogram of", selected_plot_variable),
+          x = selected_plot_variable,
+          y = "Frequency"
+        )
 ```
 
 # 7. Chloropleth Mapping
@@ -735,13 +777,20 @@ qtm(chloropleth_data,
     fill = "median_rent")
 ```
 
-# Drafts
+# 8 Scatterplot
+
+For this, we will generate scatterplots for any pair of continuous variables the user chooses. Similar to the previous parts, we will also include filter options for the users to filter the data.
 
 ```{r}
-#| eval: false
-tmap_mode('plot')
-tm_shape(mpsz_sf%>% filter(PLN_AREA_N == 'ANG MO KIO'))+
+
+```
+
+# 9 Conclusion
+
+```{r}
+tmap_mode("view")
+tm_shape(mpsz_sf)+
   tm_polygons()+
-tm_shape(rental_sf %>% filter(planning_area_ura == 'ANG MO KIO'))+
+  tm_shape(rental_sf %>% filter(flat_type=='3-ROOM'))+
   tm_dots()
 ```
