@@ -1141,11 +1141,25 @@
     "text": "5.2 Chloropleth Map"
   },
   {
+    "objectID": "Take-home_Ex/Take-home_Ex03/Take-home_Ex03.html#scatterplot",
+    "href": "Take-home_Ex/Take-home_Ex03/Take-home_Ex03.html#scatterplot",
+    "title": "Take Home Exercise 3",
+    "section": "5.3 Scatterplot",
+    "text": "5.3 Scatterplot"
+  },
+  {
     "objectID": "Take-home_Ex/Take-home_Ex03/Take-home_Ex03.html#categorical-variables",
     "href": "Take-home_Ex/Take-home_Ex03/Take-home_Ex03.html#categorical-variables",
     "title": "Take Home Exercise 3",
-    "section": "4.1 Categorical Variables",
-    "text": "4.1 Categorical Variables\n\n4.1.1 Housing Type\n\n# Create a summary of counts for each remaining lease range\ncount_data &lt;- rental_sf %&gt;%\n  group_by(flat_type) %&gt;%\n  summarise(count = n())\n\n# Create the bar plot with labels\nggplot(count_data, aes(x = flat_type, y = count)) +\n  geom_bar(stat = \"identity\", fill = \"steelblue\") + \n  geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars\n  labs(title = \"Count of Flat Type\",\n       x = \"Flat Type\",\n       y = \"Count\") +\n  theme_minimal()"
+    "section": "6.1 Categorical Variables",
+    "text": "6.1 Categorical Variables\n6.1.1 Plotting by count of data\n\n# Create a summary of counts for each remaining lease range\ncount_data &lt;- rental_sf %&gt;%\n  group_by(flat_type) %&gt;%\n  summarise(count = n())\n\n# Create the bar plot with labels\nggplot(count_data, aes(x = flat_type, y = count)) +\n  geom_bar(stat = \"identity\", fill = \"steelblue\") + \n  geom_text(aes(label = count), vjust = -0.5, size = 4) +  # Add labels on top of the bars\n  labs(title = \"Count of Flat Type\",\n       x = \"Flat Type\",\n       y = \"Count\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\n6.1.2 Plotting By Median Rental Price"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex03/Take-home_Ex03.html#continuous-variables",
+    "href": "Take-home_Ex/Take-home_Ex03/Take-home_Ex03.html#continuous-variables",
+    "title": "Take Home Exercise 3",
+    "section": "6.2 Continuous Variables",
+    "text": "6.2 Continuous Variables\n\nselected_month = \"2024 Jan\"\nselected_flat_type = '3-ROOM'\nselected_town = 'ANG MO KIO'\nselected_plot_variable = 'monthly_rent'\nbin_number = 10\n# Filter based on params\nhisto_filtered_rental_sf &lt;- rental_sf %&gt;%\n      mutate(year_month = format(rent_approval_date, \"%Y %b\")) %&gt;%\n      filter (if (selected_month == \"2024 Jan to Sep\") {\n        TRUE  # No additional filtering by month\n      } else {\n        format(rent_approval_date, \"%Y %b\") == selected_month  # Filter by selected year-month\n      }) %&gt;%\n      filter(flat_type == selected_flat_type) %&gt;%\n      filter(town == selected_town)\n\n# Create the histogram with labels\nggplot(histo_filtered_rental_sf,\n                  aes_string(x = selected_plot_variable)) +\n        geom_histogram(\n          bins = bin_number,\n          fill = \"blue\",\n          color = \"black\"\n        ) +  \n        labs(\n          title = paste(\"Histogram of\", selected_plot_variable),\n          x = selected_plot_variable,\n          y = \"Frequency\"\n        )"
   },
   {
     "objectID": "Take-home_Ex/Take-home_Ex03/Take-home_Ex03.html#example-for-rented-flat-count",

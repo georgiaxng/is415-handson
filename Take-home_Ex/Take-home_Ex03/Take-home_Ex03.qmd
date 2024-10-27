@@ -786,11 +786,3 @@ For this, we will generate scatterplots for any pair of continuous variables the
 ```
 
 # 9 Conclusion
-
-```{r}
-tmap_mode("view")
-tm_shape(mpsz_sf)+
-  tm_polygons()+
-  tm_shape(rental_sf %>% filter(flat_type=='3-ROOM'))+
-  tm_dots()
-```
