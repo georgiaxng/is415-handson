@@ -37,7 +37,7 @@ pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2, spatstat, json
 
 For this project, we will be using the following data sets.
 
--   Singapore Rental Flat Prices (Jan-17 to Sep-24) from data.gov.sg
+-   Singapore Rental Flat Prices (Jan-17 to Sep-24) from data.gov.sg, we will only be using the data from 2024
 
 -   Master Plan 2014 Subzone Boundary (Web) from data.gov.sg
 
@@ -89,13 +89,15 @@ plot(mpsz_sf)
 
 #### 2.1.1.2 Grouping By Town
 
-Since our data is categorised by towns, it will be useful for us to have this done so as well.
+Since our data is categorised by towns, it will be useful for us to group the geometries like so as well so that we can later use this to
 
 ```{r}
 # Combine geometries by town in mpsz_sf
 combined_town_mpsz_sf <- mpsz_sf %>%
   group_by(PLN_AREA_N) %>%  # Group by town identifier
   summarize(geometry = st_union(geometry), .groups = 'drop')
+
+write_rds(combined_town_mpsz_sf, 'data/rds/mpsz_grped_by_town.rds')
 ```
 
 ### 2.1.2 Importing Kindergartens
@@ -619,13 +621,19 @@ Categorical
 
 # 5. Shiny Storyboard (EDA)
 
-For my part I am in charge of the explanatory data analysis. Thus, I will be
+For my part I am in charge of the explanatory data analysis.
 
 ## 5.1 Histogram
 
-## 5.2 Chloropeth Map for Rental Prices
+## 5.2 Chloropleth Map
 
-# 4. Histograms
+# 6. Histograms
+
+For the histogram, the user will be given the options to:
+
+-   Filter by: `month_year`, `flat_type`, `town`
+
+-   Plot different variables: Categorical & Continuous
 
 ## 4.1 Categorical Variables
 
@@ -647,19 +655,39 @@ ggplot(count_data, aes(x = flat_type, y = count)) +
   theme_minimal()
 ```
 
-# Chloropleth Mapping
+# 7. Chloropleth Mapping
+
+For the chloropleth map, the user will be given the options to:
+
+-   Filter by: `month_year` and `flat_type`
+
+-   Plot different variables: Median Monthly Rent, Rented Flat Count
+
+::: callout-note
+Note: As Kallang/Whampoa does not match any towns in `mpsz_sf`, we will map it to Kallang. On the other hand for the town 'Central', since we are not able to make any deduction based on this naming and it also does not match any values in `mpsz_sf`, we can only remove it from the chloropleth mapping.
+:::
+
+## 7.1 Example for Rented Flat Count
 
 ```{r}
+selected_month = "2024 Jan"
+selected_flat_type = '3-ROOM'
 # Dealing with Kallang/Whampoa & Central town which is not present in mpsz
 # Filter based on month and flat type
 ch_filtered_rental_sf <- rental_sf %>%
   mutate(town = if_else(town == 'KALLANG/WHAMPOA', 'KALLANG', town)) %>%   
-  filter(town != "CENTRAL") %>% filter (month(rent_approval_date) ==1 & flat_type == '5-ROOM')
+  filter(town != "CENTRAL") %>% 
+  filter (if (selected_month == "2024 Jan to Sep") {
+        TRUE  # No additional filtering by month
+      } else {
+        format(rent_approval_date, "%Y %b") == selected_month  # Filter by selected year-month
+      }) %>%
+      filter(flat_type == selected_flat_type)
   
 # Create chloropleth_data
 chloropleth_data <- ch_filtered_rental_sf  %>%
   group_by(town) %>%
-  summarize(event_count = n(), .groups = 'drop') %>%
+  summarize(rented_count = n(), .groups = 'drop') %>%
   st_drop_geometry() %>%
   right_join(combined_town_mpsz_sf, 
             by = c("town" = "PLN_AREA_N")) %>%
@@ -670,26 +698,44 @@ chloropleth_data <- ch_filtered_rental_sf  %>%
 ```{r}
 tmap_mode("view")
 qtm(chloropleth_data, 
-    fill = "event_count")
+    fill = "rented_count")
+```
+
+## 7.2 Example of Median Monthly Rent
+
+```{r}
+selected_month = "2024 Jan"
+selected_flat_type = '3-ROOM'
+# Dealing with Kallang/Whampoa & Central town which is not present in mpsz
+# Filter based on month and flat type
+ch_filtered_rental_sf <- rental_sf %>%
+  mutate(town = if_else(town == 'KALLANG/WHAMPOA', 'KALLANG', town)) %>%
+  filter(town != "CENTRAL") %>%
+  filter (if (selected_month == "2024 Jan to Sep") {
+    TRUE  # No additional filtering by month
+  } else {
+    format(rent_approval_date, "%Y %b") == selected_month  # Filter by selected year-month
+  }) %>%
+  filter(flat_type == selected_flat_type)
+
+# Create chloropleth_data
+chloropleth_data <- ch_filtered_rental_sf  %>%
+  group_by(town) %>%
+  summarize(median_rent = median(monthly_rent, na.rm = TRUE),
+            .groups = 'drop') %>%
+  st_drop_geometry() %>%
+  right_join(combined_town_mpsz_sf, by = c("town" = "PLN_AREA_N")) %>%
+  st_as_sf()  # Convert to sf object after joining
+
 ```
 
 ```{r}
-(n_distinct(rental_sf$town))
+tmap_mode("view")
+qtm(chloropleth_data, 
+    fill = "median_rent")
 ```
 
 # Drafts
-
-```{r}
-mpsz_sf_main <- st_union(mpsz_sf) %>%
-    st_cast("POLYGON")
-mpsz_sf_main <- mpsz_sf_main[c(12)]
-
-mpsz_sf_owin <- as.owin(mpsz_sf_main)
-```
-
-```{r}
-plot(mpsz_sf_owin)
-```
 
 ```{r}
 #| eval: false
