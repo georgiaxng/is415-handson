@@ -56,8 +56,8 @@ For this project, we will be using the following data sets.
 The code chunk below is used to import *MP_SUBZONE_WEB_PL* shapefile by using `st_read()` of **sf**packages.
 
 ```{r}
-mpsz_sf <- st_read(dsn = "data/geospatial/MasterPlan2014SubzoneBoundaryWebSHP/", layer = "MP14_SUBZONE_WEB_PL")
-write_rds(mpsz_sf, 'data/rds/mpsz_sf.rds')
+mpsz_sf <- st_read(dsn = "data/geospatial/MasterPlan2014SubzoneBoundaryWebSHP/", layer = "MP14_SUBZONE_WEB_PL") %>%
+  st_transform(crs = 3414)
 ```
 
 Using `st_crs`, we can check the coordinate system.
@@ -118,6 +118,7 @@ kindergarten_df <- data.frame(
 kindergarten_sf <- kindergarten_df %>%
   st_as_sf(coords = c("longitude", "latitude"), crs=4326) %>%
   st_transform(crs = 3414)
+
 ```
 
 ### 2.1.3 Importing Childcare
@@ -142,7 +143,13 @@ childcare_sf <- childcare_df %>%
 
 ### 2.1.4 Importing Hawker Centre
 
-Similarly here, we will use `st_read` to read the geojson information, however since the columns values are in the format of html code of '<th><td>' etc we will need to use a function to apply a regex expression in order to extract the name of the hawker centres.
+Similarly here, we will use `st_read` to read the geojson information, however since the columns values are in the format of html code of '
+
+<th>
+
+<td>
+
+' etc we will need to use a function to apply a regex expression in order to extract the name of the hawker centres.
 
 ```{r}
 hawker_sf <- st_read('data/geospatial/HawkerCentresGEOJSON.geojson')
@@ -308,6 +315,19 @@ lng <- 103.851784
 cbd_sf <- data.frame(lat, lng) %>%
   st_as_sf(coords = c("lng", "lat"), crs=4326) %>%
   st_transform(crs=3414)
+```
+
+### 2.1.10 Writing Into RDS
+
+```{r}
+write_rds(kindergarten_sf, 'data/rds/geospatial/kindergarten_sf.rds')
+write_rds(childcare_sf, 'data/rds/geospatial/childcare_sf.rds')
+write_rds(hawker_sf, 'data/rds/geospatial/hawker_sf.rds')
+write_rds(busstop_sf, 'data/rds/geospatial/busstop_sf.rds')
+write_rds(shoppingmall_sf, 'data/rds/geospatial/shoppingmall_sf.rds')
+write_rds(mrt_sf, 'data/rds/geospatial/mrt_sf.rds')
+write_rds(primarysch_sf, 'data/rds/geospatial/primarysch_sf.rds')
+write_rds(cbd_sf, 'data/rds/geospatial/cbd_sf.rds')
 ```
 
 ## 2.2 Importing Aspatial Data
@@ -625,13 +645,19 @@ For my part I am in charge of the explanatory data analysis.
 
 ## 5.1 Histogram
 
-![](images/clipboard-2250997801.png){width="676"}
+![](images/clipboard-2175309603.png)
 
-## 5.2 Chloropleth Map
+## 5.2 Choropleth Map
 
-![](images/clipboard-2681238715.png){width="683"}
+![](images/clipboard-544302462.png)
 
 ## 5.3 Scatterplot
+
+![](images/clipboard-186348156.png)
+
+## 5.4 Locations of Interest
+
+![](images/clipboard-755984476.png)
 
 # 6. Histograms
 
@@ -643,9 +669,10 @@ For the histogram, the user will be given the options to:
 
 ## 6.1 Categorical Variables
 
-6.1.1 Plotting by count of data
+### 6.1.1 Plotting by count of data
 
 ```{r}
+#| code-fold: true
 # Create a summary of counts for each remaining lease range
 count_data <- rental_sf %>%
   group_by(flat_type) %>%
@@ -661,11 +688,31 @@ ggplot(count_data, aes(x = flat_type, y = count)) +
   theme_minimal()
 ```
 
-6.1.2 Plotting By Median Rental Price
+### 6.1.2 Plotting By Median Rental Price
+
+```{r}
+#| code-fold: true
+# Get Median Rent Data
+median_rent_data <- rental_sf %>%
+  group_by(flat_type) %>%
+  summarise(median_rent = median(monthly_rent, na.rm = TRUE),
+        .groups = 'drop'
+  )
+
+# Create the bar plot with labels
+ggplot(median_rent_data, aes(x = flat_type, y = median_rent)) +
+  geom_bar(stat = "identity", fill = "steelblue") + 
+  geom_text(aes(label = median_rent), vjust = -0.5, size = 4) +  # Add labels on top of the bars
+  labs(title = "Median Rent of Different Flat Type",
+       x = "Flat Type",
+       y = "Median Rent") +
+  theme_minimal()
+```
 
 ## 6.2 Continuous Variables
 
 ```{r}
+#| code-fold: true
 selected_month = "2024 Jan"
 selected_flat_type = '3-ROOM'
 selected_town = 'ANG MO KIO'
@@ -697,16 +744,16 @@ ggplot(histo_filtered_rental_sf,
         )
 ```
 
-# 7. Chloropleth Mapping
+# 7. Choropleth Mapping
 
-For the chloropleth map, the user will be given the options to:
+For the choropleth map, the user will be given the options to:
 
 -   Filter by: `month_year` and `flat_type`
 
 -   Plot different variables: Median Monthly Rent, Rented Flat Count
 
 ::: callout-note
-Note: As Kallang/Whampoa does not match any towns in `mpsz_sf`, we will map it to Kallang. On the other hand for the town 'Central', since we are not able to make any deduction based on this naming and it also does not match any values in `mpsz_sf`, we can only remove it from the chloropleth mapping.
+Note: As Kallang/Whampoa does not match any towns in `mpsz_sf`, we will map it to Kallang. On the other hand for the town 'Central', since we are not able to make any deduction based on this naming and it also does not match any values in `mpsz_sf`, we can only remove it from the choropleth mapping.
 :::
 
 ## 7.1 Example for Rented Flat Count
@@ -726,8 +773,8 @@ ch_filtered_rental_sf <- rental_sf %>%
       }) %>%
       filter(flat_type == selected_flat_type)
   
-# Create chloropleth_data
-chloropleth_data <- ch_filtered_rental_sf  %>%
+# Create choropleth_data
+choropleth_data <- ch_filtered_rental_sf  %>%
   group_by(town) %>%
   summarize(rented_count = n(), .groups = 'drop') %>%
   st_drop_geometry() %>%
@@ -739,7 +786,7 @@ chloropleth_data <- ch_filtered_rental_sf  %>%
 
 ```{r}
 tmap_mode("view")
-qtm(chloropleth_data, 
+qtm(choropleth_data, 
     fill = "rented_count")
 ```
 
@@ -760,8 +807,8 @@ ch_filtered_rental_sf <- rental_sf %>%
   }) %>%
   filter(flat_type == selected_flat_type)
 
-# Create chloropleth_data
-chloropleth_data <- ch_filtered_rental_sf  %>%
+# Create choropleth_data
+choropleth_data <- ch_filtered_rental_sf  %>%
   group_by(town) %>%
   summarize(median_rent = median(monthly_rent, na.rm = TRUE),
             .groups = 'drop') %>%
@@ -773,7 +820,7 @@ chloropleth_data <- ch_filtered_rental_sf  %>%
 
 ```{r}
 tmap_mode("view")
-qtm(chloropleth_data, 
+qtm(choropleth_data, 
     fill = "median_rent")
 ```
 
@@ -782,7 +829,76 @@ qtm(chloropleth_data,
 For this, we will generate scatterplots for any pair of continuous variables the user chooses. Similar to the previous parts, we will also include filter options for the users to filter the data.
 
 ```{r}
-
+selected_month = "2024 Jan"
+selected_flat_type = '3-ROOM'
+selected_town = 'YISHUN'
+scatter_filtered_data <- rental_sf %>%
+      mutate(year_month = format(rent_approval_date, "%Y %b")) %>%
+      filter (if (selected_month == "2024 Jan to Sep") {
+        TRUE  # No additional filtering by month
+      } else {
+        format(rent_approval_date, "%Y %b") == selected_month  # Filter by selected year-month
+      }) %>%
+      filter(flat_type == selected_flat_type)%>%
+      filter(if (selected_town == 'all') TRUE else town == selected_town)
+ggplot(scatter_filtered_data,
+       aes(x = monthly_rent, y = prox_hawker)) +  # Refer to columns directly
+  geom_point(color = 'blue', size = 1) +
+  labs(
+    title = paste("Scatterplot of Monthly Rent vs. Proximity to Hawker"),
+    x = "Monthly Rent",
+    y = "Proximity to Hawker"
+  ) +
+  theme_minimal()
 ```
 
-# 9 Conclusion
+# 9 **Visualising Locations of Interest**
+
+Calibration Parameters:
+
+-   Town
+
+-   Plot Variable: Geospatial data including Kindergarten, Primary School etc
+
+Here is an example of how the user can visualise the locations of interest by inputting the town they want and also the categories of location (like bus stops, hawker centre locations etc).
+
+The below example is for Bus Stops in Yishun.
+
+```{r}
+# Filter for town boundaries in mpsz_sf
+specific_town_sf <- mpsz_sf %>% filter(PLN_AREA_N == 'YISHUN')
+
+# Performing a spatial intersection
+filtered_busstops <- st_intersection(busstop_sf, specific_town_sf)
+
+# Switch to interactive map mode
+tmap_mode('view')
+
+# Plot bus stops within Yishun
+tm_shape(filtered_busstops) +
+  tm_dots(col = 'red')
+```
+
+# 10 Final Result
+
+## 10.1 Histogram
+
+### 10.1.1 Continuous
+
+![](images/clipboard-2346678178.png)
+
+### 10.1.2 Categorical
+
+![](images/clipboard-1728895008.png)
+
+## 10.2 Choropleth Map
+
+![](images/clipboard-2622783023.png)
+
+## 10.3 Scatterplot
+
+![](images/clipboard-1900428479.png)
+
+## 10.4 Locations of Interest
+
+![](images/clipboard-4076469297.png)
