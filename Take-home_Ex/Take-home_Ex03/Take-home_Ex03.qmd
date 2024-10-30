@@ -20,6 +20,10 @@ format:
 
 ## 1.1 Introduction
 
+Recent MRT service breakdowns in Singapore have highlighted the importance of transportation accessibility for housing. This situation, combined with the rising influx of expats seeking rental housing, has intensified competition for well-located flats. As access to reliable public transport becomes a pivotal factor for potential renters, understanding its influence on rental prices is more critical than ever.
+
+With this project, we aim to provide individuals looking to rent a flat with a better understanding of how transportation accessibility and other local factors affect rental prices. By leveraging Geographically Weighted Regression (GWR), our analysis will help prospective renters make informed decisions, ultimately improving their housing choices in Singapore’s dynamic urban landscape.
+
 ## 1.2 My Responsibilities
 
 -   Data Preparation, Preprocessing
@@ -32,6 +36,28 @@ Here, we have loaded the following packages:
 ```{r}
 pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2, spatstat, jsonlite, units, matrixStats, httr)
 ```
+
+-   **sf**: Provides tools for handling and analyzing spatial vector data using simple features, facilitating operations like spatial joins, buffering, and transformations.
+
+-   **sfdep**: Adds spatial dependency features for the `sf` package, allowing for the analysis of spatial autocorrelation and other spatial dependencies.
+
+-   **tmap**: Used for creating and visualizing thematic maps, supporting both static and interactive mapping with various customization options.
+
+-   **tidyverse**: A collection of R packages designed for data science, including tools for data manipulation (dplyr), visualization (ggplot2), and tidying data (tidyr).
+
+-   **RColorBrewer**: Provides color palettes that are colorblind-friendly and designed for creating visually appealing maps and charts, suitable for categorical, sequential, and diverging data.
+
+-   **ggplot2**: A powerful system for creating static graphics in R, based on the grammar of graphics, allowing for highly customizable visualizations.
+
+-   **spatstat**: Offers tools for analyzing spatial point patterns, including functions for point process modeling, density estimation, and spatial statistics.
+
+-   **jsonlite**: Simplifies the process of working with JSON data in R, enabling easy conversion between JSON and R objects for data interchange and web APIs.
+
+-   **units**: Provides support for unit conversions in R, allowing for handling and manipulation of quantities with associated units (e.g., meters, feet) in a consistent way.
+
+-   **matrixStats**: Offers highly optimized functions for computing statistics on matrices, particularly useful for large datasets, enabling efficient calculations for row and column operations.
+
+-   **httr**: Simplifies working with HTTP requests in R, providing functions for sending requests, handling responses, and working with REST APIs.
 
 # 2. The Data
 
@@ -122,8 +148,6 @@ kindergarten_sf <- kindergarten_df %>%
 ```
 
 ### 2.1.3 Importing Childcare
-
-This chunk of code imports the childcare data.
 
 ```{r}
 childcare_json <- fromJSON("data/geospatial/childcare.json")
@@ -318,6 +342,8 @@ cbd_sf <- data.frame(lat, lng) %>%
 ```
 
 ### 2.1.10 Writing Into RDS
+
+To later use this for visualisation in our shiny app, we can use `write_rds` to store it.
 
 ```{r}
 write_rds(kindergarten_sf, 'data/rds/geospatial/kindergarten_sf.rds')
@@ -641,7 +667,7 @@ Categorical
 
 # 5. Shiny Storyboard (EDA)
 
-For my part I am in charge of the explanatory data analysis.
+Since I am in charge of the exploratory data analysis. sections for my group's shiny app, here is a brief overview of the storyboard of the visualisations we will be doing. This is not final and only serves as a guideline of how our app will look like.
 
 ## 5.1 Histogram
 
@@ -661,11 +687,19 @@ For my part I am in charge of the explanatory data analysis.
 
 # 6. Histograms
 
-For the histogram, the user will be given the options to:
+Continuous
 
--   Filter by (Only for plot for continuous variables): `month_year`, `flat_type`, `town`
+| Options                       | Values                            |
+|-------------------------------|-----------------------------------|
+| Filter                        | `month_year`, `flat_type`, `town` |
+| Choose Variables for Plotting | `monthly_rent`, `prox_hawker` etc |
 
--   Plot different variables: Categorical & Continuous
+Categorical
+
+| Options     | Values                                        |
+|-------------|-----------------------------------------------|
+| X variables | `flat_type`, rent_approval_date (month_year), |
+| Y variables | `frequency`, `median_rent`                    |
 
 ## 6.1 Categorical Variables
 
@@ -746,14 +780,13 @@ ggplot(histo_filtered_rental_sf,
 
 # 7. Choropleth Mapping
 
-For the choropleth map, the user will be given the options to:
-
--   Filter by: `month_year` and `flat_type`
-
--   Plot different variables: Median Monthly Rent, Rented Flat Count
+| Options                  | Values                                 |
+|--------------------------|----------------------------------------|
+| Filter                   | `month_year` and `flat_type`           |
+| Plot different variables | Median Monthly Rent, Rented Flat Count |
 
 ::: callout-note
-Note: As Kallang/Whampoa does not match any towns in `mpsz_sf`, we will map it to Kallang. On the other hand for the town 'Central', since we are not able to make any deduction based on this naming and it also does not match any values in `mpsz_sf`, we can only remove it from the choropleth mapping.
+Note: As Kallang/Whampoa does not match any towns in `mpsz_sf`, we will map it to Kallang. On the other hand for the town 'Central', since we are not able to make any deduction based on this naming and it also does not match any region values in `mpsz_sf`, we can only remove it from the choropleth mapping.
 :::
 
 ## 7.1 Example for Rented Flat Count
@@ -828,6 +861,12 @@ qtm(choropleth_data,
 
 For this, we will generate scatterplots for any pair of continuous variables the user chooses. Similar to the previous parts, we will also include filter options for the users to filter the data.
 
+| Options     | Values                                          |
+|-------------|-------------------------------------------------|
+| X variables | any continuous, eg `monthly_rent`, `prox_mrt`   |
+| Y variables | any continuous, eg `prox_hawker`, `prox_prisch` |
+| Filter      | `month_year`, `flat_type`, `town`               |
+
 ```{r}
 selected_month = "2024 Jan"
 selected_flat_type = '3-ROOM'
@@ -854,11 +893,10 @@ ggplot(scatter_filtered_data,
 
 # 9 **Visualising Locations of Interest**
 
-Calibration Parameters:
-
--   Town
-
--   Plot Variable: Geospatial data including Kindergarten, Primary School etc
+| Options                 | Values                                                             |
+|--------------------------|----------------------------------------------|
+| Filter by town          | `town`                                                             |
+| Geospatial data to plot | All geospatial datasets including Kindergarten, Primary School etc |
 
 Here is an example of how the user can visualise the locations of interest by inputting the town they want and also the categories of location (like bus stops, hawker centre locations etc).
 
@@ -881,7 +919,11 @@ tm_shape(filtered_busstops) +
 
 # 10 Final Result
 
+Below are the screenshots of the final results. While most of the inputs are dropdowns, I also tried incorporating other different inputs like radio and sliders to increase the variety.
+
 ## 10.1 Histogram
+
+With a histogram, the users can see the frequency and distribution of their selected variables.
 
 ### 10.1.1 Continuous
 
@@ -893,12 +935,22 @@ tm_shape(filtered_busstops) +
 
 ## 10.2 Choropleth Map
 
+The choropleth map on the other hand will provide them with a quick understanding of the spatial distribution of median rent and monthly rent across various towns **in** Singapore.
+
 ![](images/clipboard-2622783023.png)
 
 ## 10.3 Scatterplot
+
+With the scatterplot, we can easily see the relationship between pairs of variables and see how one correlates with another.
 
 ![](images/clipboard-1900428479.png)
 
 ## 10.4 Locations of Interest
 
+With this map, we can see the locations of different locations of interest that we have used to calculate values like the proximity to the nearest locations of interest and count of locations of interest within a certain radius.
+
 ![](images/clipboard-4076469297.png)
+
+# 11 Conclusion
+
+For my part, I tried to include filters wherever possible so that users can narrow down the data to find **specific insights tailored to their needs**. By allowing users to filter based on criteria such as flat type, rental prices, and geographic locations, they can focus on the most relevant information for their purposes. This functionality enhances the user experience by making the data exploration process more intuitive and efficient, enabling users to uncover trends and patterns that are directly applicable to their individual interests or decision-making processes.
