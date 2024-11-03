@@ -63,9 +63,9 @@ pacman::p_load(sf, sfdep, tmap, tidyverse, RColorBrewer, ggplot2, spatstat, json
 
 For this project, we will be using the following data sets.
 
--   Singapore Rental Flat Prices (Jan-17 to Sep-24) from data.gov.sg, we will only be using the data from 2024
+-   Singapore Rental Flat Prices (Jan-17 to Sep-24) from [data.gov.sg](https://data.gov.sg/datasets/d_c9f57187485a850908655db0e8cfe651/view)
 
--   Master Plan 2014 Subzone Boundary (Web) from data.gov.sg
+-   Master Plan 2014 Subzone Boundary (Web) from [data.gov.sg](https://data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view)
 
 -   Hawker Centres Dataset from [data.gov.sg](https://data.gov.sg/datasets?formats=GEOJSON%7CKML%7CSHP%7CKMZ&sort=relevancy&page=1&resultId=d_4a086da0a5553be1d89383cd90d07ecd)
 
