@@ -696,10 +696,10 @@ Continuous
 
 Categorical
 
-| Options     | Values                                        |
-|-------------|-----------------------------------------------|
-| X variables | `flat_type`, rent_approval_date (month_year), |
-| Y variables | `frequency`, `median_rent`                    |
+| Options     | Values                     |
+|-------------|----------------------------|
+| X variables | `flat_type`, `region`      |
+| Y variables | `frequency`, `median_rent` |
 
 ## 6.1 Categorical Variables
 
@@ -894,7 +894,7 @@ ggplot(scatter_filtered_data,
 # 9 **Visualising Locations of Interest**
 
 | Options                 | Values                                                             |
-|--------------------------|----------------------------------------------|
+|--------------------|----------------------------------------------------|
 | Filter by town          | `town`                                                             |
 | Geospatial data to plot | All geospatial datasets including Kindergarten, Primary School etc |
 
@@ -927,23 +927,23 @@ With a histogram, the users can see the frequency and distribution of their sele
 
 ### 10.1.1 Continuous
 
-![](images/clipboard-2346678178.png)
+![](images/clipboard-1713461402.png)
 
 ### 10.1.2 Categorical
 
-![](images/clipboard-1728895008.png)
+![](images/clipboard-1450392771.png)
 
 ## 10.2 Choropleth Map
 
 The choropleth map on the other hand will provide them with a quick understanding of the spatial distribution of median rent and monthly rent across various towns **in** Singapore.
 
-![](images/clipboard-2622783023.png)
+![](images/clipboard-3861265493.png)
 
 ## 10.3 Scatterplot
 
 With the scatterplot, we can easily see the relationship between pairs of variables and see how one correlates with another.
 
-![](images/clipboard-1900428479.png)
+![](images/clipboard-1548578381.png)
 
 ## 10.4 Locations of Interest
 
